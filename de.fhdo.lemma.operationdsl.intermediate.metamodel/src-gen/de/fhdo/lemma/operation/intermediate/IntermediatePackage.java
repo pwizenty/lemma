@@ -85,22 +85,22 @@ public interface IntermediatePackage extends EPackage {
 	int INTERMEDIATE_OPERATION_MODEL__IMPORTS = 1;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Container</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Containers</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_OPERATION_MODEL__INTERMEDIATE_CONTAINER = 2;
+	int INTERMEDIATE_OPERATION_MODEL__CONTAINERS = 2;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Infrastructure Node</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Infrastructure Nodes</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_OPERATION_MODEL__INTERMEDIATE_INFRASTRUCTURE_NODE = 3;
+	int INTERMEDIATE_OPERATION_MODEL__INFRASTRUCTURE_NODES = 3;
 
 	/**
 	 * The number of structural features of the '<em>Operation Model</em>' class.
@@ -140,40 +140,49 @@ public interface IntermediatePackage extends EPackage {
 	int INTERMEDIATE_OPERATION_NODE__NAME = 0;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Import</b></em>' reference list.
+	 * The feature id for the '<em><b>Imports</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_OPERATION_NODE__INTERMEDIATE_IMPORT = 1;
+	int INTERMEDIATE_OPERATION_NODE__IMPORTS = 1;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Operation Environment</b></em>' reference.
+	 * The feature id for the '<em><b>Operation Environment</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_OPERATION_NODE__INTERMEDIATE_OPERATION_ENVIRONMENT = 2;
+	int INTERMEDIATE_OPERATION_NODE__OPERATION_ENVIRONMENT = 2;
 
 	/**
-	 * The feature id for the '<em><b>Operation Microservice References</b></em>' reference list.
+	 * The feature id for the '<em><b>Deployed Services</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_OPERATION_NODE__OPERATION_MICROSERVICE_REFERENCES = 3;
+	int INTERMEDIATE_OPERATION_NODE__DEPLOYED_SERVICES = 3;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Service Deployment Specification</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Endpoints</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_OPERATION_NODE__INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION = 4;
+	int INTERMEDIATE_OPERATION_NODE__ENDPOINTS = 4;
+
+	/**
+	 * The feature id for the '<em><b>Specifications</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INTERMEDIATE_OPERATION_NODE__SPECIFICATIONS = 5;
 
 	/**
 	 * The number of structural features of the '<em>Operation Node</em>' class.
@@ -182,7 +191,7 @@ public interface IntermediatePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_OPERATION_NODE_FEATURE_COUNT = 5;
+	int INTERMEDIATE_OPERATION_NODE_FEATURE_COUNT = 6;
 
 	/**
 	 * The number of operations of the '<em>Operation Node</em>' class.
@@ -213,67 +222,67 @@ public interface IntermediatePackage extends EPackage {
 	int INTERMEDIATE_CONTAINER__NAME = INTERMEDIATE_OPERATION_NODE__NAME;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Import</b></em>' reference list.
+	 * The feature id for the '<em><b>Imports</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_CONTAINER__INTERMEDIATE_IMPORT = INTERMEDIATE_OPERATION_NODE__INTERMEDIATE_IMPORT;
+	int INTERMEDIATE_CONTAINER__IMPORTS = INTERMEDIATE_OPERATION_NODE__IMPORTS;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Operation Environment</b></em>' reference.
+	 * The feature id for the '<em><b>Operation Environment</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_CONTAINER__INTERMEDIATE_OPERATION_ENVIRONMENT = INTERMEDIATE_OPERATION_NODE__INTERMEDIATE_OPERATION_ENVIRONMENT;
+	int INTERMEDIATE_CONTAINER__OPERATION_ENVIRONMENT = INTERMEDIATE_OPERATION_NODE__OPERATION_ENVIRONMENT;
 
 	/**
-	 * The feature id for the '<em><b>Operation Microservice References</b></em>' reference list.
+	 * The feature id for the '<em><b>Deployed Services</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_CONTAINER__OPERATION_MICROSERVICE_REFERENCES = INTERMEDIATE_OPERATION_NODE__OPERATION_MICROSERVICE_REFERENCES;
+	int INTERMEDIATE_CONTAINER__DEPLOYED_SERVICES = INTERMEDIATE_OPERATION_NODE__DEPLOYED_SERVICES;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Service Deployment Specification</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Endpoints</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_CONTAINER__INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION = INTERMEDIATE_OPERATION_NODE__INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION;
+	int INTERMEDIATE_CONTAINER__ENDPOINTS = INTERMEDIATE_OPERATION_NODE__ENDPOINTS;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Deployment Technology Reference</b></em>' containment reference.
+	 * The feature id for the '<em><b>Specifications</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_CONTAINER__INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE = INTERMEDIATE_OPERATION_NODE_FEATURE_COUNT + 0;
+	int INTERMEDIATE_CONTAINER__SPECIFICATIONS = INTERMEDIATE_OPERATION_NODE__SPECIFICATIONS;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Endpoint</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Technology Reference</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_CONTAINER__INTERMEDIATE_ENDPOINT = INTERMEDIATE_OPERATION_NODE_FEATURE_COUNT + 1;
+	int INTERMEDIATE_CONTAINER__TECHNOLOGY_REFERENCE = INTERMEDIATE_OPERATION_NODE_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Operation Model</b></em>' container reference.
+	 * The feature id for the '<em><b>Operation Model</b></em>' container reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_CONTAINER__INTERMEDIATE_OPERATION_MODEL = INTERMEDIATE_OPERATION_NODE_FEATURE_COUNT + 2;
+	int INTERMEDIATE_CONTAINER__OPERATION_MODEL = INTERMEDIATE_OPERATION_NODE_FEATURE_COUNT + 1;
 
 	/**
 	 * The number of structural features of the '<em>Container</em>' class.
@@ -282,7 +291,7 @@ public interface IntermediatePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_CONTAINER_FEATURE_COUNT = INTERMEDIATE_OPERATION_NODE_FEATURE_COUNT + 3;
+	int INTERMEDIATE_CONTAINER_FEATURE_COUNT = INTERMEDIATE_OPERATION_NODE_FEATURE_COUNT + 2;
 
 	/**
 	 * The number of operations of the '<em>Container</em>' class.
@@ -313,85 +322,85 @@ public interface IntermediatePackage extends EPackage {
 	int INTERMEDIATE_INFRASTRUCTURE_NODE__NAME = INTERMEDIATE_OPERATION_NODE__NAME;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Import</b></em>' reference list.
+	 * The feature id for the '<em><b>Imports</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_IMPORT = INTERMEDIATE_OPERATION_NODE__INTERMEDIATE_IMPORT;
+	int INTERMEDIATE_INFRASTRUCTURE_NODE__IMPORTS = INTERMEDIATE_OPERATION_NODE__IMPORTS;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Operation Environment</b></em>' reference.
+	 * The feature id for the '<em><b>Operation Environment</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_OPERATION_ENVIRONMENT = INTERMEDIATE_OPERATION_NODE__INTERMEDIATE_OPERATION_ENVIRONMENT;
+	int INTERMEDIATE_INFRASTRUCTURE_NODE__OPERATION_ENVIRONMENT = INTERMEDIATE_OPERATION_NODE__OPERATION_ENVIRONMENT;
 
 	/**
-	 * The feature id for the '<em><b>Operation Microservice References</b></em>' reference list.
+	 * The feature id for the '<em><b>Deployed Services</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_INFRASTRUCTURE_NODE__OPERATION_MICROSERVICE_REFERENCES = INTERMEDIATE_OPERATION_NODE__OPERATION_MICROSERVICE_REFERENCES;
+	int INTERMEDIATE_INFRASTRUCTURE_NODE__DEPLOYED_SERVICES = INTERMEDIATE_OPERATION_NODE__DEPLOYED_SERVICES;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Service Deployment Specification</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Endpoints</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION = INTERMEDIATE_OPERATION_NODE__INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION;
+	int INTERMEDIATE_INFRASTRUCTURE_NODE__ENDPOINTS = INTERMEDIATE_OPERATION_NODE__ENDPOINTS;
 
 	/**
-	 * The feature id for the '<em><b>Dependent Operation Nodes</b></em>' reference list.
+	 * The feature id for the '<em><b>Specifications</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_INFRASTRUCTURE_NODE__DEPENDENT_OPERATION_NODES = INTERMEDIATE_OPERATION_NODE_FEATURE_COUNT + 0;
+	int INTERMEDIATE_INFRASTRUCTURE_NODE__SPECIFICATIONS = INTERMEDIATE_OPERATION_NODE__SPECIFICATIONS;
 
 	/**
-	 * The feature id for the '<em><b>Used By Operation Nodes</b></em>' reference list.
+	 * The feature id for the '<em><b>Depends On Nodes</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_INFRASTRUCTURE_NODE__USED_BY_OPERATION_NODES = INTERMEDIATE_OPERATION_NODE_FEATURE_COUNT + 1;
+	int INTERMEDIATE_INFRASTRUCTURE_NODE__DEPENDS_ON_NODES = INTERMEDIATE_OPERATION_NODE_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Infrastructure Technology Reference</b></em>' containment reference.
+	 * The feature id for the '<em><b>Used By Nodes</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE = INTERMEDIATE_OPERATION_NODE_FEATURE_COUNT + 2;
+	int INTERMEDIATE_INFRASTRUCTURE_NODE__USED_BY_NODES = INTERMEDIATE_OPERATION_NODE_FEATURE_COUNT + 1;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Endpoint</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Reference</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_ENDPOINT = INTERMEDIATE_OPERATION_NODE_FEATURE_COUNT + 3;
+	int INTERMEDIATE_INFRASTRUCTURE_NODE__REFERENCE = INTERMEDIATE_OPERATION_NODE_FEATURE_COUNT + 2;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Operation Model</b></em>' container reference.
+	 * The feature id for the '<em><b>Operation Model</b></em>' container reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_OPERATION_MODEL = INTERMEDIATE_OPERATION_NODE_FEATURE_COUNT + 4;
+	int INTERMEDIATE_INFRASTRUCTURE_NODE__OPERATION_MODEL = INTERMEDIATE_OPERATION_NODE_FEATURE_COUNT + 3;
 
 	/**
 	 * The number of structural features of the '<em>Infrastructure Node</em>' class.
@@ -400,7 +409,7 @@ public interface IntermediatePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_INFRASTRUCTURE_NODE_FEATURE_COUNT = INTERMEDIATE_OPERATION_NODE_FEATURE_COUNT + 5;
+	int INTERMEDIATE_INFRASTRUCTURE_NODE_FEATURE_COUNT = INTERMEDIATE_OPERATION_NODE_FEATURE_COUNT + 4;
 
 	/**
 	 * The number of operations of the '<em>Infrastructure Node</em>' class.
@@ -422,40 +431,40 @@ public interface IntermediatePackage extends EPackage {
 	int INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION = 4;
 
 	/**
-	 * The feature id for the '<em><b>Operation Microservice Reference</b></em>' reference.
+	 * The feature id for the '<em><b>Service</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__OPERATION_MICROSERVICE_REFERENCE = 0;
+	int INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__SERVICE = 0;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Technology Specific Property Value</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Property Values</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE = 1;
+	int INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__PROPERTY_VALUES = 1;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Endpoints</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Endpoints</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_ENDPOINTS = 2;
+	int INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__ENDPOINTS = 2;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Operation Node</b></em>' container reference.
+	 * The feature id for the '<em><b>Operation Node</b></em>' container reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_OPERATION_NODE = 3;
+	int INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__OPERATION_NODE = 3;
 
 	/**
 	 * The number of structural features of the '<em>Service Deployment Specification</em>' class.
@@ -504,13 +513,13 @@ public interface IntermediatePackage extends EPackage {
 	int INTERMEDIATE_OPERATION_ENVIRONMENT__DEFAULT = 1;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Operationtechnology</b></em>' container reference.
+	 * The feature id for the '<em><b>Operation Technology</b></em>' container reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_OPERATION_ENVIRONMENT__INTERMEDIATE_OPERATIONTECHNOLOGY = 2;
+	int INTERMEDIATE_OPERATION_ENVIRONMENT__OPERATION_TECHNOLOGY = 2;
 
 	/**
 	 * The number of structural features of the '<em>Operation Environment</em>' class.
@@ -550,22 +559,22 @@ public interface IntermediatePackage extends EPackage {
 	int INTERMEDIATE_OPERATION_TECHNOLOGY__NAME = 0;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Operation Environment</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Environments</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_OPERATION_TECHNOLOGY__INTERMEDIATE_OPERATION_ENVIRONMENT = 1;
+	int INTERMEDIATE_OPERATION_TECHNOLOGY__ENVIRONMENTS = 1;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Technology Specific Property</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Propertys</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_OPERATION_TECHNOLOGY__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY = 2;
+	int INTERMEDIATE_OPERATION_TECHNOLOGY__PROPERTYS = 2;
 
 	/**
 	 * The number of structural features of the '<em>Operation Technology</em>' class.
@@ -605,22 +614,22 @@ public interface IntermediatePackage extends EPackage {
 	int INTERMEDIATE_DEPLOYMENT_TECHNOLOGY__NAME = INTERMEDIATE_OPERATION_TECHNOLOGY__NAME;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Operation Environment</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Environments</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_DEPLOYMENT_TECHNOLOGY__INTERMEDIATE_OPERATION_ENVIRONMENT = INTERMEDIATE_OPERATION_TECHNOLOGY__INTERMEDIATE_OPERATION_ENVIRONMENT;
+	int INTERMEDIATE_DEPLOYMENT_TECHNOLOGY__ENVIRONMENTS = INTERMEDIATE_OPERATION_TECHNOLOGY__ENVIRONMENTS;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Technology Specific Property</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Propertys</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_DEPLOYMENT_TECHNOLOGY__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY = INTERMEDIATE_OPERATION_TECHNOLOGY__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY;
+	int INTERMEDIATE_DEPLOYMENT_TECHNOLOGY__PROPERTYS = INTERMEDIATE_OPERATION_TECHNOLOGY__PROPERTYS;
 
 	/**
 	 * The number of structural features of the '<em>Deployment Technology</em>' class.
@@ -660,22 +669,22 @@ public interface IntermediatePackage extends EPackage {
 	int INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY__NAME = INTERMEDIATE_OPERATION_TECHNOLOGY__NAME;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Operation Environment</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Environments</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY__INTERMEDIATE_OPERATION_ENVIRONMENT = INTERMEDIATE_OPERATION_TECHNOLOGY__INTERMEDIATE_OPERATION_ENVIRONMENT;
+	int INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY__ENVIRONMENTS = INTERMEDIATE_OPERATION_TECHNOLOGY__ENVIRONMENTS;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Technology Specific Property</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Propertys</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY = INTERMEDIATE_OPERATION_TECHNOLOGY__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY;
+	int INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY__PROPERTYS = INTERMEDIATE_OPERATION_TECHNOLOGY__PROPERTYS;
 
 	/**
 	 * The number of structural features of the '<em>Infrastructure Technology</em>' class.
@@ -706,31 +715,31 @@ public interface IntermediatePackage extends EPackage {
 	int INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE = 9;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Import</b></em>' reference.
+	 * The feature id for the '<em><b>Import</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_IMPORT = 0;
+	int INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__IMPORT = 0;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Infrastructure Technology</b></em>' reference.
+	 * The feature id for the '<em><b>Infrastructure Technology</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY = 1;
+	int INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INFRASTRUCTURE_TECHNOLOGY = 1;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Infrastructure Node</b></em>' container reference.
+	 * The feature id for the '<em><b>Infrastructure Node</b></em>' container reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_INFRASTRUCTURE_NODE = 2;
+	int INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INFRASTRUCTURE_NODE = 2;
 
 	/**
 	 * The number of structural features of the '<em>Infrastructure Technology Reference</em>' class.
@@ -761,31 +770,31 @@ public interface IntermediatePackage extends EPackage {
 	int INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE = 10;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Deployment Technology</b></em>' reference.
+	 * The feature id for the '<em><b>Deployment Technology</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_DEPLOYMENT_TECHNOLOGY = 0;
+	int INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__DEPLOYMENT_TECHNOLOGY = 0;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Import</b></em>' reference.
+	 * The feature id for the '<em><b>Import</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_IMPORT = 1;
+	int INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__IMPORT = 1;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Container</b></em>' container reference.
+	 * The feature id for the '<em><b>Container</b></em>' container reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_CONTAINER = 2;
+	int INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__CONTAINER = 2;
 
 	/**
 	 * The number of structural features of the '<em>Deployment Technology Reference</em>' class.
@@ -852,22 +861,22 @@ public interface IntermediatePackage extends EPackage {
 	int INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__FEATUREAMES = 3;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Technology Specific Property Value</b></em>' containment reference.
+	 * The feature id for the '<em><b>Property Value</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE = 4;
+	int INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__PROPERTY_VALUE = 4;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Operation Technology</b></em>' container reference.
+	 * The feature id for the '<em><b>Operation Technology</b></em>' container reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__INTERMEDIATE_OPERATION_TECHNOLOGY = 5;
+	int INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__OPERATION_TECHNOLOGY = 5;
 
 	/**
 	 * The number of structural features of the '<em>Technology Specific Property</em>' class.
@@ -907,22 +916,22 @@ public interface IntermediatePackage extends EPackage {
 	int INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE__VALUE = 0;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Service Deployment Specification</b></em>' container reference.
+	 * The feature id for the '<em><b>Specification</b></em>' container reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE__INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION = 1;
+	int INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE__SPECIFICATION = 1;
 
 	/**
-	 * The feature id for the '<em><b>Intermediate Technology Specific Property</b></em>' container reference.
+	 * The feature id for the '<em><b>Property</b></em>' container reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY = 2;
+	int INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE__PROPERTY = 2;
 
 	/**
 	 * The number of structural features of the '<em>Technology Specific Property Value</em>' class.
@@ -1052,13 +1061,31 @@ public interface IntermediatePackage extends EPackage {
 	int OPERATION_MICROSERVICE_REFERENCE__INTERMEDIATE_IMPORT = de.fhdo.lemma.service.intermediate.IntermediatePackage.MICROSERVICE_REFERENCE_FEATURE_COUNT + 3;
 
 	/**
+	 * The feature id for the '<em><b>Service</b></em>' container reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int OPERATION_MICROSERVICE_REFERENCE__SERVICE = de.fhdo.lemma.service.intermediate.IntermediatePackage.MICROSERVICE_REFERENCE_FEATURE_COUNT + 4;
+
+	/**
+	 * The feature id for the '<em><b>Specification</b></em>' container reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int OPERATION_MICROSERVICE_REFERENCE__SPECIFICATION = de.fhdo.lemma.service.intermediate.IntermediatePackage.MICROSERVICE_REFERENCE_FEATURE_COUNT + 5;
+
+	/**
 	 * The number of structural features of the '<em>Operation Microservice Reference</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int OPERATION_MICROSERVICE_REFERENCE_FEATURE_COUNT = de.fhdo.lemma.service.intermediate.IntermediatePackage.MICROSERVICE_REFERENCE_FEATURE_COUNT + 4;
+	int OPERATION_MICROSERVICE_REFERENCE_FEATURE_COUNT = de.fhdo.lemma.service.intermediate.IntermediatePackage.MICROSERVICE_REFERENCE_FEATURE_COUNT + 6;
 
 	/**
 	 * The number of operations of the '<em>Operation Microservice Reference</em>' class.
@@ -1103,26 +1130,26 @@ public interface IntermediatePackage extends EPackage {
 	EReference getIntermediateOperationModel_Imports();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationModel#getIntermediateContainer <em>Intermediate Container</em>}'.
+	 * Returns the meta object for the containment reference list '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationModel#getContainers <em>Containers</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Intermediate Container</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationModel#getIntermediateContainer()
+	 * @return the meta object for the containment reference list '<em>Containers</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationModel#getContainers()
 	 * @see #getIntermediateOperationModel()
 	 * @generated
 	 */
-	EReference getIntermediateOperationModel_IntermediateContainer();
+	EReference getIntermediateOperationModel_Containers();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationModel#getIntermediateInfrastructureNode <em>Intermediate Infrastructure Node</em>}'.
+	 * Returns the meta object for the containment reference list '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationModel#getInfrastructureNodes <em>Infrastructure Nodes</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Intermediate Infrastructure Node</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationModel#getIntermediateInfrastructureNode()
+	 * @return the meta object for the containment reference list '<em>Infrastructure Nodes</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationModel#getInfrastructureNodes()
 	 * @see #getIntermediateOperationModel()
 	 * @generated
 	 */
-	EReference getIntermediateOperationModel_IntermediateInfrastructureNode();
+	EReference getIntermediateOperationModel_InfrastructureNodes();
 
 	/**
 	 * Returns the meta object for class '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationNode <em>Operation Node</em>}'.
@@ -1146,48 +1173,59 @@ public interface IntermediatePackage extends EPackage {
 	EAttribute getIntermediateOperationNode_Name();
 
 	/**
-	 * Returns the meta object for the reference list '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationNode#getIntermediateImport <em>Intermediate Import</em>}'.
+	 * Returns the meta object for the reference list '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationNode#getImports <em>Imports</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference list '<em>Intermediate Import</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationNode#getIntermediateImport()
+	 * @return the meta object for the reference list '<em>Imports</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationNode#getImports()
 	 * @see #getIntermediateOperationNode()
 	 * @generated
 	 */
-	EReference getIntermediateOperationNode_IntermediateImport();
+	EReference getIntermediateOperationNode_Imports();
 
 	/**
-	 * Returns the meta object for the reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationNode#getIntermediateOperationEnvironment <em>Intermediate Operation Environment</em>}'.
+	 * Returns the meta object for the reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationNode#getOperationEnvironment <em>Operation Environment</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Intermediate Operation Environment</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationNode#getIntermediateOperationEnvironment()
+	 * @return the meta object for the reference '<em>Operation Environment</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationNode#getOperationEnvironment()
 	 * @see #getIntermediateOperationNode()
 	 * @generated
 	 */
-	EReference getIntermediateOperationNode_IntermediateOperationEnvironment();
+	EReference getIntermediateOperationNode_OperationEnvironment();
 
 	/**
-	 * Returns the meta object for the reference list '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationNode#getOperationMicroserviceReferences <em>Operation Microservice References</em>}'.
+	 * Returns the meta object for the containment reference list '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationNode#getDeployedServices <em>Deployed Services</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference list '<em>Operation Microservice References</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationNode#getOperationMicroserviceReferences()
+	 * @return the meta object for the containment reference list '<em>Deployed Services</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationNode#getDeployedServices()
 	 * @see #getIntermediateOperationNode()
 	 * @generated
 	 */
-	EReference getIntermediateOperationNode_OperationMicroserviceReferences();
+	EReference getIntermediateOperationNode_DeployedServices();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationNode#getIntermediateServiceDeploymentSpecification <em>Intermediate Service Deployment Specification</em>}'.
+	 * Returns the meta object for the containment reference list '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationNode#getEndpoints <em>Endpoints</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Intermediate Service Deployment Specification</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationNode#getIntermediateServiceDeploymentSpecification()
+	 * @return the meta object for the containment reference list '<em>Endpoints</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationNode#getEndpoints()
 	 * @see #getIntermediateOperationNode()
 	 * @generated
 	 */
-	EReference getIntermediateOperationNode_IntermediateServiceDeploymentSpecification();
+	EReference getIntermediateOperationNode_Endpoints();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationNode#getSpecifications <em>Specifications</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Specifications</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationNode#getSpecifications()
+	 * @see #getIntermediateOperationNode()
+	 * @generated
+	 */
+	EReference getIntermediateOperationNode_Specifications();
 
 	/**
 	 * Returns the meta object for class '{@link de.fhdo.lemma.operation.intermediate.IntermediateContainer <em>Container</em>}'.
@@ -1200,37 +1238,26 @@ public interface IntermediatePackage extends EPackage {
 	EClass getIntermediateContainer();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateContainer#getIntermediateDeploymentTechnologyReference <em>Intermediate Deployment Technology Reference</em>}'.
+	 * Returns the meta object for the containment reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateContainer#getTechnologyReference <em>Technology Reference</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Intermediate Deployment Technology Reference</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateContainer#getIntermediateDeploymentTechnologyReference()
+	 * @return the meta object for the containment reference '<em>Technology Reference</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateContainer#getTechnologyReference()
 	 * @see #getIntermediateContainer()
 	 * @generated
 	 */
-	EReference getIntermediateContainer_IntermediateDeploymentTechnologyReference();
+	EReference getIntermediateContainer_TechnologyReference();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link de.fhdo.lemma.operation.intermediate.IntermediateContainer#getIntermediateEndpoint <em>Intermediate Endpoint</em>}'.
+	 * Returns the meta object for the container reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateContainer#getOperationModel <em>Operation Model</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Intermediate Endpoint</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateContainer#getIntermediateEndpoint()
+	 * @return the meta object for the container reference '<em>Operation Model</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateContainer#getOperationModel()
 	 * @see #getIntermediateContainer()
 	 * @generated
 	 */
-	EReference getIntermediateContainer_IntermediateEndpoint();
-
-	/**
-	 * Returns the meta object for the container reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateContainer#getIntermediateOperationModel <em>Intermediate Operation Model</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the container reference '<em>Intermediate Operation Model</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateContainer#getIntermediateOperationModel()
-	 * @see #getIntermediateContainer()
-	 * @generated
-	 */
-	EReference getIntermediateContainer_IntermediateOperationModel();
+	EReference getIntermediateContainer_OperationModel();
 
 	/**
 	 * Returns the meta object for class '{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode <em>Infrastructure Node</em>}'.
@@ -1243,59 +1270,48 @@ public interface IntermediatePackage extends EPackage {
 	EClass getIntermediateInfrastructureNode();
 
 	/**
-	 * Returns the meta object for the reference list '{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode#getDependentOperationNodes <em>Dependent Operation Nodes</em>}'.
+	 * Returns the meta object for the reference list '{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode#getDependsOnNodes <em>Depends On Nodes</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference list '<em>Dependent Operation Nodes</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode#getDependentOperationNodes()
+	 * @return the meta object for the reference list '<em>Depends On Nodes</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode#getDependsOnNodes()
 	 * @see #getIntermediateInfrastructureNode()
 	 * @generated
 	 */
-	EReference getIntermediateInfrastructureNode_DependentOperationNodes();
+	EReference getIntermediateInfrastructureNode_DependsOnNodes();
 
 	/**
-	 * Returns the meta object for the reference list '{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode#getUsedByOperationNodes <em>Used By Operation Nodes</em>}'.
+	 * Returns the meta object for the reference list '{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode#getUsedByNodes <em>Used By Nodes</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference list '<em>Used By Operation Nodes</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode#getUsedByOperationNodes()
+	 * @return the meta object for the reference list '<em>Used By Nodes</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode#getUsedByNodes()
 	 * @see #getIntermediateInfrastructureNode()
 	 * @generated
 	 */
-	EReference getIntermediateInfrastructureNode_UsedByOperationNodes();
+	EReference getIntermediateInfrastructureNode_UsedByNodes();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode#getIntermediateInfrastructureTechnologyReference <em>Intermediate Infrastructure Technology Reference</em>}'.
+	 * Returns the meta object for the containment reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode#getReference <em>Reference</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Intermediate Infrastructure Technology Reference</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode#getIntermediateInfrastructureTechnologyReference()
+	 * @return the meta object for the containment reference '<em>Reference</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode#getReference()
 	 * @see #getIntermediateInfrastructureNode()
 	 * @generated
 	 */
-	EReference getIntermediateInfrastructureNode_IntermediateInfrastructureTechnologyReference();
+	EReference getIntermediateInfrastructureNode_Reference();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode#getIntermediateEndpoint <em>Intermediate Endpoint</em>}'.
+	 * Returns the meta object for the container reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode#getOperationModel <em>Operation Model</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Intermediate Endpoint</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode#getIntermediateEndpoint()
+	 * @return the meta object for the container reference '<em>Operation Model</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode#getOperationModel()
 	 * @see #getIntermediateInfrastructureNode()
 	 * @generated
 	 */
-	EReference getIntermediateInfrastructureNode_IntermediateEndpoint();
-
-	/**
-	 * Returns the meta object for the container reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode#getIntermediateOperationModel <em>Intermediate Operation Model</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the container reference '<em>Intermediate Operation Model</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode#getIntermediateOperationModel()
-	 * @see #getIntermediateInfrastructureNode()
-	 * @generated
-	 */
-	EReference getIntermediateInfrastructureNode_IntermediateOperationModel();
+	EReference getIntermediateInfrastructureNode_OperationModel();
 
 	/**
 	 * Returns the meta object for class '{@link de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification <em>Service Deployment Specification</em>}'.
@@ -1308,48 +1324,48 @@ public interface IntermediatePackage extends EPackage {
 	EClass getIntermediateServiceDeploymentSpecification();
 
 	/**
-	 * Returns the meta object for the reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getOperationMicroserviceReference <em>Operation Microservice Reference</em>}'.
+	 * Returns the meta object for the containment reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getService <em>Service</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Operation Microservice Reference</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getOperationMicroserviceReference()
+	 * @return the meta object for the containment reference '<em>Service</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getService()
 	 * @see #getIntermediateServiceDeploymentSpecification()
 	 * @generated
 	 */
-	EReference getIntermediateServiceDeploymentSpecification_OperationMicroserviceReference();
+	EReference getIntermediateServiceDeploymentSpecification_Service();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getIntermediateTechnologySpecificPropertyValue <em>Intermediate Technology Specific Property Value</em>}'.
+	 * Returns the meta object for the containment reference list '{@link de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getPropertyValues <em>Property Values</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Intermediate Technology Specific Property Value</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getIntermediateTechnologySpecificPropertyValue()
+	 * @return the meta object for the containment reference list '<em>Property Values</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getPropertyValues()
 	 * @see #getIntermediateServiceDeploymentSpecification()
 	 * @generated
 	 */
-	EReference getIntermediateServiceDeploymentSpecification_IntermediateTechnologySpecificPropertyValue();
+	EReference getIntermediateServiceDeploymentSpecification_PropertyValues();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getIntermediateEndpoints <em>Intermediate Endpoints</em>}'.
+	 * Returns the meta object for the containment reference list '{@link de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getEndpoints <em>Endpoints</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Intermediate Endpoints</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getIntermediateEndpoints()
+	 * @return the meta object for the containment reference list '<em>Endpoints</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getEndpoints()
 	 * @see #getIntermediateServiceDeploymentSpecification()
 	 * @generated
 	 */
-	EReference getIntermediateServiceDeploymentSpecification_IntermediateEndpoints();
+	EReference getIntermediateServiceDeploymentSpecification_Endpoints();
 
 	/**
-	 * Returns the meta object for the container reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getIntermediateOperationNode <em>Intermediate Operation Node</em>}'.
+	 * Returns the meta object for the container reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getOperationNode <em>Operation Node</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the container reference '<em>Intermediate Operation Node</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getIntermediateOperationNode()
+	 * @return the meta object for the container reference '<em>Operation Node</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getOperationNode()
 	 * @see #getIntermediateServiceDeploymentSpecification()
 	 * @generated
 	 */
-	EReference getIntermediateServiceDeploymentSpecification_IntermediateOperationNode();
+	EReference getIntermediateServiceDeploymentSpecification_OperationNode();
 
 	/**
 	 * Returns the meta object for class '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationEnvironment <em>Operation Environment</em>}'.
@@ -1384,15 +1400,15 @@ public interface IntermediatePackage extends EPackage {
 	EAttribute getIntermediateOperationEnvironment_Default();
 
 	/**
-	 * Returns the meta object for the container reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationEnvironment#getIntermediateOperationtechnology <em>Intermediate Operationtechnology</em>}'.
+	 * Returns the meta object for the container reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationEnvironment#getOperationTechnology <em>Operation Technology</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the container reference '<em>Intermediate Operationtechnology</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationEnvironment#getIntermediateOperationtechnology()
+	 * @return the meta object for the container reference '<em>Operation Technology</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationEnvironment#getOperationTechnology()
 	 * @see #getIntermediateOperationEnvironment()
 	 * @generated
 	 */
-	EReference getIntermediateOperationEnvironment_IntermediateOperationtechnology();
+	EReference getIntermediateOperationEnvironment_OperationTechnology();
 
 	/**
 	 * Returns the meta object for class '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationTechnology <em>Operation Technology</em>}'.
@@ -1416,26 +1432,26 @@ public interface IntermediatePackage extends EPackage {
 	EAttribute getIntermediateOperationTechnology_Name();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationTechnology#getIntermediateOperationEnvironment <em>Intermediate Operation Environment</em>}'.
+	 * Returns the meta object for the containment reference list '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationTechnology#getEnvironments <em>Environments</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Intermediate Operation Environment</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationTechnology#getIntermediateOperationEnvironment()
+	 * @return the meta object for the containment reference list '<em>Environments</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationTechnology#getEnvironments()
 	 * @see #getIntermediateOperationTechnology()
 	 * @generated
 	 */
-	EReference getIntermediateOperationTechnology_IntermediateOperationEnvironment();
+	EReference getIntermediateOperationTechnology_Environments();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationTechnology#getIntermediateTechnologySpecificProperty <em>Intermediate Technology Specific Property</em>}'.
+	 * Returns the meta object for the containment reference list '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationTechnology#getPropertys <em>Propertys</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Intermediate Technology Specific Property</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationTechnology#getIntermediateTechnologySpecificProperty()
+	 * @return the meta object for the containment reference list '<em>Propertys</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationTechnology#getPropertys()
 	 * @see #getIntermediateOperationTechnology()
 	 * @generated
 	 */
-	EReference getIntermediateOperationTechnology_IntermediateTechnologySpecificProperty();
+	EReference getIntermediateOperationTechnology_Propertys();
 
 	/**
 	 * Returns the meta object for class '{@link de.fhdo.lemma.operation.intermediate.IntermediateDeploymentTechnology <em>Deployment Technology</em>}'.
@@ -1468,37 +1484,37 @@ public interface IntermediatePackage extends EPackage {
 	EClass getIntermediateInfrastructureTechnologyReference();
 
 	/**
-	 * Returns the meta object for the reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureTechnologyReference#getIntermediateImport <em>Intermediate Import</em>}'.
+	 * Returns the meta object for the reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureTechnologyReference#getImport <em>Import</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Intermediate Import</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureTechnologyReference#getIntermediateImport()
+	 * @return the meta object for the reference '<em>Import</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureTechnologyReference#getImport()
 	 * @see #getIntermediateInfrastructureTechnologyReference()
 	 * @generated
 	 */
-	EReference getIntermediateInfrastructureTechnologyReference_IntermediateImport();
+	EReference getIntermediateInfrastructureTechnologyReference_Import();
 
 	/**
-	 * Returns the meta object for the reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureTechnologyReference#getIntermediateInfrastructureTechnology <em>Intermediate Infrastructure Technology</em>}'.
+	 * Returns the meta object for the reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureTechnologyReference#getInfrastructureTechnology <em>Infrastructure Technology</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Intermediate Infrastructure Technology</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureTechnologyReference#getIntermediateInfrastructureTechnology()
+	 * @return the meta object for the reference '<em>Infrastructure Technology</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureTechnologyReference#getInfrastructureTechnology()
 	 * @see #getIntermediateInfrastructureTechnologyReference()
 	 * @generated
 	 */
-	EReference getIntermediateInfrastructureTechnologyReference_IntermediateInfrastructureTechnology();
+	EReference getIntermediateInfrastructureTechnologyReference_InfrastructureTechnology();
 
 	/**
-	 * Returns the meta object for the container reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureTechnologyReference#getIntermediateInfrastructureNode <em>Intermediate Infrastructure Node</em>}'.
+	 * Returns the meta object for the container reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureTechnologyReference#getInfrastructureNode <em>Infrastructure Node</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the container reference '<em>Intermediate Infrastructure Node</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureTechnologyReference#getIntermediateInfrastructureNode()
+	 * @return the meta object for the container reference '<em>Infrastructure Node</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureTechnologyReference#getInfrastructureNode()
 	 * @see #getIntermediateInfrastructureTechnologyReference()
 	 * @generated
 	 */
-	EReference getIntermediateInfrastructureTechnologyReference_IntermediateInfrastructureNode();
+	EReference getIntermediateInfrastructureTechnologyReference_InfrastructureNode();
 
 	/**
 	 * Returns the meta object for class '{@link de.fhdo.lemma.operation.intermediate.IntermediateDeploymentTechnologyReference <em>Deployment Technology Reference</em>}'.
@@ -1511,37 +1527,37 @@ public interface IntermediatePackage extends EPackage {
 	EClass getIntermediateDeploymentTechnologyReference();
 
 	/**
-	 * Returns the meta object for the reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateDeploymentTechnologyReference#getIntermediateDeploymentTechnology <em>Intermediate Deployment Technology</em>}'.
+	 * Returns the meta object for the reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateDeploymentTechnologyReference#getDeploymentTechnology <em>Deployment Technology</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Intermediate Deployment Technology</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateDeploymentTechnologyReference#getIntermediateDeploymentTechnology()
+	 * @return the meta object for the reference '<em>Deployment Technology</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateDeploymentTechnologyReference#getDeploymentTechnology()
 	 * @see #getIntermediateDeploymentTechnologyReference()
 	 * @generated
 	 */
-	EReference getIntermediateDeploymentTechnologyReference_IntermediateDeploymentTechnology();
+	EReference getIntermediateDeploymentTechnologyReference_DeploymentTechnology();
 
 	/**
-	 * Returns the meta object for the reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateDeploymentTechnologyReference#getIntermediateImport <em>Intermediate Import</em>}'.
+	 * Returns the meta object for the reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateDeploymentTechnologyReference#getImport <em>Import</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Intermediate Import</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateDeploymentTechnologyReference#getIntermediateImport()
+	 * @return the meta object for the reference '<em>Import</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateDeploymentTechnologyReference#getImport()
 	 * @see #getIntermediateDeploymentTechnologyReference()
 	 * @generated
 	 */
-	EReference getIntermediateDeploymentTechnologyReference_IntermediateImport();
+	EReference getIntermediateDeploymentTechnologyReference_Import();
 
 	/**
-	 * Returns the meta object for the container reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateDeploymentTechnologyReference#getIntermediateContainer <em>Intermediate Container</em>}'.
+	 * Returns the meta object for the container reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateDeploymentTechnologyReference#getContainer <em>Container</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the container reference '<em>Intermediate Container</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateDeploymentTechnologyReference#getIntermediateContainer()
+	 * @return the meta object for the container reference '<em>Container</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateDeploymentTechnologyReference#getContainer()
 	 * @see #getIntermediateDeploymentTechnologyReference()
 	 * @generated
 	 */
-	EReference getIntermediateDeploymentTechnologyReference_IntermediateContainer();
+	EReference getIntermediateDeploymentTechnologyReference_Container();
 
 	/**
 	 * Returns the meta object for class '{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty <em>Technology Specific Property</em>}'.
@@ -1598,26 +1614,26 @@ public interface IntermediatePackage extends EPackage {
 	EAttribute getIntermediateTechnologySpecificProperty_Featureames();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty#getIntermediateTechnologySpecificPropertyValue <em>Intermediate Technology Specific Property Value</em>}'.
+	 * Returns the meta object for the containment reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty#getPropertyValue <em>Property Value</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Intermediate Technology Specific Property Value</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty#getIntermediateTechnologySpecificPropertyValue()
+	 * @return the meta object for the containment reference '<em>Property Value</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty#getPropertyValue()
 	 * @see #getIntermediateTechnologySpecificProperty()
 	 * @generated
 	 */
-	EReference getIntermediateTechnologySpecificProperty_IntermediateTechnologySpecificPropertyValue();
+	EReference getIntermediateTechnologySpecificProperty_PropertyValue();
 
 	/**
-	 * Returns the meta object for the container reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty#getIntermediateOperationTechnology <em>Intermediate Operation Technology</em>}'.
+	 * Returns the meta object for the container reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty#getOperationTechnology <em>Operation Technology</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the container reference '<em>Intermediate Operation Technology</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty#getIntermediateOperationTechnology()
+	 * @return the meta object for the container reference '<em>Operation Technology</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty#getOperationTechnology()
 	 * @see #getIntermediateTechnologySpecificProperty()
 	 * @generated
 	 */
-	EReference getIntermediateTechnologySpecificProperty_IntermediateOperationTechnology();
+	EReference getIntermediateTechnologySpecificProperty_OperationTechnology();
 
 	/**
 	 * Returns the meta object for class '{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificPropertyValue <em>Technology Specific Property Value</em>}'.
@@ -1641,26 +1657,26 @@ public interface IntermediatePackage extends EPackage {
 	EAttribute getIntermediateTechnologySpecificPropertyValue_Value();
 
 	/**
-	 * Returns the meta object for the container reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificPropertyValue#getIntermediateServiceDeploymentSpecification <em>Intermediate Service Deployment Specification</em>}'.
+	 * Returns the meta object for the container reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificPropertyValue#getSpecification <em>Specification</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the container reference '<em>Intermediate Service Deployment Specification</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificPropertyValue#getIntermediateServiceDeploymentSpecification()
+	 * @return the meta object for the container reference '<em>Specification</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificPropertyValue#getSpecification()
 	 * @see #getIntermediateTechnologySpecificPropertyValue()
 	 * @generated
 	 */
-	EReference getIntermediateTechnologySpecificPropertyValue_IntermediateServiceDeploymentSpecification();
+	EReference getIntermediateTechnologySpecificPropertyValue_Specification();
 
 	/**
-	 * Returns the meta object for the container reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificPropertyValue#getIntermediateTechnologySpecificProperty <em>Intermediate Technology Specific Property</em>}'.
+	 * Returns the meta object for the container reference '{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificPropertyValue#getProperty <em>Property</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the container reference '<em>Intermediate Technology Specific Property</em>'.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificPropertyValue#getIntermediateTechnologySpecificProperty()
+	 * @return the meta object for the container reference '<em>Property</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificPropertyValue#getProperty()
 	 * @see #getIntermediateTechnologySpecificPropertyValue()
 	 * @generated
 	 */
-	EReference getIntermediateTechnologySpecificPropertyValue_IntermediateTechnologySpecificProperty();
+	EReference getIntermediateTechnologySpecificPropertyValue_Property();
 
 	/**
 	 * Returns the meta object for class '{@link de.fhdo.lemma.operation.intermediate.OperationMicroserviceReference <em>Operation Microservice Reference</em>}'.
@@ -1717,6 +1733,28 @@ public interface IntermediatePackage extends EPackage {
 	EReference getOperationMicroserviceReference_IntermediateImport();
 
 	/**
+	 * Returns the meta object for the container reference '{@link de.fhdo.lemma.operation.intermediate.OperationMicroserviceReference#getService <em>Service</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the container reference '<em>Service</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.OperationMicroserviceReference#getService()
+	 * @see #getOperationMicroserviceReference()
+	 * @generated
+	 */
+	EReference getOperationMicroserviceReference_Service();
+
+	/**
+	 * Returns the meta object for the container reference '{@link de.fhdo.lemma.operation.intermediate.OperationMicroserviceReference#getSpecification <em>Specification</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the container reference '<em>Specification</em>'.
+	 * @see de.fhdo.lemma.operation.intermediate.OperationMicroserviceReference#getSpecification()
+	 * @see #getOperationMicroserviceReference()
+	 * @generated
+	 */
+	EReference getOperationMicroserviceReference_Specification();
+
+	/**
 	 * Returns the factory that creates the instances of the model.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1766,20 +1804,20 @@ public interface IntermediatePackage extends EPackage {
 		EReference INTERMEDIATE_OPERATION_MODEL__IMPORTS = eINSTANCE.getIntermediateOperationModel_Imports();
 
 		/**
-		 * The meta object literal for the '<em><b>Intermediate Container</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Containers</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_OPERATION_MODEL__INTERMEDIATE_CONTAINER = eINSTANCE.getIntermediateOperationModel_IntermediateContainer();
+		EReference INTERMEDIATE_OPERATION_MODEL__CONTAINERS = eINSTANCE.getIntermediateOperationModel_Containers();
 
 		/**
-		 * The meta object literal for the '<em><b>Intermediate Infrastructure Node</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Infrastructure Nodes</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_OPERATION_MODEL__INTERMEDIATE_INFRASTRUCTURE_NODE = eINSTANCE.getIntermediateOperationModel_IntermediateInfrastructureNode();
+		EReference INTERMEDIATE_OPERATION_MODEL__INFRASTRUCTURE_NODES = eINSTANCE.getIntermediateOperationModel_InfrastructureNodes();
 
 		/**
 		 * The meta object literal for the '{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateOperationNodeImpl <em>Operation Node</em>}' class.
@@ -1800,36 +1838,44 @@ public interface IntermediatePackage extends EPackage {
 		EAttribute INTERMEDIATE_OPERATION_NODE__NAME = eINSTANCE.getIntermediateOperationNode_Name();
 
 		/**
-		 * The meta object literal for the '<em><b>Intermediate Import</b></em>' reference list feature.
+		 * The meta object literal for the '<em><b>Imports</b></em>' reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_OPERATION_NODE__INTERMEDIATE_IMPORT = eINSTANCE.getIntermediateOperationNode_IntermediateImport();
+		EReference INTERMEDIATE_OPERATION_NODE__IMPORTS = eINSTANCE.getIntermediateOperationNode_Imports();
 
 		/**
-		 * The meta object literal for the '<em><b>Intermediate Operation Environment</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Operation Environment</b></em>' reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_OPERATION_NODE__INTERMEDIATE_OPERATION_ENVIRONMENT = eINSTANCE.getIntermediateOperationNode_IntermediateOperationEnvironment();
+		EReference INTERMEDIATE_OPERATION_NODE__OPERATION_ENVIRONMENT = eINSTANCE.getIntermediateOperationNode_OperationEnvironment();
 
 		/**
-		 * The meta object literal for the '<em><b>Operation Microservice References</b></em>' reference list feature.
+		 * The meta object literal for the '<em><b>Deployed Services</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_OPERATION_NODE__OPERATION_MICROSERVICE_REFERENCES = eINSTANCE.getIntermediateOperationNode_OperationMicroserviceReferences();
+		EReference INTERMEDIATE_OPERATION_NODE__DEPLOYED_SERVICES = eINSTANCE.getIntermediateOperationNode_DeployedServices();
 
 		/**
-		 * The meta object literal for the '<em><b>Intermediate Service Deployment Specification</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Endpoints</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_OPERATION_NODE__INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION = eINSTANCE.getIntermediateOperationNode_IntermediateServiceDeploymentSpecification();
+		EReference INTERMEDIATE_OPERATION_NODE__ENDPOINTS = eINSTANCE.getIntermediateOperationNode_Endpoints();
+
+		/**
+		 * The meta object literal for the '<em><b>Specifications</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference INTERMEDIATE_OPERATION_NODE__SPECIFICATIONS = eINSTANCE.getIntermediateOperationNode_Specifications();
 
 		/**
 		 * The meta object literal for the '{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateContainerImpl <em>Container</em>}' class.
@@ -1842,28 +1888,20 @@ public interface IntermediatePackage extends EPackage {
 		EClass INTERMEDIATE_CONTAINER = eINSTANCE.getIntermediateContainer();
 
 		/**
-		 * The meta object literal for the '<em><b>Intermediate Deployment Technology Reference</b></em>' containment reference feature.
+		 * The meta object literal for the '<em><b>Technology Reference</b></em>' containment reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_CONTAINER__INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE = eINSTANCE.getIntermediateContainer_IntermediateDeploymentTechnologyReference();
+		EReference INTERMEDIATE_CONTAINER__TECHNOLOGY_REFERENCE = eINSTANCE.getIntermediateContainer_TechnologyReference();
 
 		/**
-		 * The meta object literal for the '<em><b>Intermediate Endpoint</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Operation Model</b></em>' container reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_CONTAINER__INTERMEDIATE_ENDPOINT = eINSTANCE.getIntermediateContainer_IntermediateEndpoint();
-
-		/**
-		 * The meta object literal for the '<em><b>Intermediate Operation Model</b></em>' container reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference INTERMEDIATE_CONTAINER__INTERMEDIATE_OPERATION_MODEL = eINSTANCE.getIntermediateContainer_IntermediateOperationModel();
+		EReference INTERMEDIATE_CONTAINER__OPERATION_MODEL = eINSTANCE.getIntermediateContainer_OperationModel();
 
 		/**
 		 * The meta object literal for the '{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateInfrastructureNodeImpl <em>Infrastructure Node</em>}' class.
@@ -1876,44 +1914,36 @@ public interface IntermediatePackage extends EPackage {
 		EClass INTERMEDIATE_INFRASTRUCTURE_NODE = eINSTANCE.getIntermediateInfrastructureNode();
 
 		/**
-		 * The meta object literal for the '<em><b>Dependent Operation Nodes</b></em>' reference list feature.
+		 * The meta object literal for the '<em><b>Depends On Nodes</b></em>' reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_INFRASTRUCTURE_NODE__DEPENDENT_OPERATION_NODES = eINSTANCE.getIntermediateInfrastructureNode_DependentOperationNodes();
+		EReference INTERMEDIATE_INFRASTRUCTURE_NODE__DEPENDS_ON_NODES = eINSTANCE.getIntermediateInfrastructureNode_DependsOnNodes();
 
 		/**
-		 * The meta object literal for the '<em><b>Used By Operation Nodes</b></em>' reference list feature.
+		 * The meta object literal for the '<em><b>Used By Nodes</b></em>' reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_INFRASTRUCTURE_NODE__USED_BY_OPERATION_NODES = eINSTANCE.getIntermediateInfrastructureNode_UsedByOperationNodes();
+		EReference INTERMEDIATE_INFRASTRUCTURE_NODE__USED_BY_NODES = eINSTANCE.getIntermediateInfrastructureNode_UsedByNodes();
 
 		/**
-		 * The meta object literal for the '<em><b>Intermediate Infrastructure Technology Reference</b></em>' containment reference feature.
+		 * The meta object literal for the '<em><b>Reference</b></em>' containment reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE = eINSTANCE.getIntermediateInfrastructureNode_IntermediateInfrastructureTechnologyReference();
+		EReference INTERMEDIATE_INFRASTRUCTURE_NODE__REFERENCE = eINSTANCE.getIntermediateInfrastructureNode_Reference();
 
 		/**
-		 * The meta object literal for the '<em><b>Intermediate Endpoint</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Operation Model</b></em>' container reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_ENDPOINT = eINSTANCE.getIntermediateInfrastructureNode_IntermediateEndpoint();
-
-		/**
-		 * The meta object literal for the '<em><b>Intermediate Operation Model</b></em>' container reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_OPERATION_MODEL = eINSTANCE.getIntermediateInfrastructureNode_IntermediateOperationModel();
+		EReference INTERMEDIATE_INFRASTRUCTURE_NODE__OPERATION_MODEL = eINSTANCE.getIntermediateInfrastructureNode_OperationModel();
 
 		/**
 		 * The meta object literal for the '{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateServiceDeploymentSpecificationImpl <em>Service Deployment Specification</em>}' class.
@@ -1926,36 +1956,36 @@ public interface IntermediatePackage extends EPackage {
 		EClass INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION = eINSTANCE.getIntermediateServiceDeploymentSpecification();
 
 		/**
-		 * The meta object literal for the '<em><b>Operation Microservice Reference</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Service</b></em>' containment reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__OPERATION_MICROSERVICE_REFERENCE = eINSTANCE.getIntermediateServiceDeploymentSpecification_OperationMicroserviceReference();
+		EReference INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__SERVICE = eINSTANCE.getIntermediateServiceDeploymentSpecification_Service();
 
 		/**
-		 * The meta object literal for the '<em><b>Intermediate Technology Specific Property Value</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Property Values</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE = eINSTANCE.getIntermediateServiceDeploymentSpecification_IntermediateTechnologySpecificPropertyValue();
+		EReference INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__PROPERTY_VALUES = eINSTANCE.getIntermediateServiceDeploymentSpecification_PropertyValues();
 
 		/**
-		 * The meta object literal for the '<em><b>Intermediate Endpoints</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Endpoints</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_ENDPOINTS = eINSTANCE.getIntermediateServiceDeploymentSpecification_IntermediateEndpoints();
+		EReference INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__ENDPOINTS = eINSTANCE.getIntermediateServiceDeploymentSpecification_Endpoints();
 
 		/**
-		 * The meta object literal for the '<em><b>Intermediate Operation Node</b></em>' container reference feature.
+		 * The meta object literal for the '<em><b>Operation Node</b></em>' container reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_OPERATION_NODE = eINSTANCE.getIntermediateServiceDeploymentSpecification_IntermediateOperationNode();
+		EReference INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__OPERATION_NODE = eINSTANCE.getIntermediateServiceDeploymentSpecification_OperationNode();
 
 		/**
 		 * The meta object literal for the '{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateOperationEnvironmentImpl <em>Operation Environment</em>}' class.
@@ -1984,12 +2014,12 @@ public interface IntermediatePackage extends EPackage {
 		EAttribute INTERMEDIATE_OPERATION_ENVIRONMENT__DEFAULT = eINSTANCE.getIntermediateOperationEnvironment_Default();
 
 		/**
-		 * The meta object literal for the '<em><b>Intermediate Operationtechnology</b></em>' container reference feature.
+		 * The meta object literal for the '<em><b>Operation Technology</b></em>' container reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_OPERATION_ENVIRONMENT__INTERMEDIATE_OPERATIONTECHNOLOGY = eINSTANCE.getIntermediateOperationEnvironment_IntermediateOperationtechnology();
+		EReference INTERMEDIATE_OPERATION_ENVIRONMENT__OPERATION_TECHNOLOGY = eINSTANCE.getIntermediateOperationEnvironment_OperationTechnology();
 
 		/**
 		 * The meta object literal for the '{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateOperationTechnologyImpl <em>Operation Technology</em>}' class.
@@ -2010,20 +2040,20 @@ public interface IntermediatePackage extends EPackage {
 		EAttribute INTERMEDIATE_OPERATION_TECHNOLOGY__NAME = eINSTANCE.getIntermediateOperationTechnology_Name();
 
 		/**
-		 * The meta object literal for the '<em><b>Intermediate Operation Environment</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Environments</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_OPERATION_TECHNOLOGY__INTERMEDIATE_OPERATION_ENVIRONMENT = eINSTANCE.getIntermediateOperationTechnology_IntermediateOperationEnvironment();
+		EReference INTERMEDIATE_OPERATION_TECHNOLOGY__ENVIRONMENTS = eINSTANCE.getIntermediateOperationTechnology_Environments();
 
 		/**
-		 * The meta object literal for the '<em><b>Intermediate Technology Specific Property</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Propertys</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_OPERATION_TECHNOLOGY__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY = eINSTANCE.getIntermediateOperationTechnology_IntermediateTechnologySpecificProperty();
+		EReference INTERMEDIATE_OPERATION_TECHNOLOGY__PROPERTYS = eINSTANCE.getIntermediateOperationTechnology_Propertys();
 
 		/**
 		 * The meta object literal for the '{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateDeploymentTechnologyImpl <em>Deployment Technology</em>}' class.
@@ -2056,28 +2086,28 @@ public interface IntermediatePackage extends EPackage {
 		EClass INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE = eINSTANCE.getIntermediateInfrastructureTechnologyReference();
 
 		/**
-		 * The meta object literal for the '<em><b>Intermediate Import</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Import</b></em>' reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_IMPORT = eINSTANCE.getIntermediateInfrastructureTechnologyReference_IntermediateImport();
+		EReference INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__IMPORT = eINSTANCE.getIntermediateInfrastructureTechnologyReference_Import();
 
 		/**
-		 * The meta object literal for the '<em><b>Intermediate Infrastructure Technology</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Infrastructure Technology</b></em>' reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY = eINSTANCE.getIntermediateInfrastructureTechnologyReference_IntermediateInfrastructureTechnology();
+		EReference INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INFRASTRUCTURE_TECHNOLOGY = eINSTANCE.getIntermediateInfrastructureTechnologyReference_InfrastructureTechnology();
 
 		/**
-		 * The meta object literal for the '<em><b>Intermediate Infrastructure Node</b></em>' container reference feature.
+		 * The meta object literal for the '<em><b>Infrastructure Node</b></em>' container reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_INFRASTRUCTURE_NODE = eINSTANCE.getIntermediateInfrastructureTechnologyReference_IntermediateInfrastructureNode();
+		EReference INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INFRASTRUCTURE_NODE = eINSTANCE.getIntermediateInfrastructureTechnologyReference_InfrastructureNode();
 
 		/**
 		 * The meta object literal for the '{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateDeploymentTechnologyReferenceImpl <em>Deployment Technology Reference</em>}' class.
@@ -2090,28 +2120,28 @@ public interface IntermediatePackage extends EPackage {
 		EClass INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE = eINSTANCE.getIntermediateDeploymentTechnologyReference();
 
 		/**
-		 * The meta object literal for the '<em><b>Intermediate Deployment Technology</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Deployment Technology</b></em>' reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_DEPLOYMENT_TECHNOLOGY = eINSTANCE.getIntermediateDeploymentTechnologyReference_IntermediateDeploymentTechnology();
+		EReference INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__DEPLOYMENT_TECHNOLOGY = eINSTANCE.getIntermediateDeploymentTechnologyReference_DeploymentTechnology();
 
 		/**
-		 * The meta object literal for the '<em><b>Intermediate Import</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Import</b></em>' reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_IMPORT = eINSTANCE.getIntermediateDeploymentTechnologyReference_IntermediateImport();
+		EReference INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__IMPORT = eINSTANCE.getIntermediateDeploymentTechnologyReference_Import();
 
 		/**
-		 * The meta object literal for the '<em><b>Intermediate Container</b></em>' container reference feature.
+		 * The meta object literal for the '<em><b>Container</b></em>' container reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_CONTAINER = eINSTANCE.getIntermediateDeploymentTechnologyReference_IntermediateContainer();
+		EReference INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__CONTAINER = eINSTANCE.getIntermediateDeploymentTechnologyReference_Container();
 
 		/**
 		 * The meta object literal for the '{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateTechnologySpecificPropertyImpl <em>Technology Specific Property</em>}' class.
@@ -2156,20 +2186,20 @@ public interface IntermediatePackage extends EPackage {
 		EAttribute INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__FEATUREAMES = eINSTANCE.getIntermediateTechnologySpecificProperty_Featureames();
 
 		/**
-		 * The meta object literal for the '<em><b>Intermediate Technology Specific Property Value</b></em>' containment reference feature.
+		 * The meta object literal for the '<em><b>Property Value</b></em>' containment reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE = eINSTANCE.getIntermediateTechnologySpecificProperty_IntermediateTechnologySpecificPropertyValue();
+		EReference INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__PROPERTY_VALUE = eINSTANCE.getIntermediateTechnologySpecificProperty_PropertyValue();
 
 		/**
-		 * The meta object literal for the '<em><b>Intermediate Operation Technology</b></em>' container reference feature.
+		 * The meta object literal for the '<em><b>Operation Technology</b></em>' container reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__INTERMEDIATE_OPERATION_TECHNOLOGY = eINSTANCE.getIntermediateTechnologySpecificProperty_IntermediateOperationTechnology();
+		EReference INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__OPERATION_TECHNOLOGY = eINSTANCE.getIntermediateTechnologySpecificProperty_OperationTechnology();
 
 		/**
 		 * The meta object literal for the '{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateTechnologySpecificPropertyValueImpl <em>Technology Specific Property Value</em>}' class.
@@ -2190,20 +2220,20 @@ public interface IntermediatePackage extends EPackage {
 		EAttribute INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE__VALUE = eINSTANCE.getIntermediateTechnologySpecificPropertyValue_Value();
 
 		/**
-		 * The meta object literal for the '<em><b>Intermediate Service Deployment Specification</b></em>' container reference feature.
+		 * The meta object literal for the '<em><b>Specification</b></em>' container reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE__INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION = eINSTANCE.getIntermediateTechnologySpecificPropertyValue_IntermediateServiceDeploymentSpecification();
+		EReference INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE__SPECIFICATION = eINSTANCE.getIntermediateTechnologySpecificPropertyValue_Specification();
 
 		/**
-		 * The meta object literal for the '<em><b>Intermediate Technology Specific Property</b></em>' container reference feature.
+		 * The meta object literal for the '<em><b>Property</b></em>' container reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY = eINSTANCE.getIntermediateTechnologySpecificPropertyValue_IntermediateTechnologySpecificProperty();
+		EReference INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE__PROPERTY = eINSTANCE.getIntermediateTechnologySpecificPropertyValue_Property();
 
 		/**
 		 * The meta object literal for the '{@link de.fhdo.lemma.operation.intermediate.impl.OperationMicroserviceReferenceImpl <em>Operation Microservice Reference</em>}' class.
@@ -2246,6 +2276,22 @@ public interface IntermediatePackage extends EPackage {
 		 * @generated
 		 */
 		EReference OPERATION_MICROSERVICE_REFERENCE__INTERMEDIATE_IMPORT = eINSTANCE.getOperationMicroserviceReference_IntermediateImport();
+
+		/**
+		 * The meta object literal for the '<em><b>Service</b></em>' container reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference OPERATION_MICROSERVICE_REFERENCE__SERVICE = eINSTANCE.getOperationMicroserviceReference_Service();
+
+		/**
+		 * The meta object literal for the '<em><b>Specification</b></em>' container reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference OPERATION_MICROSERVICE_REFERENCE__SPECIFICATION = eINSTANCE.getOperationMicroserviceReference_Specification();
 
 	}
 

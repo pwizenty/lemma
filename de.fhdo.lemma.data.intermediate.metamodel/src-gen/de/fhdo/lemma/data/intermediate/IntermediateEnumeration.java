@@ -26,22 +26,18 @@ import org.eclipse.emf.common.util.EList;
  * @generated
  */
 public interface IntermediateEnumeration extends IntermediateComplexType {
-    /**
-     * Returns the value of the '<em><b>Fields</b></em>' containment reference list.
-     * The list contents are of type {@link de.fhdo.lemma.data.intermediate.IntermediateEnumerationField}.
-     * It is bidirectional and its opposite is '{@link de.fhdo.lemma.data.intermediate.IntermediateEnumerationField#getEnumeration <em>Enumeration</em>}'.
-     * <!-- begin-user-doc -->
-     * <p>
-     * If the meaning of the '<em>Fields</em>' containment reference list isn't clear,
-     * there really should be more of a description here...
-     * </p>
-     * <!-- end-user-doc -->
-     * @return the value of the '<em>Fields</em>' containment reference list.
-     * @see de.fhdo.lemma.data.intermediate.IntermediatePackage#getIntermediateEnumeration_Fields()
-     * @see de.fhdo.lemma.data.intermediate.IntermediateEnumerationField#getEnumeration
-     * @model opposite="enumeration" containment="true" required="true"
-     * @generated
-     */
-    EList<IntermediateEnumerationField> getFields();
+	/**
+	 * Returns the value of the '<em><b>Fields</b></em>' containment reference list.
+	 * The list contents are of type {@link de.fhdo.lemma.data.intermediate.IntermediateEnumerationField}.
+	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.data.intermediate.IntermediateEnumerationField#getEnumeration <em>Enumeration</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Fields</em>' containment reference list.
+	 * @see de.fhdo.lemma.data.intermediate.IntermediatePackage#getIntermediateEnumeration_Fields()
+	 * @see de.fhdo.lemma.data.intermediate.IntermediateEnumerationField#getEnumeration
+	 * @model opposite="enumeration" containment="true" required="true"
+	 * @generated
+	 */
+	EList<IntermediateEnumerationField> getFields();
 
 } // IntermediateEnumeration

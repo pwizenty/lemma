@@ -4,7 +4,9 @@ package de.fhdo.lemma.operation.intermediate.impl;
 
 import de.fhdo.lemma.data.intermediate.IntermediateImport;
 
+import de.fhdo.lemma.operation.intermediate.IntermediateOperationNode;
 import de.fhdo.lemma.operation.intermediate.IntermediatePackage;
+import de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification;
 import de.fhdo.lemma.operation.intermediate.OperationMicroserviceReference;
 
 import de.fhdo.lemma.service.MicroserviceType;
@@ -13,11 +15,14 @@ import de.fhdo.lemma.service.Visibility;
 import de.fhdo.lemma.service.intermediate.impl.MicroserviceReferenceImpl;
 
 import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.notify.NotificationChain;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
+
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * <!-- begin-user-doc -->
@@ -31,6 +36,8 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.OperationMicroserviceReferenceImpl#getMicroserviceType <em>Microservice Type</em>}</li>
  *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.OperationMicroserviceReferenceImpl#getVisibility <em>Visibility</em>}</li>
  *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.OperationMicroserviceReferenceImpl#getIntermediateImport <em>Intermediate Import</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.OperationMicroserviceReferenceImpl#getService <em>Service</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.OperationMicroserviceReferenceImpl#getSpecification <em>Specification</em>}</li>
  * </ul>
  *
  * @generated
@@ -231,6 +238,160 @@ public class OperationMicroserviceReferenceImpl extends MicroserviceReferenceImp
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public IntermediateOperationNode getService() {
+		if (eContainerFeatureID() != IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__SERVICE) return null;
+		return (IntermediateOperationNode)eContainer();
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public IntermediateOperationNode basicGetService() {
+		if (eContainerFeatureID() != IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__SERVICE) return null;
+		return (IntermediateOperationNode)eInternalContainer();
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetService(IntermediateOperationNode newService, NotificationChain msgs) {
+		msgs = eBasicSetContainer((InternalEObject)newService, IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__SERVICE, msgs);
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setService(IntermediateOperationNode newService) {
+		if (newService != eInternalContainer() || (eContainerFeatureID() != IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__SERVICE && newService != null)) {
+			if (EcoreUtil.isAncestor(this, newService))
+				throw new IllegalArgumentException("Recursive containment not allowed for " + toString());
+			NotificationChain msgs = null;
+			if (eInternalContainer() != null)
+				msgs = eBasicRemoveFromContainer(msgs);
+			if (newService != null)
+				msgs = ((InternalEObject)newService).eInverseAdd(this, IntermediatePackage.INTERMEDIATE_OPERATION_NODE__DEPLOYED_SERVICES, IntermediateOperationNode.class, msgs);
+			msgs = basicSetService(newService, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__SERVICE, newService, newService));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public IntermediateServiceDeploymentSpecification getSpecification() {
+		if (eContainerFeatureID() != IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__SPECIFICATION) return null;
+		return (IntermediateServiceDeploymentSpecification)eContainer();
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public IntermediateServiceDeploymentSpecification basicGetSpecification() {
+		if (eContainerFeatureID() != IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__SPECIFICATION) return null;
+		return (IntermediateServiceDeploymentSpecification)eInternalContainer();
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetSpecification(IntermediateServiceDeploymentSpecification newSpecification, NotificationChain msgs) {
+		msgs = eBasicSetContainer((InternalEObject)newSpecification, IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__SPECIFICATION, msgs);
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setSpecification(IntermediateServiceDeploymentSpecification newSpecification) {
+		if (newSpecification != eInternalContainer() || (eContainerFeatureID() != IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__SPECIFICATION && newSpecification != null)) {
+			if (EcoreUtil.isAncestor(this, newSpecification))
+				throw new IllegalArgumentException("Recursive containment not allowed for " + toString());
+			NotificationChain msgs = null;
+			if (eInternalContainer() != null)
+				msgs = eBasicRemoveFromContainer(msgs);
+			if (newSpecification != null)
+				msgs = ((InternalEObject)newSpecification).eInverseAdd(this, IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__SERVICE, IntermediateServiceDeploymentSpecification.class, msgs);
+			msgs = basicSetSpecification(newSpecification, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__SPECIFICATION, newSpecification, newSpecification));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__SERVICE:
+				if (eInternalContainer() != null)
+					msgs = eBasicRemoveFromContainer(msgs);
+				return basicSetService((IntermediateOperationNode)otherEnd, msgs);
+			case IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__SPECIFICATION:
+				if (eInternalContainer() != null)
+					msgs = eBasicRemoveFromContainer(msgs);
+				return basicSetSpecification((IntermediateServiceDeploymentSpecification)otherEnd, msgs);
+		}
+		return super.eInverseAdd(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__SERVICE:
+				return basicSetService(null, msgs);
+			case IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__SPECIFICATION:
+				return basicSetSpecification(null, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eBasicRemoveFromContainerFeature(NotificationChain msgs) {
+		switch (eContainerFeatureID()) {
+			case IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__SERVICE:
+				return eInternalContainer().eInverseRemove(this, IntermediatePackage.INTERMEDIATE_OPERATION_NODE__DEPLOYED_SERVICES, IntermediateOperationNode.class, msgs);
+			case IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__SPECIFICATION:
+				return eInternalContainer().eInverseRemove(this, IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__SERVICE, IntermediateServiceDeploymentSpecification.class, msgs);
+		}
+		return super.eBasicRemoveFromContainerFeature(msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
@@ -243,6 +404,12 @@ public class OperationMicroserviceReferenceImpl extends MicroserviceReferenceImp
 			case IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__INTERMEDIATE_IMPORT:
 				if (resolve) return getIntermediateImport();
 				return basicGetIntermediateImport();
+			case IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__SERVICE:
+				if (resolve) return getService();
+				return basicGetService();
+			case IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__SPECIFICATION:
+				if (resolve) return getSpecification();
+				return basicGetSpecification();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -266,6 +433,12 @@ public class OperationMicroserviceReferenceImpl extends MicroserviceReferenceImp
 				return;
 			case IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__INTERMEDIATE_IMPORT:
 				setIntermediateImport((IntermediateImport)newValue);
+				return;
+			case IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__SERVICE:
+				setService((IntermediateOperationNode)newValue);
+				return;
+			case IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__SPECIFICATION:
+				setSpecification((IntermediateServiceDeploymentSpecification)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -291,6 +464,12 @@ public class OperationMicroserviceReferenceImpl extends MicroserviceReferenceImp
 			case IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__INTERMEDIATE_IMPORT:
 				setIntermediateImport((IntermediateImport)null);
 				return;
+			case IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__SERVICE:
+				setService((IntermediateOperationNode)null);
+				return;
+			case IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__SPECIFICATION:
+				setSpecification((IntermediateServiceDeploymentSpecification)null);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -311,6 +490,10 @@ public class OperationMicroserviceReferenceImpl extends MicroserviceReferenceImp
 				return visibility != VISIBILITY_EDEFAULT;
 			case IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__INTERMEDIATE_IMPORT:
 				return intermediateImport != null;
+			case IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__SERVICE:
+				return basicGetService() != null;
+			case IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__SPECIFICATION:
+				return basicGetSpecification() != null;
 		}
 		return super.eIsSet(featureID);
 	}

@@ -32,8 +32,8 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * </p>
  * <ul>
  *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateOperationTechnologyImpl#getName <em>Name</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateOperationTechnologyImpl#getIntermediateOperationEnvironment <em>Intermediate Operation Environment</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateOperationTechnologyImpl#getIntermediateTechnologySpecificProperty <em>Intermediate Technology Specific Property</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateOperationTechnologyImpl#getEnvironments <em>Environments</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateOperationTechnologyImpl#getPropertys <em>Propertys</em>}</li>
  * </ul>
  *
  * @generated
@@ -60,24 +60,24 @@ public abstract class IntermediateOperationTechnologyImpl extends MinimalEObject
 	protected String name = NAME_EDEFAULT;
 
 	/**
-	 * The cached value of the '{@link #getIntermediateOperationEnvironment() <em>Intermediate Operation Environment</em>}' containment reference list.
+	 * The cached value of the '{@link #getEnvironments() <em>Environments</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getIntermediateOperationEnvironment()
+	 * @see #getEnvironments()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<IntermediateOperationEnvironment> intermediateOperationEnvironment;
+	protected EList<IntermediateOperationEnvironment> environments;
 
 	/**
-	 * The cached value of the '{@link #getIntermediateTechnologySpecificProperty() <em>Intermediate Technology Specific Property</em>}' containment reference list.
+	 * The cached value of the '{@link #getPropertys() <em>Propertys</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getIntermediateTechnologySpecificProperty()
+	 * @see #getPropertys()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<IntermediateTechnologySpecificProperty> intermediateTechnologySpecificProperty;
+	protected EList<IntermediateTechnologySpecificProperty> propertys;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -124,11 +124,11 @@ public abstract class IntermediateOperationTechnologyImpl extends MinimalEObject
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<IntermediateOperationEnvironment> getIntermediateOperationEnvironment() {
-		if (intermediateOperationEnvironment == null) {
-			intermediateOperationEnvironment = new EObjectContainmentWithInverseEList<IntermediateOperationEnvironment>(IntermediateOperationEnvironment.class, this, IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__INTERMEDIATE_OPERATION_ENVIRONMENT, IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__INTERMEDIATE_OPERATIONTECHNOLOGY);
+	public EList<IntermediateOperationEnvironment> getEnvironments() {
+		if (environments == null) {
+			environments = new EObjectContainmentWithInverseEList<IntermediateOperationEnvironment>(IntermediateOperationEnvironment.class, this, IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__ENVIRONMENTS, IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__OPERATION_TECHNOLOGY);
 		}
-		return intermediateOperationEnvironment;
+		return environments;
 	}
 
 	/**
@@ -136,11 +136,11 @@ public abstract class IntermediateOperationTechnologyImpl extends MinimalEObject
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<IntermediateTechnologySpecificProperty> getIntermediateTechnologySpecificProperty() {
-		if (intermediateTechnologySpecificProperty == null) {
-			intermediateTechnologySpecificProperty = new EObjectContainmentWithInverseEList<IntermediateTechnologySpecificProperty>(IntermediateTechnologySpecificProperty.class, this, IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY, IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__INTERMEDIATE_OPERATION_TECHNOLOGY);
+	public EList<IntermediateTechnologySpecificProperty> getPropertys() {
+		if (propertys == null) {
+			propertys = new EObjectContainmentWithInverseEList<IntermediateTechnologySpecificProperty>(IntermediateTechnologySpecificProperty.class, this, IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__PROPERTYS, IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__OPERATION_TECHNOLOGY);
 		}
-		return intermediateTechnologySpecificProperty;
+		return propertys;
 	}
 
 	/**
@@ -152,10 +152,10 @@ public abstract class IntermediateOperationTechnologyImpl extends MinimalEObject
 	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__INTERMEDIATE_OPERATION_ENVIRONMENT:
-				return ((InternalEList<InternalEObject>)(InternalEList<?>)getIntermediateOperationEnvironment()).basicAdd(otherEnd, msgs);
-			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY:
-				return ((InternalEList<InternalEObject>)(InternalEList<?>)getIntermediateTechnologySpecificProperty()).basicAdd(otherEnd, msgs);
+			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__ENVIRONMENTS:
+				return ((InternalEList<InternalEObject>)(InternalEList<?>)getEnvironments()).basicAdd(otherEnd, msgs);
+			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__PROPERTYS:
+				return ((InternalEList<InternalEObject>)(InternalEList<?>)getPropertys()).basicAdd(otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -168,10 +168,10 @@ public abstract class IntermediateOperationTechnologyImpl extends MinimalEObject
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__INTERMEDIATE_OPERATION_ENVIRONMENT:
-				return ((InternalEList<?>)getIntermediateOperationEnvironment()).basicRemove(otherEnd, msgs);
-			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY:
-				return ((InternalEList<?>)getIntermediateTechnologySpecificProperty()).basicRemove(otherEnd, msgs);
+			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__ENVIRONMENTS:
+				return ((InternalEList<?>)getEnvironments()).basicRemove(otherEnd, msgs);
+			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__PROPERTYS:
+				return ((InternalEList<?>)getPropertys()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -186,10 +186,10 @@ public abstract class IntermediateOperationTechnologyImpl extends MinimalEObject
 		switch (featureID) {
 			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__NAME:
 				return getName();
-			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__INTERMEDIATE_OPERATION_ENVIRONMENT:
-				return getIntermediateOperationEnvironment();
-			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY:
-				return getIntermediateTechnologySpecificProperty();
+			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__ENVIRONMENTS:
+				return getEnvironments();
+			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__PROPERTYS:
+				return getPropertys();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -206,13 +206,13 @@ public abstract class IntermediateOperationTechnologyImpl extends MinimalEObject
 			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__NAME:
 				setName((String)newValue);
 				return;
-			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__INTERMEDIATE_OPERATION_ENVIRONMENT:
-				getIntermediateOperationEnvironment().clear();
-				getIntermediateOperationEnvironment().addAll((Collection<? extends IntermediateOperationEnvironment>)newValue);
+			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__ENVIRONMENTS:
+				getEnvironments().clear();
+				getEnvironments().addAll((Collection<? extends IntermediateOperationEnvironment>)newValue);
 				return;
-			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY:
-				getIntermediateTechnologySpecificProperty().clear();
-				getIntermediateTechnologySpecificProperty().addAll((Collection<? extends IntermediateTechnologySpecificProperty>)newValue);
+			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__PROPERTYS:
+				getPropertys().clear();
+				getPropertys().addAll((Collection<? extends IntermediateTechnologySpecificProperty>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -229,11 +229,11 @@ public abstract class IntermediateOperationTechnologyImpl extends MinimalEObject
 			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__NAME:
 				setName(NAME_EDEFAULT);
 				return;
-			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__INTERMEDIATE_OPERATION_ENVIRONMENT:
-				getIntermediateOperationEnvironment().clear();
+			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__ENVIRONMENTS:
+				getEnvironments().clear();
 				return;
-			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY:
-				getIntermediateTechnologySpecificProperty().clear();
+			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__PROPERTYS:
+				getPropertys().clear();
 				return;
 		}
 		super.eUnset(featureID);
@@ -249,10 +249,10 @@ public abstract class IntermediateOperationTechnologyImpl extends MinimalEObject
 		switch (featureID) {
 			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
-			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__INTERMEDIATE_OPERATION_ENVIRONMENT:
-				return intermediateOperationEnvironment != null && !intermediateOperationEnvironment.isEmpty();
-			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY:
-				return intermediateTechnologySpecificProperty != null && !intermediateTechnologySpecificProperty.isEmpty();
+			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__ENVIRONMENTS:
+				return environments != null && !environments.isEmpty();
+			case IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__PROPERTYS:
+				return propertys != null && !propertys.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

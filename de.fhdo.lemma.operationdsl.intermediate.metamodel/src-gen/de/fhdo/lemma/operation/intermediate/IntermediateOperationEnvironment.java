@@ -11,7 +11,8 @@ import org.eclipse.emf.ecore.EObject;
  *
  * <!-- begin-model-doc -->
  * *
- * Intermediate operation environment of an intermediate operation technology, e.g., an image of a deployment container
+ * Intermediate operation environment of an intermediate operation technology, e.g., an image
+ * of a deployment container
  * <!-- end-model-doc -->
  *
  * <p>
@@ -20,7 +21,7 @@ import org.eclipse.emf.ecore.EObject;
  * <ul>
  *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationEnvironment#getEnvironmentName <em>Environment Name</em>}</li>
  *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationEnvironment#isDefault <em>Default</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationEnvironment#getIntermediateOperationtechnology <em>Intermediate Operationtechnology</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationEnvironment#getOperationTechnology <em>Operation Technology</em>}</li>
  * </ul>
  *
  * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateOperationEnvironment()
@@ -52,12 +53,13 @@ public interface IntermediateOperationEnvironment extends EObject {
 
 	/**
 	 * Returns the value of the '<em><b>Default</b></em>' attribute.
+	 * The default value is <code>"false"</code>.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Default</em>' attribute.
 	 * @see #setDefault(boolean)
 	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateOperationEnvironment_Default()
-	 * @model unique="false"
+	 * @model default="false" unique="false"
 	 * @generated
 	 */
 	boolean isDefault();
@@ -73,27 +75,27 @@ public interface IntermediateOperationEnvironment extends EObject {
 	void setDefault(boolean value);
 
 	/**
-	 * Returns the value of the '<em><b>Intermediate Operationtechnology</b></em>' container reference.
-	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationTechnology#getIntermediateOperationEnvironment <em>Intermediate Operation Environment</em>}'.
+	 * Returns the value of the '<em><b>Operation Technology</b></em>' container reference.
+	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationTechnology#getEnvironments <em>Environments</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Intermediate Operationtechnology</em>' container reference.
-	 * @see #setIntermediateOperationtechnology(IntermediateOperationTechnology)
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateOperationEnvironment_IntermediateOperationtechnology()
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationTechnology#getIntermediateOperationEnvironment
-	 * @model opposite="intermediateOperationEnvironment" transient="false"
+	 * @return the value of the '<em>Operation Technology</em>' container reference.
+	 * @see #setOperationTechnology(IntermediateOperationTechnology)
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateOperationEnvironment_OperationTechnology()
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationTechnology#getEnvironments
+	 * @model opposite="environments" transient="false"
 	 * @generated
 	 */
-	IntermediateOperationTechnology getIntermediateOperationtechnology();
+	IntermediateOperationTechnology getOperationTechnology();
 
 	/**
-	 * Sets the value of the '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationEnvironment#getIntermediateOperationtechnology <em>Intermediate Operationtechnology</em>}' container reference.
+	 * Sets the value of the '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationEnvironment#getOperationTechnology <em>Operation Technology</em>}' container reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Intermediate Operationtechnology</em>' container reference.
-	 * @see #getIntermediateOperationtechnology()
+	 * @param value the new value of the '<em>Operation Technology</em>' container reference.
+	 * @see #getOperationTechnology()
 	 * @generated
 	 */
-	void setIntermediateOperationtechnology(IntermediateOperationTechnology value);
+	void setOperationTechnology(IntermediateOperationTechnology value);
 
 } // IntermediateOperationEnvironment

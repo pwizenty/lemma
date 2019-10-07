@@ -27,7 +27,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * <ul>
  *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateOperationEnvironmentImpl#getEnvironmentName <em>Environment Name</em>}</li>
  *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateOperationEnvironmentImpl#isDefault <em>Default</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateOperationEnvironmentImpl#getIntermediateOperationtechnology <em>Intermediate Operationtechnology</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateOperationEnvironmentImpl#getOperationTechnology <em>Operation Technology</em>}</li>
  * </ul>
  *
  * @generated
@@ -139,8 +139,8 @@ public class IntermediateOperationEnvironmentImpl extends MinimalEObjectImpl.Con
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public IntermediateOperationTechnology getIntermediateOperationtechnology() {
-		if (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__INTERMEDIATE_OPERATIONTECHNOLOGY) return null;
+	public IntermediateOperationTechnology getOperationTechnology() {
+		if (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__OPERATION_TECHNOLOGY) return null;
 		return (IntermediateOperationTechnology)eContainer();
 	}
 
@@ -149,8 +149,8 @@ public class IntermediateOperationEnvironmentImpl extends MinimalEObjectImpl.Con
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public IntermediateOperationTechnology basicGetIntermediateOperationtechnology() {
-		if (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__INTERMEDIATE_OPERATIONTECHNOLOGY) return null;
+	public IntermediateOperationTechnology basicGetOperationTechnology() {
+		if (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__OPERATION_TECHNOLOGY) return null;
 		return (IntermediateOperationTechnology)eInternalContainer();
 	}
 
@@ -159,8 +159,8 @@ public class IntermediateOperationEnvironmentImpl extends MinimalEObjectImpl.Con
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetIntermediateOperationtechnology(IntermediateOperationTechnology newIntermediateOperationtechnology, NotificationChain msgs) {
-		msgs = eBasicSetContainer((InternalEObject)newIntermediateOperationtechnology, IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__INTERMEDIATE_OPERATIONTECHNOLOGY, msgs);
+	public NotificationChain basicSetOperationTechnology(IntermediateOperationTechnology newOperationTechnology, NotificationChain msgs) {
+		msgs = eBasicSetContainer((InternalEObject)newOperationTechnology, IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__OPERATION_TECHNOLOGY, msgs);
 		return msgs;
 	}
 
@@ -169,20 +169,20 @@ public class IntermediateOperationEnvironmentImpl extends MinimalEObjectImpl.Con
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setIntermediateOperationtechnology(IntermediateOperationTechnology newIntermediateOperationtechnology) {
-		if (newIntermediateOperationtechnology != eInternalContainer() || (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__INTERMEDIATE_OPERATIONTECHNOLOGY && newIntermediateOperationtechnology != null)) {
-			if (EcoreUtil.isAncestor(this, newIntermediateOperationtechnology))
+	public void setOperationTechnology(IntermediateOperationTechnology newOperationTechnology) {
+		if (newOperationTechnology != eInternalContainer() || (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__OPERATION_TECHNOLOGY && newOperationTechnology != null)) {
+			if (EcoreUtil.isAncestor(this, newOperationTechnology))
 				throw new IllegalArgumentException("Recursive containment not allowed for " + toString());
 			NotificationChain msgs = null;
 			if (eInternalContainer() != null)
 				msgs = eBasicRemoveFromContainer(msgs);
-			if (newIntermediateOperationtechnology != null)
-				msgs = ((InternalEObject)newIntermediateOperationtechnology).eInverseAdd(this, IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__INTERMEDIATE_OPERATION_ENVIRONMENT, IntermediateOperationTechnology.class, msgs);
-			msgs = basicSetIntermediateOperationtechnology(newIntermediateOperationtechnology, msgs);
+			if (newOperationTechnology != null)
+				msgs = ((InternalEObject)newOperationTechnology).eInverseAdd(this, IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__ENVIRONMENTS, IntermediateOperationTechnology.class, msgs);
+			msgs = basicSetOperationTechnology(newOperationTechnology, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__INTERMEDIATE_OPERATIONTECHNOLOGY, newIntermediateOperationtechnology, newIntermediateOperationtechnology));
+			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__OPERATION_TECHNOLOGY, newOperationTechnology, newOperationTechnology));
 	}
 
 	/**
@@ -193,10 +193,10 @@ public class IntermediateOperationEnvironmentImpl extends MinimalEObjectImpl.Con
 	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__INTERMEDIATE_OPERATIONTECHNOLOGY:
+			case IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__OPERATION_TECHNOLOGY:
 				if (eInternalContainer() != null)
 					msgs = eBasicRemoveFromContainer(msgs);
-				return basicSetIntermediateOperationtechnology((IntermediateOperationTechnology)otherEnd, msgs);
+				return basicSetOperationTechnology((IntermediateOperationTechnology)otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -209,8 +209,8 @@ public class IntermediateOperationEnvironmentImpl extends MinimalEObjectImpl.Con
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__INTERMEDIATE_OPERATIONTECHNOLOGY:
-				return basicSetIntermediateOperationtechnology(null, msgs);
+			case IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__OPERATION_TECHNOLOGY:
+				return basicSetOperationTechnology(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -223,8 +223,8 @@ public class IntermediateOperationEnvironmentImpl extends MinimalEObjectImpl.Con
 	@Override
 	public NotificationChain eBasicRemoveFromContainerFeature(NotificationChain msgs) {
 		switch (eContainerFeatureID()) {
-			case IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__INTERMEDIATE_OPERATIONTECHNOLOGY:
-				return eInternalContainer().eInverseRemove(this, IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__INTERMEDIATE_OPERATION_ENVIRONMENT, IntermediateOperationTechnology.class, msgs);
+			case IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__OPERATION_TECHNOLOGY:
+				return eInternalContainer().eInverseRemove(this, IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__ENVIRONMENTS, IntermediateOperationTechnology.class, msgs);
 		}
 		return super.eBasicRemoveFromContainerFeature(msgs);
 	}
@@ -241,9 +241,9 @@ public class IntermediateOperationEnvironmentImpl extends MinimalEObjectImpl.Con
 				return getEnvironmentName();
 			case IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__DEFAULT:
 				return isDefault();
-			case IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__INTERMEDIATE_OPERATIONTECHNOLOGY:
-				if (resolve) return getIntermediateOperationtechnology();
-				return basicGetIntermediateOperationtechnology();
+			case IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__OPERATION_TECHNOLOGY:
+				if (resolve) return getOperationTechnology();
+				return basicGetOperationTechnology();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -262,8 +262,8 @@ public class IntermediateOperationEnvironmentImpl extends MinimalEObjectImpl.Con
 			case IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__DEFAULT:
 				setDefault((Boolean)newValue);
 				return;
-			case IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__INTERMEDIATE_OPERATIONTECHNOLOGY:
-				setIntermediateOperationtechnology((IntermediateOperationTechnology)newValue);
+			case IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__OPERATION_TECHNOLOGY:
+				setOperationTechnology((IntermediateOperationTechnology)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -283,8 +283,8 @@ public class IntermediateOperationEnvironmentImpl extends MinimalEObjectImpl.Con
 			case IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__DEFAULT:
 				setDefault(DEFAULT_EDEFAULT);
 				return;
-			case IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__INTERMEDIATE_OPERATIONTECHNOLOGY:
-				setIntermediateOperationtechnology((IntermediateOperationTechnology)null);
+			case IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__OPERATION_TECHNOLOGY:
+				setOperationTechnology((IntermediateOperationTechnology)null);
 				return;
 		}
 		super.eUnset(featureID);
@@ -302,8 +302,8 @@ public class IntermediateOperationEnvironmentImpl extends MinimalEObjectImpl.Con
 				return ENVIRONMENT_NAME_EDEFAULT == null ? environmentName != null : !ENVIRONMENT_NAME_EDEFAULT.equals(environmentName);
 			case IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__DEFAULT:
 				return default_ != DEFAULT_EDEFAULT;
-			case IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__INTERMEDIATE_OPERATIONTECHNOLOGY:
-				return basicGetIntermediateOperationtechnology() != null;
+			case IntermediatePackage.INTERMEDIATE_OPERATION_ENVIRONMENT__OPERATION_TECHNOLOGY:
+				return basicGetOperationTechnology() != null;
 		}
 		return super.eIsSet(featureID);
 	}

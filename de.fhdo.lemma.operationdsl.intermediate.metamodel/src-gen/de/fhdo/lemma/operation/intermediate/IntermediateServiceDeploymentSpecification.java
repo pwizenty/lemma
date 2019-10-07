@@ -15,17 +15,18 @@ import org.eclipse.emf.ecore.EObject;
  *
  * <!-- begin-model-doc -->
  * *
- * Represents the further specification of a service being deployed to an intermediate operation node
+ * Represents the further specification of a service being deployed to an
+ * intermediate operation node
  * <!-- end-model-doc -->
  *
  * <p>
  * The following features are supported:
  * </p>
  * <ul>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getOperationMicroserviceReference <em>Operation Microservice Reference</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getIntermediateTechnologySpecificPropertyValue <em>Intermediate Technology Specific Property Value</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getIntermediateEndpoints <em>Intermediate Endpoints</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getIntermediateOperationNode <em>Intermediate Operation Node</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getService <em>Service</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getPropertyValues <em>Property Values</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getEndpoints <em>Endpoints</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getOperationNode <em>Operation Node</em>}</li>
  * </ul>
  *
  * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateServiceDeploymentSpecification()
@@ -34,75 +35,77 @@ import org.eclipse.emf.ecore.EObject;
  */
 public interface IntermediateServiceDeploymentSpecification extends EObject {
 	/**
-	 * Returns the value of the '<em><b>Operation Microservice Reference</b></em>' reference.
+	 * Returns the value of the '<em><b>Service</b></em>' containment reference.
+	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.operation.intermediate.OperationMicroserviceReference#getSpecification <em>Specification</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Operation Microservice Reference</em>' reference.
-	 * @see #setOperationMicroserviceReference(OperationMicroserviceReference)
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateServiceDeploymentSpecification_OperationMicroserviceReference()
-	 * @model
+	 * @return the value of the '<em>Service</em>' containment reference.
+	 * @see #setService(OperationMicroserviceReference)
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateServiceDeploymentSpecification_Service()
+	 * @see de.fhdo.lemma.operation.intermediate.OperationMicroserviceReference#getSpecification
+	 * @model opposite="specification" containment="true"
 	 * @generated
 	 */
-	OperationMicroserviceReference getOperationMicroserviceReference();
+	OperationMicroserviceReference getService();
 
 	/**
-	 * Sets the value of the '{@link de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getOperationMicroserviceReference <em>Operation Microservice Reference</em>}' reference.
+	 * Sets the value of the '{@link de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getService <em>Service</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Operation Microservice Reference</em>' reference.
-	 * @see #getOperationMicroserviceReference()
+	 * @param value the new value of the '<em>Service</em>' containment reference.
+	 * @see #getService()
 	 * @generated
 	 */
-	void setOperationMicroserviceReference(OperationMicroserviceReference value);
+	void setService(OperationMicroserviceReference value);
 
 	/**
-	 * Returns the value of the '<em><b>Intermediate Technology Specific Property Value</b></em>' containment reference list.
+	 * Returns the value of the '<em><b>Property Values</b></em>' containment reference list.
 	 * The list contents are of type {@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificPropertyValue}.
-	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificPropertyValue#getIntermediateServiceDeploymentSpecification <em>Intermediate Service Deployment Specification</em>}'.
+	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificPropertyValue#getSpecification <em>Specification</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Intermediate Technology Specific Property Value</em>' containment reference list.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateServiceDeploymentSpecification_IntermediateTechnologySpecificPropertyValue()
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificPropertyValue#getIntermediateServiceDeploymentSpecification
-	 * @model opposite="intermediateServiceDeploymentSpecification" containment="true"
+	 * @return the value of the '<em>Property Values</em>' containment reference list.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateServiceDeploymentSpecification_PropertyValues()
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificPropertyValue#getSpecification
+	 * @model opposite="specification" containment="true"
 	 * @generated
 	 */
-	EList<IntermediateTechnologySpecificPropertyValue> getIntermediateTechnologySpecificPropertyValue();
+	EList<IntermediateTechnologySpecificPropertyValue> getPropertyValues();
 
 	/**
-	 * Returns the value of the '<em><b>Intermediate Endpoints</b></em>' containment reference list.
+	 * Returns the value of the '<em><b>Endpoints</b></em>' containment reference list.
 	 * The list contents are of type {@link de.fhdo.lemma.service.intermediate.IntermediateEndpoint}.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Intermediate Endpoints</em>' containment reference list.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateServiceDeploymentSpecification_IntermediateEndpoints()
+	 * @return the value of the '<em>Endpoints</em>' containment reference list.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateServiceDeploymentSpecification_Endpoints()
 	 * @model containment="true" required="true"
 	 * @generated
 	 */
-	EList<IntermediateEndpoint> getIntermediateEndpoints();
+	EList<IntermediateEndpoint> getEndpoints();
 
 	/**
-	 * Returns the value of the '<em><b>Intermediate Operation Node</b></em>' container reference.
-	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationNode#getIntermediateServiceDeploymentSpecification <em>Intermediate Service Deployment Specification</em>}'.
+	 * Returns the value of the '<em><b>Operation Node</b></em>' container reference.
+	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationNode#getSpecifications <em>Specifications</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Intermediate Operation Node</em>' container reference.
-	 * @see #setIntermediateOperationNode(IntermediateOperationNode)
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateServiceDeploymentSpecification_IntermediateOperationNode()
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationNode#getIntermediateServiceDeploymentSpecification
-	 * @model opposite="intermediateServiceDeploymentSpecification" transient="false"
+	 * @return the value of the '<em>Operation Node</em>' container reference.
+	 * @see #setOperationNode(IntermediateOperationNode)
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateServiceDeploymentSpecification_OperationNode()
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationNode#getSpecifications
+	 * @model opposite="specifications" transient="false"
 	 * @generated
 	 */
-	IntermediateOperationNode getIntermediateOperationNode();
+	IntermediateOperationNode getOperationNode();
 
 	/**
-	 * Sets the value of the '{@link de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getIntermediateOperationNode <em>Intermediate Operation Node</em>}' container reference.
+	 * Sets the value of the '{@link de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getOperationNode <em>Operation Node</em>}' container reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Intermediate Operation Node</em>' container reference.
-	 * @see #getIntermediateOperationNode()
+	 * @param value the new value of the '<em>Operation Node</em>' container reference.
+	 * @see #getOperationNode()
 	 * @generated
 	 */
-	void setIntermediateOperationNode(IntermediateOperationNode value);
+	void setOperationNode(IntermediateOperationNode value);
 
 } // IntermediateServiceDeploymentSpecification

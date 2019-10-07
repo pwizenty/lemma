@@ -27,6 +27,8 @@ import de.fhdo.lemma.service.intermediate.MicroserviceReference;
  *   <li>{@link de.fhdo.lemma.operation.intermediate.OperationMicroserviceReference#getMicroserviceType <em>Microservice Type</em>}</li>
  *   <li>{@link de.fhdo.lemma.operation.intermediate.OperationMicroserviceReference#getVisibility <em>Visibility</em>}</li>
  *   <li>{@link de.fhdo.lemma.operation.intermediate.OperationMicroserviceReference#getIntermediateImport <em>Intermediate Import</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.OperationMicroserviceReference#getService <em>Service</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.OperationMicroserviceReference#getSpecification <em>Specification</em>}</li>
  * </ul>
  *
  * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getOperationMicroserviceReference()
@@ -127,5 +129,53 @@ public interface OperationMicroserviceReference extends MicroserviceReference {
 	 * @generated
 	 */
 	void setIntermediateImport(IntermediateImport value);
+
+	/**
+	 * Returns the value of the '<em><b>Service</b></em>' container reference.
+	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationNode#getDeployedServices <em>Deployed Services</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Service</em>' container reference.
+	 * @see #setService(IntermediateOperationNode)
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getOperationMicroserviceReference_Service()
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationNode#getDeployedServices
+	 * @model opposite="deployedServices" transient="false"
+	 * @generated
+	 */
+	IntermediateOperationNode getService();
+
+	/**
+	 * Sets the value of the '{@link de.fhdo.lemma.operation.intermediate.OperationMicroserviceReference#getService <em>Service</em>}' container reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Service</em>' container reference.
+	 * @see #getService()
+	 * @generated
+	 */
+	void setService(IntermediateOperationNode value);
+
+	/**
+	 * Returns the value of the '<em><b>Specification</b></em>' container reference.
+	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getService <em>Service</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Specification</em>' container reference.
+	 * @see #setSpecification(IntermediateServiceDeploymentSpecification)
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getOperationMicroserviceReference_Specification()
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getService
+	 * @model opposite="service" transient="false"
+	 * @generated
+	 */
+	IntermediateServiceDeploymentSpecification getSpecification();
+
+	/**
+	 * Sets the value of the '{@link de.fhdo.lemma.operation.intermediate.OperationMicroserviceReference#getSpecification <em>Specification</em>}' container reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Specification</em>' container reference.
+	 * @see #getSpecification()
+	 * @generated
+	 */
+	void setSpecification(IntermediateServiceDeploymentSpecification value);
 
 } // OperationMicroserviceReference
