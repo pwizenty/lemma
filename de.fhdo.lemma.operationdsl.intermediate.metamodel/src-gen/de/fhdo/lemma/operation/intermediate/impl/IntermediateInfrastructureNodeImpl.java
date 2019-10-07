@@ -8,8 +8,6 @@ import de.fhdo.lemma.operation.intermediate.IntermediateOperationModel;
 import de.fhdo.lemma.operation.intermediate.IntermediateOperationNode;
 import de.fhdo.lemma.operation.intermediate.IntermediatePackage;
 
-import de.fhdo.lemma.service.intermediate.IntermediateEndpoint;
-
 import java.util.Collection;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -22,10 +20,8 @@ import org.eclipse.emf.ecore.InternalEObject;
 
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
-import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
  * <!-- begin-user-doc -->
@@ -35,55 +31,44 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * The following features are implemented:
  * </p>
  * <ul>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateInfrastructureNodeImpl#getDependentOperationNodes <em>Dependent Operation Nodes</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateInfrastructureNodeImpl#getUsedByOperationNodes <em>Used By Operation Nodes</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateInfrastructureNodeImpl#getIntermediateInfrastructureTechnologyReference <em>Intermediate Infrastructure Technology Reference</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateInfrastructureNodeImpl#getIntermediateEndpoint <em>Intermediate Endpoint</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateInfrastructureNodeImpl#getIntermediateOperationModel <em>Intermediate Operation Model</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateInfrastructureNodeImpl#getDependsOnNodes <em>Depends On Nodes</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateInfrastructureNodeImpl#getUsedByNodes <em>Used By Nodes</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateInfrastructureNodeImpl#getReference <em>Reference</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateInfrastructureNodeImpl#getOperationModel <em>Operation Model</em>}</li>
  * </ul>
  *
  * @generated
  */
 public class IntermediateInfrastructureNodeImpl extends IntermediateOperationNodeImpl implements IntermediateInfrastructureNode {
 	/**
-	 * The cached value of the '{@link #getDependentOperationNodes() <em>Dependent Operation Nodes</em>}' reference list.
+	 * The cached value of the '{@link #getDependsOnNodes() <em>Depends On Nodes</em>}' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getDependentOperationNodes()
+	 * @see #getDependsOnNodes()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<IntermediateOperationNode> dependentOperationNodes;
+	protected EList<IntermediateOperationNode> dependsOnNodes;
 
 	/**
-	 * The cached value of the '{@link #getUsedByOperationNodes() <em>Used By Operation Nodes</em>}' reference list.
+	 * The cached value of the '{@link #getUsedByNodes() <em>Used By Nodes</em>}' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getUsedByOperationNodes()
+	 * @see #getUsedByNodes()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<IntermediateOperationNode> usedByOperationNodes;
+	protected EList<IntermediateOperationNode> usedByNodes;
 
 	/**
-	 * The cached value of the '{@link #getIntermediateInfrastructureTechnologyReference() <em>Intermediate Infrastructure Technology Reference</em>}' containment reference.
+	 * The cached value of the '{@link #getReference() <em>Reference</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getIntermediateInfrastructureTechnologyReference()
+	 * @see #getReference()
 	 * @generated
 	 * @ordered
 	 */
-	protected IntermediateInfrastructureTechnologyReference intermediateInfrastructureTechnologyReference;
-
-	/**
-	 * The cached value of the '{@link #getIntermediateEndpoint() <em>Intermediate Endpoint</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getIntermediateEndpoint()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<IntermediateEndpoint> intermediateEndpoint;
+	protected IntermediateInfrastructureTechnologyReference reference;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -109,11 +94,11 @@ public class IntermediateInfrastructureNodeImpl extends IntermediateOperationNod
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<IntermediateOperationNode> getDependentOperationNodes() {
-		if (dependentOperationNodes == null) {
-			dependentOperationNodes = new EObjectResolvingEList<IntermediateOperationNode>(IntermediateOperationNode.class, this, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__DEPENDENT_OPERATION_NODES);
+	public EList<IntermediateOperationNode> getDependsOnNodes() {
+		if (dependsOnNodes == null) {
+			dependsOnNodes = new EObjectResolvingEList<IntermediateOperationNode>(IntermediateOperationNode.class, this, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__DEPENDS_ON_NODES);
 		}
-		return dependentOperationNodes;
+		return dependsOnNodes;
 	}
 
 	/**
@@ -121,11 +106,11 @@ public class IntermediateInfrastructureNodeImpl extends IntermediateOperationNod
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<IntermediateOperationNode> getUsedByOperationNodes() {
-		if (usedByOperationNodes == null) {
-			usedByOperationNodes = new EObjectResolvingEList<IntermediateOperationNode>(IntermediateOperationNode.class, this, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__USED_BY_OPERATION_NODES);
+	public EList<IntermediateOperationNode> getUsedByNodes() {
+		if (usedByNodes == null) {
+			usedByNodes = new EObjectResolvingEList<IntermediateOperationNode>(IntermediateOperationNode.class, this, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__USED_BY_NODES);
 		}
-		return usedByOperationNodes;
+		return usedByNodes;
 	}
 
 	/**
@@ -133,8 +118,8 @@ public class IntermediateInfrastructureNodeImpl extends IntermediateOperationNod
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public IntermediateInfrastructureTechnologyReference getIntermediateInfrastructureTechnologyReference() {
-		return intermediateInfrastructureTechnologyReference;
+	public IntermediateInfrastructureTechnologyReference getReference() {
+		return reference;
 	}
 
 	/**
@@ -142,11 +127,11 @@ public class IntermediateInfrastructureNodeImpl extends IntermediateOperationNod
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetIntermediateInfrastructureTechnologyReference(IntermediateInfrastructureTechnologyReference newIntermediateInfrastructureTechnologyReference, NotificationChain msgs) {
-		IntermediateInfrastructureTechnologyReference oldIntermediateInfrastructureTechnologyReference = intermediateInfrastructureTechnologyReference;
-		intermediateInfrastructureTechnologyReference = newIntermediateInfrastructureTechnologyReference;
+	public NotificationChain basicSetReference(IntermediateInfrastructureTechnologyReference newReference, NotificationChain msgs) {
+		IntermediateInfrastructureTechnologyReference oldReference = reference;
+		reference = newReference;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE, oldIntermediateInfrastructureTechnologyReference, newIntermediateInfrastructureTechnologyReference);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__REFERENCE, oldReference, newReference);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
@@ -157,18 +142,18 @@ public class IntermediateInfrastructureNodeImpl extends IntermediateOperationNod
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setIntermediateInfrastructureTechnologyReference(IntermediateInfrastructureTechnologyReference newIntermediateInfrastructureTechnologyReference) {
-		if (newIntermediateInfrastructureTechnologyReference != intermediateInfrastructureTechnologyReference) {
+	public void setReference(IntermediateInfrastructureTechnologyReference newReference) {
+		if (newReference != reference) {
 			NotificationChain msgs = null;
-			if (intermediateInfrastructureTechnologyReference != null)
-				msgs = ((InternalEObject)intermediateInfrastructureTechnologyReference).eInverseRemove(this, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_INFRASTRUCTURE_NODE, IntermediateInfrastructureTechnologyReference.class, msgs);
-			if (newIntermediateInfrastructureTechnologyReference != null)
-				msgs = ((InternalEObject)newIntermediateInfrastructureTechnologyReference).eInverseAdd(this, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_INFRASTRUCTURE_NODE, IntermediateInfrastructureTechnologyReference.class, msgs);
-			msgs = basicSetIntermediateInfrastructureTechnologyReference(newIntermediateInfrastructureTechnologyReference, msgs);
+			if (reference != null)
+				msgs = ((InternalEObject)reference).eInverseRemove(this, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INFRASTRUCTURE_NODE, IntermediateInfrastructureTechnologyReference.class, msgs);
+			if (newReference != null)
+				msgs = ((InternalEObject)newReference).eInverseAdd(this, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INFRASTRUCTURE_NODE, IntermediateInfrastructureTechnologyReference.class, msgs);
+			msgs = basicSetReference(newReference, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE, newIntermediateInfrastructureTechnologyReference, newIntermediateInfrastructureTechnologyReference));
+			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__REFERENCE, newReference, newReference));
 	}
 
 	/**
@@ -176,20 +161,8 @@ public class IntermediateInfrastructureNodeImpl extends IntermediateOperationNod
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<IntermediateEndpoint> getIntermediateEndpoint() {
-		if (intermediateEndpoint == null) {
-			intermediateEndpoint = new EObjectContainmentEList<IntermediateEndpoint>(IntermediateEndpoint.class, this, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_ENDPOINT);
-		}
-		return intermediateEndpoint;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public IntermediateOperationModel getIntermediateOperationModel() {
-		if (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_OPERATION_MODEL) return null;
+	public IntermediateOperationModel getOperationModel() {
+		if (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__OPERATION_MODEL) return null;
 		return (IntermediateOperationModel)eContainer();
 	}
 
@@ -198,8 +171,8 @@ public class IntermediateInfrastructureNodeImpl extends IntermediateOperationNod
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public IntermediateOperationModel basicGetIntermediateOperationModel() {
-		if (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_OPERATION_MODEL) return null;
+	public IntermediateOperationModel basicGetOperationModel() {
+		if (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__OPERATION_MODEL) return null;
 		return (IntermediateOperationModel)eInternalContainer();
 	}
 
@@ -208,8 +181,8 @@ public class IntermediateInfrastructureNodeImpl extends IntermediateOperationNod
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetIntermediateOperationModel(IntermediateOperationModel newIntermediateOperationModel, NotificationChain msgs) {
-		msgs = eBasicSetContainer((InternalEObject)newIntermediateOperationModel, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_OPERATION_MODEL, msgs);
+	public NotificationChain basicSetOperationModel(IntermediateOperationModel newOperationModel, NotificationChain msgs) {
+		msgs = eBasicSetContainer((InternalEObject)newOperationModel, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__OPERATION_MODEL, msgs);
 		return msgs;
 	}
 
@@ -218,20 +191,20 @@ public class IntermediateInfrastructureNodeImpl extends IntermediateOperationNod
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setIntermediateOperationModel(IntermediateOperationModel newIntermediateOperationModel) {
-		if (newIntermediateOperationModel != eInternalContainer() || (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_OPERATION_MODEL && newIntermediateOperationModel != null)) {
-			if (EcoreUtil.isAncestor(this, newIntermediateOperationModel))
+	public void setOperationModel(IntermediateOperationModel newOperationModel) {
+		if (newOperationModel != eInternalContainer() || (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__OPERATION_MODEL && newOperationModel != null)) {
+			if (EcoreUtil.isAncestor(this, newOperationModel))
 				throw new IllegalArgumentException("Recursive containment not allowed for " + toString());
 			NotificationChain msgs = null;
 			if (eInternalContainer() != null)
 				msgs = eBasicRemoveFromContainer(msgs);
-			if (newIntermediateOperationModel != null)
-				msgs = ((InternalEObject)newIntermediateOperationModel).eInverseAdd(this, IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__INTERMEDIATE_INFRASTRUCTURE_NODE, IntermediateOperationModel.class, msgs);
-			msgs = basicSetIntermediateOperationModel(newIntermediateOperationModel, msgs);
+			if (newOperationModel != null)
+				msgs = ((InternalEObject)newOperationModel).eInverseAdd(this, IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__INFRASTRUCTURE_NODES, IntermediateOperationModel.class, msgs);
+			msgs = basicSetOperationModel(newOperationModel, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_OPERATION_MODEL, newIntermediateOperationModel, newIntermediateOperationModel));
+			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__OPERATION_MODEL, newOperationModel, newOperationModel));
 	}
 
 	/**
@@ -242,14 +215,14 @@ public class IntermediateInfrastructureNodeImpl extends IntermediateOperationNod
 	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE:
-				if (intermediateInfrastructureTechnologyReference != null)
-					msgs = ((InternalEObject)intermediateInfrastructureTechnologyReference).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE, null, msgs);
-				return basicSetIntermediateInfrastructureTechnologyReference((IntermediateInfrastructureTechnologyReference)otherEnd, msgs);
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_OPERATION_MODEL:
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__REFERENCE:
+				if (reference != null)
+					msgs = ((InternalEObject)reference).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__REFERENCE, null, msgs);
+				return basicSetReference((IntermediateInfrastructureTechnologyReference)otherEnd, msgs);
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__OPERATION_MODEL:
 				if (eInternalContainer() != null)
 					msgs = eBasicRemoveFromContainer(msgs);
-				return basicSetIntermediateOperationModel((IntermediateOperationModel)otherEnd, msgs);
+				return basicSetOperationModel((IntermediateOperationModel)otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -262,12 +235,10 @@ public class IntermediateInfrastructureNodeImpl extends IntermediateOperationNod
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE:
-				return basicSetIntermediateInfrastructureTechnologyReference(null, msgs);
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_ENDPOINT:
-				return ((InternalEList<?>)getIntermediateEndpoint()).basicRemove(otherEnd, msgs);
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_OPERATION_MODEL:
-				return basicSetIntermediateOperationModel(null, msgs);
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__REFERENCE:
+				return basicSetReference(null, msgs);
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__OPERATION_MODEL:
+				return basicSetOperationModel(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -280,8 +251,8 @@ public class IntermediateInfrastructureNodeImpl extends IntermediateOperationNod
 	@Override
 	public NotificationChain eBasicRemoveFromContainerFeature(NotificationChain msgs) {
 		switch (eContainerFeatureID()) {
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_OPERATION_MODEL:
-				return eInternalContainer().eInverseRemove(this, IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__INTERMEDIATE_INFRASTRUCTURE_NODE, IntermediateOperationModel.class, msgs);
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__OPERATION_MODEL:
+				return eInternalContainer().eInverseRemove(this, IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__INFRASTRUCTURE_NODES, IntermediateOperationModel.class, msgs);
 		}
 		return super.eBasicRemoveFromContainerFeature(msgs);
 	}
@@ -294,17 +265,15 @@ public class IntermediateInfrastructureNodeImpl extends IntermediateOperationNod
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__DEPENDENT_OPERATION_NODES:
-				return getDependentOperationNodes();
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__USED_BY_OPERATION_NODES:
-				return getUsedByOperationNodes();
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE:
-				return getIntermediateInfrastructureTechnologyReference();
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_ENDPOINT:
-				return getIntermediateEndpoint();
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_OPERATION_MODEL:
-				if (resolve) return getIntermediateOperationModel();
-				return basicGetIntermediateOperationModel();
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__DEPENDS_ON_NODES:
+				return getDependsOnNodes();
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__USED_BY_NODES:
+				return getUsedByNodes();
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__REFERENCE:
+				return getReference();
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__OPERATION_MODEL:
+				if (resolve) return getOperationModel();
+				return basicGetOperationModel();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -318,23 +287,19 @@ public class IntermediateInfrastructureNodeImpl extends IntermediateOperationNod
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__DEPENDENT_OPERATION_NODES:
-				getDependentOperationNodes().clear();
-				getDependentOperationNodes().addAll((Collection<? extends IntermediateOperationNode>)newValue);
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__DEPENDS_ON_NODES:
+				getDependsOnNodes().clear();
+				getDependsOnNodes().addAll((Collection<? extends IntermediateOperationNode>)newValue);
 				return;
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__USED_BY_OPERATION_NODES:
-				getUsedByOperationNodes().clear();
-				getUsedByOperationNodes().addAll((Collection<? extends IntermediateOperationNode>)newValue);
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__USED_BY_NODES:
+				getUsedByNodes().clear();
+				getUsedByNodes().addAll((Collection<? extends IntermediateOperationNode>)newValue);
 				return;
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE:
-				setIntermediateInfrastructureTechnologyReference((IntermediateInfrastructureTechnologyReference)newValue);
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__REFERENCE:
+				setReference((IntermediateInfrastructureTechnologyReference)newValue);
 				return;
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_ENDPOINT:
-				getIntermediateEndpoint().clear();
-				getIntermediateEndpoint().addAll((Collection<? extends IntermediateEndpoint>)newValue);
-				return;
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_OPERATION_MODEL:
-				setIntermediateOperationModel((IntermediateOperationModel)newValue);
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__OPERATION_MODEL:
+				setOperationModel((IntermediateOperationModel)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -348,20 +313,17 @@ public class IntermediateInfrastructureNodeImpl extends IntermediateOperationNod
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__DEPENDENT_OPERATION_NODES:
-				getDependentOperationNodes().clear();
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__DEPENDS_ON_NODES:
+				getDependsOnNodes().clear();
 				return;
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__USED_BY_OPERATION_NODES:
-				getUsedByOperationNodes().clear();
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__USED_BY_NODES:
+				getUsedByNodes().clear();
 				return;
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE:
-				setIntermediateInfrastructureTechnologyReference((IntermediateInfrastructureTechnologyReference)null);
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__REFERENCE:
+				setReference((IntermediateInfrastructureTechnologyReference)null);
 				return;
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_ENDPOINT:
-				getIntermediateEndpoint().clear();
-				return;
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_OPERATION_MODEL:
-				setIntermediateOperationModel((IntermediateOperationModel)null);
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__OPERATION_MODEL:
+				setOperationModel((IntermediateOperationModel)null);
 				return;
 		}
 		super.eUnset(featureID);
@@ -375,16 +337,14 @@ public class IntermediateInfrastructureNodeImpl extends IntermediateOperationNod
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__DEPENDENT_OPERATION_NODES:
-				return dependentOperationNodes != null && !dependentOperationNodes.isEmpty();
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__USED_BY_OPERATION_NODES:
-				return usedByOperationNodes != null && !usedByOperationNodes.isEmpty();
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE:
-				return intermediateInfrastructureTechnologyReference != null;
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_ENDPOINT:
-				return intermediateEndpoint != null && !intermediateEndpoint.isEmpty();
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_OPERATION_MODEL:
-				return basicGetIntermediateOperationModel() != null;
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__DEPENDS_ON_NODES:
+				return dependsOnNodes != null && !dependsOnNodes.isEmpty();
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__USED_BY_NODES:
+				return usedByNodes != null && !usedByNodes.isEmpty();
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__REFERENCE:
+				return reference != null;
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__OPERATION_MODEL:
+				return basicGetOperationModel() != null;
 		}
 		return super.eIsSet(featureID);
 	}

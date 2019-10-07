@@ -28,33 +28,33 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * The following features are implemented:
  * </p>
  * <ul>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateDeploymentTechnologyReferenceImpl#getIntermediateDeploymentTechnology <em>Intermediate Deployment Technology</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateDeploymentTechnologyReferenceImpl#getIntermediateImport <em>Intermediate Import</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateDeploymentTechnologyReferenceImpl#getIntermediateContainer <em>Intermediate Container</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateDeploymentTechnologyReferenceImpl#getDeploymentTechnology <em>Deployment Technology</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateDeploymentTechnologyReferenceImpl#getImport <em>Import</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateDeploymentTechnologyReferenceImpl#getContainer <em>Container</em>}</li>
  * </ul>
  *
  * @generated
  */
 public class IntermediateDeploymentTechnologyReferenceImpl extends MinimalEObjectImpl.Container implements IntermediateDeploymentTechnologyReference {
 	/**
-	 * The cached value of the '{@link #getIntermediateDeploymentTechnology() <em>Intermediate Deployment Technology</em>}' reference.
+	 * The cached value of the '{@link #getDeploymentTechnology() <em>Deployment Technology</em>}' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getIntermediateDeploymentTechnology()
+	 * @see #getDeploymentTechnology()
 	 * @generated
 	 * @ordered
 	 */
-	protected IntermediateDeploymentTechnology intermediateDeploymentTechnology;
+	protected IntermediateDeploymentTechnology deploymentTechnology;
 
 	/**
-	 * The cached value of the '{@link #getIntermediateImport() <em>Intermediate Import</em>}' reference.
+	 * The cached value of the '{@link #getImport() <em>Import</em>}' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getIntermediateImport()
+	 * @see #getImport()
 	 * @generated
 	 * @ordered
 	 */
-	protected IntermediateImport intermediateImport;
+	protected IntermediateImport import_;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -80,16 +80,16 @@ public class IntermediateDeploymentTechnologyReferenceImpl extends MinimalEObjec
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public IntermediateDeploymentTechnology getIntermediateDeploymentTechnology() {
-		if (intermediateDeploymentTechnology != null && intermediateDeploymentTechnology.eIsProxy()) {
-			InternalEObject oldIntermediateDeploymentTechnology = (InternalEObject)intermediateDeploymentTechnology;
-			intermediateDeploymentTechnology = (IntermediateDeploymentTechnology)eResolveProxy(oldIntermediateDeploymentTechnology);
-			if (intermediateDeploymentTechnology != oldIntermediateDeploymentTechnology) {
+	public IntermediateDeploymentTechnology getDeploymentTechnology() {
+		if (deploymentTechnology != null && deploymentTechnology.eIsProxy()) {
+			InternalEObject oldDeploymentTechnology = (InternalEObject)deploymentTechnology;
+			deploymentTechnology = (IntermediateDeploymentTechnology)eResolveProxy(oldDeploymentTechnology);
+			if (deploymentTechnology != oldDeploymentTechnology) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_DEPLOYMENT_TECHNOLOGY, oldIntermediateDeploymentTechnology, intermediateDeploymentTechnology));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__DEPLOYMENT_TECHNOLOGY, oldDeploymentTechnology, deploymentTechnology));
 			}
 		}
-		return intermediateDeploymentTechnology;
+		return deploymentTechnology;
 	}
 
 	/**
@@ -97,8 +97,8 @@ public class IntermediateDeploymentTechnologyReferenceImpl extends MinimalEObjec
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public IntermediateDeploymentTechnology basicGetIntermediateDeploymentTechnology() {
-		return intermediateDeploymentTechnology;
+	public IntermediateDeploymentTechnology basicGetDeploymentTechnology() {
+		return deploymentTechnology;
 	}
 
 	/**
@@ -106,11 +106,11 @@ public class IntermediateDeploymentTechnologyReferenceImpl extends MinimalEObjec
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setIntermediateDeploymentTechnology(IntermediateDeploymentTechnology newIntermediateDeploymentTechnology) {
-		IntermediateDeploymentTechnology oldIntermediateDeploymentTechnology = intermediateDeploymentTechnology;
-		intermediateDeploymentTechnology = newIntermediateDeploymentTechnology;
+	public void setDeploymentTechnology(IntermediateDeploymentTechnology newDeploymentTechnology) {
+		IntermediateDeploymentTechnology oldDeploymentTechnology = deploymentTechnology;
+		deploymentTechnology = newDeploymentTechnology;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_DEPLOYMENT_TECHNOLOGY, oldIntermediateDeploymentTechnology, intermediateDeploymentTechnology));
+			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__DEPLOYMENT_TECHNOLOGY, oldDeploymentTechnology, deploymentTechnology));
 	}
 
 	/**
@@ -118,16 +118,16 @@ public class IntermediateDeploymentTechnologyReferenceImpl extends MinimalEObjec
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public IntermediateImport getIntermediateImport() {
-		if (intermediateImport != null && intermediateImport.eIsProxy()) {
-			InternalEObject oldIntermediateImport = (InternalEObject)intermediateImport;
-			intermediateImport = (IntermediateImport)eResolveProxy(oldIntermediateImport);
-			if (intermediateImport != oldIntermediateImport) {
+	public IntermediateImport getImport() {
+		if (import_ != null && import_.eIsProxy()) {
+			InternalEObject oldImport = (InternalEObject)import_;
+			import_ = (IntermediateImport)eResolveProxy(oldImport);
+			if (import_ != oldImport) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_IMPORT, oldIntermediateImport, intermediateImport));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__IMPORT, oldImport, import_));
 			}
 		}
-		return intermediateImport;
+		return import_;
 	}
 
 	/**
@@ -135,8 +135,8 @@ public class IntermediateDeploymentTechnologyReferenceImpl extends MinimalEObjec
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public IntermediateImport basicGetIntermediateImport() {
-		return intermediateImport;
+	public IntermediateImport basicGetImport() {
+		return import_;
 	}
 
 	/**
@@ -144,11 +144,11 @@ public class IntermediateDeploymentTechnologyReferenceImpl extends MinimalEObjec
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setIntermediateImport(IntermediateImport newIntermediateImport) {
-		IntermediateImport oldIntermediateImport = intermediateImport;
-		intermediateImport = newIntermediateImport;
+	public void setImport(IntermediateImport newImport) {
+		IntermediateImport oldImport = import_;
+		import_ = newImport;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_IMPORT, oldIntermediateImport, intermediateImport));
+			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__IMPORT, oldImport, import_));
 	}
 
 	/**
@@ -156,8 +156,8 @@ public class IntermediateDeploymentTechnologyReferenceImpl extends MinimalEObjec
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public IntermediateContainer getIntermediateContainer() {
-		if (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_CONTAINER) return null;
+	public IntermediateContainer getContainer() {
+		if (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__CONTAINER) return null;
 		return (IntermediateContainer)eContainer();
 	}
 
@@ -166,8 +166,8 @@ public class IntermediateDeploymentTechnologyReferenceImpl extends MinimalEObjec
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public IntermediateContainer basicGetIntermediateContainer() {
-		if (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_CONTAINER) return null;
+	public IntermediateContainer basicGetContainer() {
+		if (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__CONTAINER) return null;
 		return (IntermediateContainer)eInternalContainer();
 	}
 
@@ -176,8 +176,8 @@ public class IntermediateDeploymentTechnologyReferenceImpl extends MinimalEObjec
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetIntermediateContainer(IntermediateContainer newIntermediateContainer, NotificationChain msgs) {
-		msgs = eBasicSetContainer((InternalEObject)newIntermediateContainer, IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_CONTAINER, msgs);
+	public NotificationChain basicSetContainer(IntermediateContainer newContainer, NotificationChain msgs) {
+		msgs = eBasicSetContainer((InternalEObject)newContainer, IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__CONTAINER, msgs);
 		return msgs;
 	}
 
@@ -186,20 +186,20 @@ public class IntermediateDeploymentTechnologyReferenceImpl extends MinimalEObjec
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setIntermediateContainer(IntermediateContainer newIntermediateContainer) {
-		if (newIntermediateContainer != eInternalContainer() || (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_CONTAINER && newIntermediateContainer != null)) {
-			if (EcoreUtil.isAncestor(this, newIntermediateContainer))
+	public void setContainer(IntermediateContainer newContainer) {
+		if (newContainer != eInternalContainer() || (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__CONTAINER && newContainer != null)) {
+			if (EcoreUtil.isAncestor(this, newContainer))
 				throw new IllegalArgumentException("Recursive containment not allowed for " + toString());
 			NotificationChain msgs = null;
 			if (eInternalContainer() != null)
 				msgs = eBasicRemoveFromContainer(msgs);
-			if (newIntermediateContainer != null)
-				msgs = ((InternalEObject)newIntermediateContainer).eInverseAdd(this, IntermediatePackage.INTERMEDIATE_CONTAINER__INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE, IntermediateContainer.class, msgs);
-			msgs = basicSetIntermediateContainer(newIntermediateContainer, msgs);
+			if (newContainer != null)
+				msgs = ((InternalEObject)newContainer).eInverseAdd(this, IntermediatePackage.INTERMEDIATE_CONTAINER__TECHNOLOGY_REFERENCE, IntermediateContainer.class, msgs);
+			msgs = basicSetContainer(newContainer, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_CONTAINER, newIntermediateContainer, newIntermediateContainer));
+			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__CONTAINER, newContainer, newContainer));
 	}
 
 	/**
@@ -210,10 +210,10 @@ public class IntermediateDeploymentTechnologyReferenceImpl extends MinimalEObjec
 	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_CONTAINER:
+			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__CONTAINER:
 				if (eInternalContainer() != null)
 					msgs = eBasicRemoveFromContainer(msgs);
-				return basicSetIntermediateContainer((IntermediateContainer)otherEnd, msgs);
+				return basicSetContainer((IntermediateContainer)otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -226,8 +226,8 @@ public class IntermediateDeploymentTechnologyReferenceImpl extends MinimalEObjec
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_CONTAINER:
-				return basicSetIntermediateContainer(null, msgs);
+			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__CONTAINER:
+				return basicSetContainer(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -240,8 +240,8 @@ public class IntermediateDeploymentTechnologyReferenceImpl extends MinimalEObjec
 	@Override
 	public NotificationChain eBasicRemoveFromContainerFeature(NotificationChain msgs) {
 		switch (eContainerFeatureID()) {
-			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_CONTAINER:
-				return eInternalContainer().eInverseRemove(this, IntermediatePackage.INTERMEDIATE_CONTAINER__INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE, IntermediateContainer.class, msgs);
+			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__CONTAINER:
+				return eInternalContainer().eInverseRemove(this, IntermediatePackage.INTERMEDIATE_CONTAINER__TECHNOLOGY_REFERENCE, IntermediateContainer.class, msgs);
 		}
 		return super.eBasicRemoveFromContainerFeature(msgs);
 	}
@@ -254,15 +254,15 @@ public class IntermediateDeploymentTechnologyReferenceImpl extends MinimalEObjec
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_DEPLOYMENT_TECHNOLOGY:
-				if (resolve) return getIntermediateDeploymentTechnology();
-				return basicGetIntermediateDeploymentTechnology();
-			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_IMPORT:
-				if (resolve) return getIntermediateImport();
-				return basicGetIntermediateImport();
-			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_CONTAINER:
-				if (resolve) return getIntermediateContainer();
-				return basicGetIntermediateContainer();
+			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__DEPLOYMENT_TECHNOLOGY:
+				if (resolve) return getDeploymentTechnology();
+				return basicGetDeploymentTechnology();
+			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__IMPORT:
+				if (resolve) return getImport();
+				return basicGetImport();
+			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__CONTAINER:
+				if (resolve) return getContainer();
+				return basicGetContainer();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -275,14 +275,14 @@ public class IntermediateDeploymentTechnologyReferenceImpl extends MinimalEObjec
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_DEPLOYMENT_TECHNOLOGY:
-				setIntermediateDeploymentTechnology((IntermediateDeploymentTechnology)newValue);
+			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__DEPLOYMENT_TECHNOLOGY:
+				setDeploymentTechnology((IntermediateDeploymentTechnology)newValue);
 				return;
-			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_IMPORT:
-				setIntermediateImport((IntermediateImport)newValue);
+			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__IMPORT:
+				setImport((IntermediateImport)newValue);
 				return;
-			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_CONTAINER:
-				setIntermediateContainer((IntermediateContainer)newValue);
+			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__CONTAINER:
+				setContainer((IntermediateContainer)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -296,14 +296,14 @@ public class IntermediateDeploymentTechnologyReferenceImpl extends MinimalEObjec
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_DEPLOYMENT_TECHNOLOGY:
-				setIntermediateDeploymentTechnology((IntermediateDeploymentTechnology)null);
+			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__DEPLOYMENT_TECHNOLOGY:
+				setDeploymentTechnology((IntermediateDeploymentTechnology)null);
 				return;
-			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_IMPORT:
-				setIntermediateImport((IntermediateImport)null);
+			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__IMPORT:
+				setImport((IntermediateImport)null);
 				return;
-			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_CONTAINER:
-				setIntermediateContainer((IntermediateContainer)null);
+			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__CONTAINER:
+				setContainer((IntermediateContainer)null);
 				return;
 		}
 		super.eUnset(featureID);
@@ -317,12 +317,12 @@ public class IntermediateDeploymentTechnologyReferenceImpl extends MinimalEObjec
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_DEPLOYMENT_TECHNOLOGY:
-				return intermediateDeploymentTechnology != null;
-			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_IMPORT:
-				return intermediateImport != null;
-			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__INTERMEDIATE_CONTAINER:
-				return basicGetIntermediateContainer() != null;
+			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__DEPLOYMENT_TECHNOLOGY:
+				return deploymentTechnology != null;
+			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__IMPORT:
+				return import_ != null;
+			case IntermediatePackage.INTERMEDIATE_DEPLOYMENT_TECHNOLOGY_REFERENCE__CONTAINER:
+				return basicGetContainer() != null;
 		}
 		return super.eIsSet(featureID);
 	}

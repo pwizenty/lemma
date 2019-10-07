@@ -75,7 +75,7 @@ class IntermediateServiceDeploymentSpecification {
     container IntermediateOperationNode operationNode opposite specifications
 }
 
- /**
+/**
  * Intermediate operation environment of an intermediate operation technology, e.g., an image
  * of a deployment container
  */
@@ -86,7 +86,7 @@ class IntermediateOperationEnvironment {
     container IntermediateOperationTechnology operationTechnology opposite environments
 }
 
- /**
+/**
  * Abstract superclass of technologies specific to intermediate service operation
  */
 abstract class IntermediateOperationTechnology {
@@ -128,7 +128,7 @@ class IntermediateDeploymentTechnologyReference {
     container IntermediateContainer  ^container opposite technologyReference
 }
 
- /**
+/**
  * A property, e.g., of an intermediate operation technology that may be set per associated
  * service or an aspect
  */
@@ -143,7 +143,7 @@ class IntermediateTechnologySpecificProperty {
     container IntermediateOperationTechnology operationTechnology opposite propertys
 }
 
- /**
+/**
  * Value assignment to a intermediate technology specific property
  */
 class IntermediateTechnologySpecificPropertyValue {

@@ -21,8 +21,8 @@ import org.eclipse.emf.ecore.EObject;
  * </p>
  * <ul>
  *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationTechnology#getName <em>Name</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationTechnology#getIntermediateOperationEnvironment <em>Intermediate Operation Environment</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationTechnology#getIntermediateTechnologySpecificProperty <em>Intermediate Technology Specific Property</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationTechnology#getEnvironments <em>Environments</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationTechnology#getPropertys <em>Propertys</em>}</li>
  * </ul>
  *
  * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateOperationTechnology()
@@ -53,31 +53,31 @@ public interface IntermediateOperationTechnology extends EObject {
 	void setName(String value);
 
 	/**
-	 * Returns the value of the '<em><b>Intermediate Operation Environment</b></em>' containment reference list.
+	 * Returns the value of the '<em><b>Environments</b></em>' containment reference list.
 	 * The list contents are of type {@link de.fhdo.lemma.operation.intermediate.IntermediateOperationEnvironment}.
-	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationEnvironment#getIntermediateOperationtechnology <em>Intermediate Operationtechnology</em>}'.
+	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationEnvironment#getOperationTechnology <em>Operation Technology</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Intermediate Operation Environment</em>' containment reference list.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateOperationTechnology_IntermediateOperationEnvironment()
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationEnvironment#getIntermediateOperationtechnology
-	 * @model opposite="intermediateOperationtechnology" containment="true" required="true"
+	 * @return the value of the '<em>Environments</em>' containment reference list.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateOperationTechnology_Environments()
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationEnvironment#getOperationTechnology
+	 * @model opposite="operationTechnology" containment="true" required="true"
 	 * @generated
 	 */
-	EList<IntermediateOperationEnvironment> getIntermediateOperationEnvironment();
+	EList<IntermediateOperationEnvironment> getEnvironments();
 
 	/**
-	 * Returns the value of the '<em><b>Intermediate Technology Specific Property</b></em>' containment reference list.
+	 * Returns the value of the '<em><b>Propertys</b></em>' containment reference list.
 	 * The list contents are of type {@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty}.
-	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty#getIntermediateOperationTechnology <em>Intermediate Operation Technology</em>}'.
+	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty#getOperationTechnology <em>Operation Technology</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Intermediate Technology Specific Property</em>' containment reference list.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateOperationTechnology_IntermediateTechnologySpecificProperty()
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty#getIntermediateOperationTechnology
-	 * @model opposite="intermediateOperationTechnology" containment="true"
+	 * @return the value of the '<em>Propertys</em>' containment reference list.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateOperationTechnology_Propertys()
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty#getOperationTechnology
+	 * @model opposite="operationTechnology" containment="true"
 	 * @generated
 	 */
-	EList<IntermediateTechnologySpecificProperty> getIntermediateTechnologySpecificProperty();
+	EList<IntermediateTechnologySpecificProperty> getPropertys();
 
 } // IntermediateOperationTechnology

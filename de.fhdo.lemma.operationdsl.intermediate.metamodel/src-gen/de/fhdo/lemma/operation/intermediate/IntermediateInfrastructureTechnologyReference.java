@@ -20,9 +20,9 @@ import org.eclipse.emf.ecore.EObject;
  * The following features are supported:
  * </p>
  * <ul>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureTechnologyReference#getIntermediateImport <em>Intermediate Import</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureTechnologyReference#getIntermediateInfrastructureTechnology <em>Intermediate Infrastructure Technology</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureTechnologyReference#getIntermediateInfrastructureNode <em>Intermediate Infrastructure Node</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureTechnologyReference#getImport <em>Import</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureTechnologyReference#getInfrastructureTechnology <em>Infrastructure Technology</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureTechnologyReference#getInfrastructureNode <em>Infrastructure Node</em>}</li>
  * </ul>
  *
  * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateInfrastructureTechnologyReference()
@@ -31,71 +31,71 @@ import org.eclipse.emf.ecore.EObject;
  */
 public interface IntermediateInfrastructureTechnologyReference extends EObject {
 	/**
-	 * Returns the value of the '<em><b>Intermediate Import</b></em>' reference.
+	 * Returns the value of the '<em><b>Import</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Intermediate Import</em>' reference.
-	 * @see #setIntermediateImport(IntermediateImport)
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateInfrastructureTechnologyReference_IntermediateImport()
+	 * @return the value of the '<em>Import</em>' reference.
+	 * @see #setImport(IntermediateImport)
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateInfrastructureTechnologyReference_Import()
 	 * @model
 	 * @generated
 	 */
-	IntermediateImport getIntermediateImport();
+	IntermediateImport getImport();
 
 	/**
-	 * Sets the value of the '{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureTechnologyReference#getIntermediateImport <em>Intermediate Import</em>}' reference.
+	 * Sets the value of the '{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureTechnologyReference#getImport <em>Import</em>}' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Intermediate Import</em>' reference.
-	 * @see #getIntermediateImport()
+	 * @param value the new value of the '<em>Import</em>' reference.
+	 * @see #getImport()
 	 * @generated
 	 */
-	void setIntermediateImport(IntermediateImport value);
+	void setImport(IntermediateImport value);
 
 	/**
-	 * Returns the value of the '<em><b>Intermediate Infrastructure Technology</b></em>' reference.
+	 * Returns the value of the '<em><b>Infrastructure Technology</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Intermediate Infrastructure Technology</em>' reference.
-	 * @see #setIntermediateInfrastructureTechnology(IntermediateInfrastructureTechnology)
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateInfrastructureTechnologyReference_IntermediateInfrastructureTechnology()
+	 * @return the value of the '<em>Infrastructure Technology</em>' reference.
+	 * @see #setInfrastructureTechnology(IntermediateInfrastructureTechnology)
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateInfrastructureTechnologyReference_InfrastructureTechnology()
 	 * @model
 	 * @generated
 	 */
-	IntermediateInfrastructureTechnology getIntermediateInfrastructureTechnology();
+	IntermediateInfrastructureTechnology getInfrastructureTechnology();
 
 	/**
-	 * Sets the value of the '{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureTechnologyReference#getIntermediateInfrastructureTechnology <em>Intermediate Infrastructure Technology</em>}' reference.
+	 * Sets the value of the '{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureTechnologyReference#getInfrastructureTechnology <em>Infrastructure Technology</em>}' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Intermediate Infrastructure Technology</em>' reference.
-	 * @see #getIntermediateInfrastructureTechnology()
+	 * @param value the new value of the '<em>Infrastructure Technology</em>' reference.
+	 * @see #getInfrastructureTechnology()
 	 * @generated
 	 */
-	void setIntermediateInfrastructureTechnology(IntermediateInfrastructureTechnology value);
+	void setInfrastructureTechnology(IntermediateInfrastructureTechnology value);
 
 	/**
-	 * Returns the value of the '<em><b>Intermediate Infrastructure Node</b></em>' container reference.
-	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode#getIntermediateInfrastructureTechnologyReference <em>Intermediate Infrastructure Technology Reference</em>}'.
+	 * Returns the value of the '<em><b>Infrastructure Node</b></em>' container reference.
+	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode#getReference <em>Reference</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Intermediate Infrastructure Node</em>' container reference.
-	 * @see #setIntermediateInfrastructureNode(IntermediateInfrastructureNode)
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateInfrastructureTechnologyReference_IntermediateInfrastructureNode()
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode#getIntermediateInfrastructureTechnologyReference
-	 * @model opposite="intermediateInfrastructureTechnologyReference" transient="false"
+	 * @return the value of the '<em>Infrastructure Node</em>' container reference.
+	 * @see #setInfrastructureNode(IntermediateInfrastructureNode)
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateInfrastructureTechnologyReference_InfrastructureNode()
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode#getReference
+	 * @model opposite="reference" transient="false"
 	 * @generated
 	 */
-	IntermediateInfrastructureNode getIntermediateInfrastructureNode();
+	IntermediateInfrastructureNode getInfrastructureNode();
 
 	/**
-	 * Sets the value of the '{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureTechnologyReference#getIntermediateInfrastructureNode <em>Intermediate Infrastructure Node</em>}' container reference.
+	 * Sets the value of the '{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureTechnologyReference#getInfrastructureNode <em>Infrastructure Node</em>}' container reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Intermediate Infrastructure Node</em>' container reference.
-	 * @see #getIntermediateInfrastructureNode()
+	 * @param value the new value of the '<em>Infrastructure Node</em>' container reference.
+	 * @see #getInfrastructureNode()
 	 * @generated
 	 */
-	void setIntermediateInfrastructureNode(IntermediateInfrastructureNode value);
+	void setInfrastructureNode(IntermediateInfrastructureNode value);
 
 } // IntermediateInfrastructureTechnologyReference

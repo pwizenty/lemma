@@ -13,7 +13,8 @@ import org.eclipse.emf.ecore.EObject;
  *
  * <!-- begin-model-doc -->
  * *
- * A property, e.g., of an intermediate operation technology that may be set per associated service or an aspect
+ * A property, e.g., of an intermediate operation technology that may be set per associated
+ * service or an aspect
  * <!-- end-model-doc -->
  *
  * <p>
@@ -24,8 +25,8 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty#getType <em>Type</em>}</li>
  *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty#getDefaultValue <em>Default Value</em>}</li>
  *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty#getFeatureames <em>Featureames</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty#getIntermediateTechnologySpecificPropertyValue <em>Intermediate Technology Specific Property Value</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty#getIntermediateOperationTechnology <em>Intermediate Operation Technology</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty#getPropertyValue <em>Property Value</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty#getOperationTechnology <em>Operation Technology</em>}</li>
  * </ul>
  *
  * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateTechnologySpecificProperty()
@@ -112,51 +113,51 @@ public interface IntermediateTechnologySpecificProperty extends EObject {
 	EList<String> getFeatureames();
 
 	/**
-	 * Returns the value of the '<em><b>Intermediate Technology Specific Property Value</b></em>' containment reference.
-	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificPropertyValue#getIntermediateTechnologySpecificProperty <em>Intermediate Technology Specific Property</em>}'.
+	 * Returns the value of the '<em><b>Property Value</b></em>' containment reference.
+	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificPropertyValue#getProperty <em>Property</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Intermediate Technology Specific Property Value</em>' containment reference.
-	 * @see #setIntermediateTechnologySpecificPropertyValue(IntermediateTechnologySpecificPropertyValue)
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateTechnologySpecificProperty_IntermediateTechnologySpecificPropertyValue()
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificPropertyValue#getIntermediateTechnologySpecificProperty
-	 * @model opposite="intermediateTechnologySpecificProperty" containment="true"
+	 * @return the value of the '<em>Property Value</em>' containment reference.
+	 * @see #setPropertyValue(IntermediateTechnologySpecificPropertyValue)
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateTechnologySpecificProperty_PropertyValue()
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificPropertyValue#getProperty
+	 * @model opposite="property" containment="true"
 	 * @generated
 	 */
-	IntermediateTechnologySpecificPropertyValue getIntermediateTechnologySpecificPropertyValue();
+	IntermediateTechnologySpecificPropertyValue getPropertyValue();
 
 	/**
-	 * Sets the value of the '{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty#getIntermediateTechnologySpecificPropertyValue <em>Intermediate Technology Specific Property Value</em>}' containment reference.
+	 * Sets the value of the '{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty#getPropertyValue <em>Property Value</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Intermediate Technology Specific Property Value</em>' containment reference.
-	 * @see #getIntermediateTechnologySpecificPropertyValue()
+	 * @param value the new value of the '<em>Property Value</em>' containment reference.
+	 * @see #getPropertyValue()
 	 * @generated
 	 */
-	void setIntermediateTechnologySpecificPropertyValue(IntermediateTechnologySpecificPropertyValue value);
+	void setPropertyValue(IntermediateTechnologySpecificPropertyValue value);
 
 	/**
-	 * Returns the value of the '<em><b>Intermediate Operation Technology</b></em>' container reference.
-	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationTechnology#getIntermediateTechnologySpecificProperty <em>Intermediate Technology Specific Property</em>}'.
+	 * Returns the value of the '<em><b>Operation Technology</b></em>' container reference.
+	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationTechnology#getPropertys <em>Propertys</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Intermediate Operation Technology</em>' container reference.
-	 * @see #setIntermediateOperationTechnology(IntermediateOperationTechnology)
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateTechnologySpecificProperty_IntermediateOperationTechnology()
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationTechnology#getIntermediateTechnologySpecificProperty
-	 * @model opposite="intermediateTechnologySpecificProperty" transient="false"
+	 * @return the value of the '<em>Operation Technology</em>' container reference.
+	 * @see #setOperationTechnology(IntermediateOperationTechnology)
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateTechnologySpecificProperty_OperationTechnology()
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateOperationTechnology#getPropertys
+	 * @model opposite="propertys" transient="false"
 	 * @generated
 	 */
-	IntermediateOperationTechnology getIntermediateOperationTechnology();
+	IntermediateOperationTechnology getOperationTechnology();
 
 	/**
-	 * Sets the value of the '{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty#getIntermediateOperationTechnology <em>Intermediate Operation Technology</em>}' container reference.
+	 * Sets the value of the '{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty#getOperationTechnology <em>Operation Technology</em>}' container reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Intermediate Operation Technology</em>' container reference.
-	 * @see #getIntermediateOperationTechnology()
+	 * @param value the new value of the '<em>Operation Technology</em>' container reference.
+	 * @see #getOperationTechnology()
 	 * @generated
 	 */
-	void setIntermediateOperationTechnology(IntermediateOperationTechnology value);
+	void setOperationTechnology(IntermediateOperationTechnology value);
 
 } // IntermediateTechnologySpecificProperty

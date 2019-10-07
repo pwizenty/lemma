@@ -36,8 +36,8 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <ul>
  *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateOperationModelImpl#getSourceModelUri <em>Source Model Uri</em>}</li>
  *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateOperationModelImpl#getImports <em>Imports</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateOperationModelImpl#getIntermediateContainer <em>Intermediate Container</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateOperationModelImpl#getIntermediateInfrastructureNode <em>Intermediate Infrastructure Node</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateOperationModelImpl#getContainers <em>Containers</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateOperationModelImpl#getInfrastructureNodes <em>Infrastructure Nodes</em>}</li>
  * </ul>
  *
  * @generated
@@ -74,24 +74,24 @@ public class IntermediateOperationModelImpl extends MinimalEObjectImpl.Container
 	protected EList<IntermediateImport> imports;
 
 	/**
-	 * The cached value of the '{@link #getIntermediateContainer() <em>Intermediate Container</em>}' containment reference list.
+	 * The cached value of the '{@link #getContainers() <em>Containers</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getIntermediateContainer()
+	 * @see #getContainers()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<IntermediateContainer> intermediateContainer;
+	protected EList<IntermediateContainer> containers;
 
 	/**
-	 * The cached value of the '{@link #getIntermediateInfrastructureNode() <em>Intermediate Infrastructure Node</em>}' containment reference list.
+	 * The cached value of the '{@link #getInfrastructureNodes() <em>Infrastructure Nodes</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getIntermediateInfrastructureNode()
+	 * @see #getInfrastructureNodes()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<IntermediateInfrastructureNode> intermediateInfrastructureNode;
+	protected EList<IntermediateInfrastructureNode> infrastructureNodes;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -150,11 +150,11 @@ public class IntermediateOperationModelImpl extends MinimalEObjectImpl.Container
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<IntermediateContainer> getIntermediateContainer() {
-		if (intermediateContainer == null) {
-			intermediateContainer = new EObjectContainmentWithInverseEList<IntermediateContainer>(IntermediateContainer.class, this, IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__INTERMEDIATE_CONTAINER, IntermediatePackage.INTERMEDIATE_CONTAINER__INTERMEDIATE_OPERATION_MODEL);
+	public EList<IntermediateContainer> getContainers() {
+		if (containers == null) {
+			containers = new EObjectContainmentWithInverseEList<IntermediateContainer>(IntermediateContainer.class, this, IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__CONTAINERS, IntermediatePackage.INTERMEDIATE_CONTAINER__OPERATION_MODEL);
 		}
-		return intermediateContainer;
+		return containers;
 	}
 
 	/**
@@ -162,11 +162,11 @@ public class IntermediateOperationModelImpl extends MinimalEObjectImpl.Container
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<IntermediateInfrastructureNode> getIntermediateInfrastructureNode() {
-		if (intermediateInfrastructureNode == null) {
-			intermediateInfrastructureNode = new EObjectContainmentWithInverseEList<IntermediateInfrastructureNode>(IntermediateInfrastructureNode.class, this, IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__INTERMEDIATE_INFRASTRUCTURE_NODE, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_OPERATION_MODEL);
+	public EList<IntermediateInfrastructureNode> getInfrastructureNodes() {
+		if (infrastructureNodes == null) {
+			infrastructureNodes = new EObjectContainmentWithInverseEList<IntermediateInfrastructureNode>(IntermediateInfrastructureNode.class, this, IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__INFRASTRUCTURE_NODES, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__OPERATION_MODEL);
 		}
-		return intermediateInfrastructureNode;
+		return infrastructureNodes;
 	}
 
 	/**
@@ -178,10 +178,10 @@ public class IntermediateOperationModelImpl extends MinimalEObjectImpl.Container
 	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__INTERMEDIATE_CONTAINER:
-				return ((InternalEList<InternalEObject>)(InternalEList<?>)getIntermediateContainer()).basicAdd(otherEnd, msgs);
-			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__INTERMEDIATE_INFRASTRUCTURE_NODE:
-				return ((InternalEList<InternalEObject>)(InternalEList<?>)getIntermediateInfrastructureNode()).basicAdd(otherEnd, msgs);
+			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__CONTAINERS:
+				return ((InternalEList<InternalEObject>)(InternalEList<?>)getContainers()).basicAdd(otherEnd, msgs);
+			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__INFRASTRUCTURE_NODES:
+				return ((InternalEList<InternalEObject>)(InternalEList<?>)getInfrastructureNodes()).basicAdd(otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -196,10 +196,10 @@ public class IntermediateOperationModelImpl extends MinimalEObjectImpl.Container
 		switch (featureID) {
 			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__IMPORTS:
 				return ((InternalEList<?>)getImports()).basicRemove(otherEnd, msgs);
-			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__INTERMEDIATE_CONTAINER:
-				return ((InternalEList<?>)getIntermediateContainer()).basicRemove(otherEnd, msgs);
-			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__INTERMEDIATE_INFRASTRUCTURE_NODE:
-				return ((InternalEList<?>)getIntermediateInfrastructureNode()).basicRemove(otherEnd, msgs);
+			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__CONTAINERS:
+				return ((InternalEList<?>)getContainers()).basicRemove(otherEnd, msgs);
+			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__INFRASTRUCTURE_NODES:
+				return ((InternalEList<?>)getInfrastructureNodes()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -216,10 +216,10 @@ public class IntermediateOperationModelImpl extends MinimalEObjectImpl.Container
 				return getSourceModelUri();
 			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__IMPORTS:
 				return getImports();
-			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__INTERMEDIATE_CONTAINER:
-				return getIntermediateContainer();
-			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__INTERMEDIATE_INFRASTRUCTURE_NODE:
-				return getIntermediateInfrastructureNode();
+			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__CONTAINERS:
+				return getContainers();
+			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__INFRASTRUCTURE_NODES:
+				return getInfrastructureNodes();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -240,13 +240,13 @@ public class IntermediateOperationModelImpl extends MinimalEObjectImpl.Container
 				getImports().clear();
 				getImports().addAll((Collection<? extends IntermediateImport>)newValue);
 				return;
-			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__INTERMEDIATE_CONTAINER:
-				getIntermediateContainer().clear();
-				getIntermediateContainer().addAll((Collection<? extends IntermediateContainer>)newValue);
+			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__CONTAINERS:
+				getContainers().clear();
+				getContainers().addAll((Collection<? extends IntermediateContainer>)newValue);
 				return;
-			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__INTERMEDIATE_INFRASTRUCTURE_NODE:
-				getIntermediateInfrastructureNode().clear();
-				getIntermediateInfrastructureNode().addAll((Collection<? extends IntermediateInfrastructureNode>)newValue);
+			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__INFRASTRUCTURE_NODES:
+				getInfrastructureNodes().clear();
+				getInfrastructureNodes().addAll((Collection<? extends IntermediateInfrastructureNode>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -266,11 +266,11 @@ public class IntermediateOperationModelImpl extends MinimalEObjectImpl.Container
 			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__IMPORTS:
 				getImports().clear();
 				return;
-			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__INTERMEDIATE_CONTAINER:
-				getIntermediateContainer().clear();
+			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__CONTAINERS:
+				getContainers().clear();
 				return;
-			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__INTERMEDIATE_INFRASTRUCTURE_NODE:
-				getIntermediateInfrastructureNode().clear();
+			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__INFRASTRUCTURE_NODES:
+				getInfrastructureNodes().clear();
 				return;
 		}
 		super.eUnset(featureID);
@@ -288,10 +288,10 @@ public class IntermediateOperationModelImpl extends MinimalEObjectImpl.Container
 				return SOURCE_MODEL_URI_EDEFAULT == null ? sourceModelUri != null : !SOURCE_MODEL_URI_EDEFAULT.equals(sourceModelUri);
 			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__IMPORTS:
 				return imports != null && !imports.isEmpty();
-			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__INTERMEDIATE_CONTAINER:
-				return intermediateContainer != null && !intermediateContainer.isEmpty();
-			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__INTERMEDIATE_INFRASTRUCTURE_NODE:
-				return intermediateInfrastructureNode != null && !intermediateInfrastructureNode.isEmpty();
+			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__CONTAINERS:
+				return containers != null && !containers.isEmpty();
+			case IntermediatePackage.INTERMEDIATE_OPERATION_MODEL__INFRASTRUCTURE_NODES:
+				return infrastructureNodes != null && !infrastructureNodes.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

@@ -25,8 +25,8 @@ import org.eclipse.emf.ecore.EObject;
  * <ul>
  *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationModel#getSourceModelUri <em>Source Model Uri</em>}</li>
  *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationModel#getImports <em>Imports</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationModel#getIntermediateContainer <em>Intermediate Container</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationModel#getIntermediateInfrastructureNode <em>Intermediate Infrastructure Node</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationModel#getContainers <em>Containers</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateOperationModel#getInfrastructureNodes <em>Infrastructure Nodes</em>}</li>
  * </ul>
  *
  * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateOperationModel()
@@ -69,31 +69,31 @@ public interface IntermediateOperationModel extends EObject {
 	EList<IntermediateImport> getImports();
 
 	/**
-	 * Returns the value of the '<em><b>Intermediate Container</b></em>' containment reference list.
+	 * Returns the value of the '<em><b>Containers</b></em>' containment reference list.
 	 * The list contents are of type {@link de.fhdo.lemma.operation.intermediate.IntermediateContainer}.
-	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.operation.intermediate.IntermediateContainer#getIntermediateOperationModel <em>Intermediate Operation Model</em>}'.
+	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.operation.intermediate.IntermediateContainer#getOperationModel <em>Operation Model</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Intermediate Container</em>' containment reference list.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateOperationModel_IntermediateContainer()
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateContainer#getIntermediateOperationModel
-	 * @model opposite="intermediateOperationModel" containment="true"
+	 * @return the value of the '<em>Containers</em>' containment reference list.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateOperationModel_Containers()
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateContainer#getOperationModel
+	 * @model opposite="operationModel" containment="true"
 	 * @generated
 	 */
-	EList<IntermediateContainer> getIntermediateContainer();
+	EList<IntermediateContainer> getContainers();
 
 	/**
-	 * Returns the value of the '<em><b>Intermediate Infrastructure Node</b></em>' containment reference list.
+	 * Returns the value of the '<em><b>Infrastructure Nodes</b></em>' containment reference list.
 	 * The list contents are of type {@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode}.
-	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode#getIntermediateOperationModel <em>Intermediate Operation Model</em>}'.
+	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode#getOperationModel <em>Operation Model</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Intermediate Infrastructure Node</em>' containment reference list.
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateOperationModel_IntermediateInfrastructureNode()
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode#getIntermediateOperationModel
-	 * @model opposite="intermediateOperationModel" containment="true"
+	 * @return the value of the '<em>Infrastructure Nodes</em>' containment reference list.
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateOperationModel_InfrastructureNodes()
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateInfrastructureNode#getOperationModel
+	 * @model opposite="operationModel" containment="true"
 	 * @generated
 	 */
-	EList<IntermediateInfrastructureNode> getIntermediateInfrastructureNode();
+	EList<IntermediateInfrastructureNode> getInfrastructureNodes();
 
 } // IntermediateOperationModel

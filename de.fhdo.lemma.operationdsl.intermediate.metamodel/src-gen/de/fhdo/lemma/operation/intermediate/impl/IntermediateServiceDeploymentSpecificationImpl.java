@@ -36,44 +36,44 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * The following features are implemented:
  * </p>
  * <ul>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateServiceDeploymentSpecificationImpl#getOperationMicroserviceReference <em>Operation Microservice Reference</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateServiceDeploymentSpecificationImpl#getIntermediateTechnologySpecificPropertyValue <em>Intermediate Technology Specific Property Value</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateServiceDeploymentSpecificationImpl#getIntermediateEndpoints <em>Intermediate Endpoints</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateServiceDeploymentSpecificationImpl#getIntermediateOperationNode <em>Intermediate Operation Node</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateServiceDeploymentSpecificationImpl#getService <em>Service</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateServiceDeploymentSpecificationImpl#getPropertyValues <em>Property Values</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateServiceDeploymentSpecificationImpl#getEndpoints <em>Endpoints</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateServiceDeploymentSpecificationImpl#getOperationNode <em>Operation Node</em>}</li>
  * </ul>
  *
  * @generated
  */
 public class IntermediateServiceDeploymentSpecificationImpl extends MinimalEObjectImpl.Container implements IntermediateServiceDeploymentSpecification {
 	/**
-	 * The cached value of the '{@link #getOperationMicroserviceReference() <em>Operation Microservice Reference</em>}' reference.
+	 * The cached value of the '{@link #getService() <em>Service</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getOperationMicroserviceReference()
+	 * @see #getService()
 	 * @generated
 	 * @ordered
 	 */
-	protected OperationMicroserviceReference operationMicroserviceReference;
+	protected OperationMicroserviceReference service;
 
 	/**
-	 * The cached value of the '{@link #getIntermediateTechnologySpecificPropertyValue() <em>Intermediate Technology Specific Property Value</em>}' containment reference list.
+	 * The cached value of the '{@link #getPropertyValues() <em>Property Values</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getIntermediateTechnologySpecificPropertyValue()
+	 * @see #getPropertyValues()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<IntermediateTechnologySpecificPropertyValue> intermediateTechnologySpecificPropertyValue;
+	protected EList<IntermediateTechnologySpecificPropertyValue> propertyValues;
 
 	/**
-	 * The cached value of the '{@link #getIntermediateEndpoints() <em>Intermediate Endpoints</em>}' containment reference list.
+	 * The cached value of the '{@link #getEndpoints() <em>Endpoints</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getIntermediateEndpoints()
+	 * @see #getEndpoints()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<IntermediateEndpoint> intermediateEndpoints;
+	protected EList<IntermediateEndpoint> endpoints;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -99,90 +99,22 @@ public class IntermediateServiceDeploymentSpecificationImpl extends MinimalEObje
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public OperationMicroserviceReference getOperationMicroserviceReference() {
-		if (operationMicroserviceReference != null && operationMicroserviceReference.eIsProxy()) {
-			InternalEObject oldOperationMicroserviceReference = (InternalEObject)operationMicroserviceReference;
-			operationMicroserviceReference = (OperationMicroserviceReference)eResolveProxy(oldOperationMicroserviceReference);
-			if (operationMicroserviceReference != oldOperationMicroserviceReference) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__OPERATION_MICROSERVICE_REFERENCE, oldOperationMicroserviceReference, operationMicroserviceReference));
-			}
+	public OperationMicroserviceReference getService() {
+		return service;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetService(OperationMicroserviceReference newService, NotificationChain msgs) {
+		OperationMicroserviceReference oldService = service;
+		service = newService;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__SERVICE, oldService, newService);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
-		return operationMicroserviceReference;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public OperationMicroserviceReference basicGetOperationMicroserviceReference() {
-		return operationMicroserviceReference;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setOperationMicroserviceReference(OperationMicroserviceReference newOperationMicroserviceReference) {
-		OperationMicroserviceReference oldOperationMicroserviceReference = operationMicroserviceReference;
-		operationMicroserviceReference = newOperationMicroserviceReference;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__OPERATION_MICROSERVICE_REFERENCE, oldOperationMicroserviceReference, operationMicroserviceReference));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<IntermediateTechnologySpecificPropertyValue> getIntermediateTechnologySpecificPropertyValue() {
-		if (intermediateTechnologySpecificPropertyValue == null) {
-			intermediateTechnologySpecificPropertyValue = new EObjectContainmentWithInverseEList<IntermediateTechnologySpecificPropertyValue>(IntermediateTechnologySpecificPropertyValue.class, this, IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE, IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE__INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION);
-		}
-		return intermediateTechnologySpecificPropertyValue;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<IntermediateEndpoint> getIntermediateEndpoints() {
-		if (intermediateEndpoints == null) {
-			intermediateEndpoints = new EObjectContainmentEList<IntermediateEndpoint>(IntermediateEndpoint.class, this, IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_ENDPOINTS);
-		}
-		return intermediateEndpoints;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public IntermediateOperationNode getIntermediateOperationNode() {
-		if (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_OPERATION_NODE) return null;
-		return (IntermediateOperationNode)eContainer();
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public IntermediateOperationNode basicGetIntermediateOperationNode() {
-		if (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_OPERATION_NODE) return null;
-		return (IntermediateOperationNode)eInternalContainer();
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NotificationChain basicSetIntermediateOperationNode(IntermediateOperationNode newIntermediateOperationNode, NotificationChain msgs) {
-		msgs = eBasicSetContainer((InternalEObject)newIntermediateOperationNode, IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_OPERATION_NODE, msgs);
 		return msgs;
 	}
 
@@ -191,20 +123,93 @@ public class IntermediateServiceDeploymentSpecificationImpl extends MinimalEObje
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setIntermediateOperationNode(IntermediateOperationNode newIntermediateOperationNode) {
-		if (newIntermediateOperationNode != eInternalContainer() || (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_OPERATION_NODE && newIntermediateOperationNode != null)) {
-			if (EcoreUtil.isAncestor(this, newIntermediateOperationNode))
+	public void setService(OperationMicroserviceReference newService) {
+		if (newService != service) {
+			NotificationChain msgs = null;
+			if (service != null)
+				msgs = ((InternalEObject)service).eInverseRemove(this, IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__SPECIFICATION, OperationMicroserviceReference.class, msgs);
+			if (newService != null)
+				msgs = ((InternalEObject)newService).eInverseAdd(this, IntermediatePackage.OPERATION_MICROSERVICE_REFERENCE__SPECIFICATION, OperationMicroserviceReference.class, msgs);
+			msgs = basicSetService(newService, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__SERVICE, newService, newService));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<IntermediateTechnologySpecificPropertyValue> getPropertyValues() {
+		if (propertyValues == null) {
+			propertyValues = new EObjectContainmentWithInverseEList<IntermediateTechnologySpecificPropertyValue>(IntermediateTechnologySpecificPropertyValue.class, this, IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__PROPERTY_VALUES, IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE__SPECIFICATION);
+		}
+		return propertyValues;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<IntermediateEndpoint> getEndpoints() {
+		if (endpoints == null) {
+			endpoints = new EObjectContainmentEList<IntermediateEndpoint>(IntermediateEndpoint.class, this, IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__ENDPOINTS);
+		}
+		return endpoints;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public IntermediateOperationNode getOperationNode() {
+		if (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__OPERATION_NODE) return null;
+		return (IntermediateOperationNode)eContainer();
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public IntermediateOperationNode basicGetOperationNode() {
+		if (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__OPERATION_NODE) return null;
+		return (IntermediateOperationNode)eInternalContainer();
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetOperationNode(IntermediateOperationNode newOperationNode, NotificationChain msgs) {
+		msgs = eBasicSetContainer((InternalEObject)newOperationNode, IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__OPERATION_NODE, msgs);
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setOperationNode(IntermediateOperationNode newOperationNode) {
+		if (newOperationNode != eInternalContainer() || (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__OPERATION_NODE && newOperationNode != null)) {
+			if (EcoreUtil.isAncestor(this, newOperationNode))
 				throw new IllegalArgumentException("Recursive containment not allowed for " + toString());
 			NotificationChain msgs = null;
 			if (eInternalContainer() != null)
 				msgs = eBasicRemoveFromContainer(msgs);
-			if (newIntermediateOperationNode != null)
-				msgs = ((InternalEObject)newIntermediateOperationNode).eInverseAdd(this, IntermediatePackage.INTERMEDIATE_OPERATION_NODE__INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION, IntermediateOperationNode.class, msgs);
-			msgs = basicSetIntermediateOperationNode(newIntermediateOperationNode, msgs);
+			if (newOperationNode != null)
+				msgs = ((InternalEObject)newOperationNode).eInverseAdd(this, IntermediatePackage.INTERMEDIATE_OPERATION_NODE__SPECIFICATIONS, IntermediateOperationNode.class, msgs);
+			msgs = basicSetOperationNode(newOperationNode, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_OPERATION_NODE, newIntermediateOperationNode, newIntermediateOperationNode));
+			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__OPERATION_NODE, newOperationNode, newOperationNode));
 	}
 
 	/**
@@ -216,12 +221,16 @@ public class IntermediateServiceDeploymentSpecificationImpl extends MinimalEObje
 	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE:
-				return ((InternalEList<InternalEObject>)(InternalEList<?>)getIntermediateTechnologySpecificPropertyValue()).basicAdd(otherEnd, msgs);
-			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_OPERATION_NODE:
+			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__SERVICE:
+				if (service != null)
+					msgs = ((InternalEObject)service).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__SERVICE, null, msgs);
+				return basicSetService((OperationMicroserviceReference)otherEnd, msgs);
+			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__PROPERTY_VALUES:
+				return ((InternalEList<InternalEObject>)(InternalEList<?>)getPropertyValues()).basicAdd(otherEnd, msgs);
+			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__OPERATION_NODE:
 				if (eInternalContainer() != null)
 					msgs = eBasicRemoveFromContainer(msgs);
-				return basicSetIntermediateOperationNode((IntermediateOperationNode)otherEnd, msgs);
+				return basicSetOperationNode((IntermediateOperationNode)otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -234,12 +243,14 @@ public class IntermediateServiceDeploymentSpecificationImpl extends MinimalEObje
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE:
-				return ((InternalEList<?>)getIntermediateTechnologySpecificPropertyValue()).basicRemove(otherEnd, msgs);
-			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_ENDPOINTS:
-				return ((InternalEList<?>)getIntermediateEndpoints()).basicRemove(otherEnd, msgs);
-			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_OPERATION_NODE:
-				return basicSetIntermediateOperationNode(null, msgs);
+			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__SERVICE:
+				return basicSetService(null, msgs);
+			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__PROPERTY_VALUES:
+				return ((InternalEList<?>)getPropertyValues()).basicRemove(otherEnd, msgs);
+			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__ENDPOINTS:
+				return ((InternalEList<?>)getEndpoints()).basicRemove(otherEnd, msgs);
+			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__OPERATION_NODE:
+				return basicSetOperationNode(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -252,8 +263,8 @@ public class IntermediateServiceDeploymentSpecificationImpl extends MinimalEObje
 	@Override
 	public NotificationChain eBasicRemoveFromContainerFeature(NotificationChain msgs) {
 		switch (eContainerFeatureID()) {
-			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_OPERATION_NODE:
-				return eInternalContainer().eInverseRemove(this, IntermediatePackage.INTERMEDIATE_OPERATION_NODE__INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION, IntermediateOperationNode.class, msgs);
+			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__OPERATION_NODE:
+				return eInternalContainer().eInverseRemove(this, IntermediatePackage.INTERMEDIATE_OPERATION_NODE__SPECIFICATIONS, IntermediateOperationNode.class, msgs);
 		}
 		return super.eBasicRemoveFromContainerFeature(msgs);
 	}
@@ -266,16 +277,15 @@ public class IntermediateServiceDeploymentSpecificationImpl extends MinimalEObje
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__OPERATION_MICROSERVICE_REFERENCE:
-				if (resolve) return getOperationMicroserviceReference();
-				return basicGetOperationMicroserviceReference();
-			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE:
-				return getIntermediateTechnologySpecificPropertyValue();
-			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_ENDPOINTS:
-				return getIntermediateEndpoints();
-			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_OPERATION_NODE:
-				if (resolve) return getIntermediateOperationNode();
-				return basicGetIntermediateOperationNode();
+			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__SERVICE:
+				return getService();
+			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__PROPERTY_VALUES:
+				return getPropertyValues();
+			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__ENDPOINTS:
+				return getEndpoints();
+			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__OPERATION_NODE:
+				if (resolve) return getOperationNode();
+				return basicGetOperationNode();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -289,19 +299,19 @@ public class IntermediateServiceDeploymentSpecificationImpl extends MinimalEObje
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__OPERATION_MICROSERVICE_REFERENCE:
-				setOperationMicroserviceReference((OperationMicroserviceReference)newValue);
+			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__SERVICE:
+				setService((OperationMicroserviceReference)newValue);
 				return;
-			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE:
-				getIntermediateTechnologySpecificPropertyValue().clear();
-				getIntermediateTechnologySpecificPropertyValue().addAll((Collection<? extends IntermediateTechnologySpecificPropertyValue>)newValue);
+			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__PROPERTY_VALUES:
+				getPropertyValues().clear();
+				getPropertyValues().addAll((Collection<? extends IntermediateTechnologySpecificPropertyValue>)newValue);
 				return;
-			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_ENDPOINTS:
-				getIntermediateEndpoints().clear();
-				getIntermediateEndpoints().addAll((Collection<? extends IntermediateEndpoint>)newValue);
+			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__ENDPOINTS:
+				getEndpoints().clear();
+				getEndpoints().addAll((Collection<? extends IntermediateEndpoint>)newValue);
 				return;
-			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_OPERATION_NODE:
-				setIntermediateOperationNode((IntermediateOperationNode)newValue);
+			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__OPERATION_NODE:
+				setOperationNode((IntermediateOperationNode)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -315,17 +325,17 @@ public class IntermediateServiceDeploymentSpecificationImpl extends MinimalEObje
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__OPERATION_MICROSERVICE_REFERENCE:
-				setOperationMicroserviceReference((OperationMicroserviceReference)null);
+			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__SERVICE:
+				setService((OperationMicroserviceReference)null);
 				return;
-			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE:
-				getIntermediateTechnologySpecificPropertyValue().clear();
+			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__PROPERTY_VALUES:
+				getPropertyValues().clear();
 				return;
-			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_ENDPOINTS:
-				getIntermediateEndpoints().clear();
+			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__ENDPOINTS:
+				getEndpoints().clear();
 				return;
-			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_OPERATION_NODE:
-				setIntermediateOperationNode((IntermediateOperationNode)null);
+			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__OPERATION_NODE:
+				setOperationNode((IntermediateOperationNode)null);
 				return;
 		}
 		super.eUnset(featureID);
@@ -339,14 +349,14 @@ public class IntermediateServiceDeploymentSpecificationImpl extends MinimalEObje
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__OPERATION_MICROSERVICE_REFERENCE:
-				return operationMicroserviceReference != null;
-			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE:
-				return intermediateTechnologySpecificPropertyValue != null && !intermediateTechnologySpecificPropertyValue.isEmpty();
-			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_ENDPOINTS:
-				return intermediateEndpoints != null && !intermediateEndpoints.isEmpty();
-			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__INTERMEDIATE_OPERATION_NODE:
-				return basicGetIntermediateOperationNode() != null;
+			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__SERVICE:
+				return service != null;
+			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__PROPERTY_VALUES:
+				return propertyValues != null && !propertyValues.isEmpty();
+			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__ENDPOINTS:
+				return endpoints != null && !endpoints.isEmpty();
+			case IntermediatePackage.INTERMEDIATE_SERVICE_DEPLOYMENT_SPECIFICATION__OPERATION_NODE:
+				return basicGetOperationNode() != null;
 		}
 		return super.eIsSet(featureID);
 	}

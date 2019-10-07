@@ -35,8 +35,8 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateTechnologySpecificPropertyImpl#getType <em>Type</em>}</li>
  *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateTechnologySpecificPropertyImpl#getDefaultValue <em>Default Value</em>}</li>
  *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateTechnologySpecificPropertyImpl#getFeatureames <em>Featureames</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateTechnologySpecificPropertyImpl#getIntermediateTechnologySpecificPropertyValue <em>Intermediate Technology Specific Property Value</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateTechnologySpecificPropertyImpl#getIntermediateOperationTechnology <em>Intermediate Operation Technology</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateTechnologySpecificPropertyImpl#getPropertyValue <em>Property Value</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateTechnologySpecificPropertyImpl#getOperationTechnology <em>Operation Technology</em>}</li>
  * </ul>
  *
  * @generated
@@ -113,14 +113,14 @@ public class IntermediateTechnologySpecificPropertyImpl extends MinimalEObjectIm
 	protected EList<String> featureames;
 
 	/**
-	 * The cached value of the '{@link #getIntermediateTechnologySpecificPropertyValue() <em>Intermediate Technology Specific Property Value</em>}' containment reference.
+	 * The cached value of the '{@link #getPropertyValue() <em>Property Value</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getIntermediateTechnologySpecificPropertyValue()
+	 * @see #getPropertyValue()
 	 * @generated
 	 * @ordered
 	 */
-	protected IntermediateTechnologySpecificPropertyValue intermediateTechnologySpecificPropertyValue;
+	protected IntermediateTechnologySpecificPropertyValue propertyValue;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -221,8 +221,8 @@ public class IntermediateTechnologySpecificPropertyImpl extends MinimalEObjectIm
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public IntermediateTechnologySpecificPropertyValue getIntermediateTechnologySpecificPropertyValue() {
-		return intermediateTechnologySpecificPropertyValue;
+	public IntermediateTechnologySpecificPropertyValue getPropertyValue() {
+		return propertyValue;
 	}
 
 	/**
@@ -230,11 +230,11 @@ public class IntermediateTechnologySpecificPropertyImpl extends MinimalEObjectIm
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetIntermediateTechnologySpecificPropertyValue(IntermediateTechnologySpecificPropertyValue newIntermediateTechnologySpecificPropertyValue, NotificationChain msgs) {
-		IntermediateTechnologySpecificPropertyValue oldIntermediateTechnologySpecificPropertyValue = intermediateTechnologySpecificPropertyValue;
-		intermediateTechnologySpecificPropertyValue = newIntermediateTechnologySpecificPropertyValue;
+	public NotificationChain basicSetPropertyValue(IntermediateTechnologySpecificPropertyValue newPropertyValue, NotificationChain msgs) {
+		IntermediateTechnologySpecificPropertyValue oldPropertyValue = propertyValue;
+		propertyValue = newPropertyValue;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE, oldIntermediateTechnologySpecificPropertyValue, newIntermediateTechnologySpecificPropertyValue);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__PROPERTY_VALUE, oldPropertyValue, newPropertyValue);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
@@ -245,18 +245,18 @@ public class IntermediateTechnologySpecificPropertyImpl extends MinimalEObjectIm
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setIntermediateTechnologySpecificPropertyValue(IntermediateTechnologySpecificPropertyValue newIntermediateTechnologySpecificPropertyValue) {
-		if (newIntermediateTechnologySpecificPropertyValue != intermediateTechnologySpecificPropertyValue) {
+	public void setPropertyValue(IntermediateTechnologySpecificPropertyValue newPropertyValue) {
+		if (newPropertyValue != propertyValue) {
 			NotificationChain msgs = null;
-			if (intermediateTechnologySpecificPropertyValue != null)
-				msgs = ((InternalEObject)intermediateTechnologySpecificPropertyValue).eInverseRemove(this, IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY, IntermediateTechnologySpecificPropertyValue.class, msgs);
-			if (newIntermediateTechnologySpecificPropertyValue != null)
-				msgs = ((InternalEObject)newIntermediateTechnologySpecificPropertyValue).eInverseAdd(this, IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY, IntermediateTechnologySpecificPropertyValue.class, msgs);
-			msgs = basicSetIntermediateTechnologySpecificPropertyValue(newIntermediateTechnologySpecificPropertyValue, msgs);
+			if (propertyValue != null)
+				msgs = ((InternalEObject)propertyValue).eInverseRemove(this, IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE__PROPERTY, IntermediateTechnologySpecificPropertyValue.class, msgs);
+			if (newPropertyValue != null)
+				msgs = ((InternalEObject)newPropertyValue).eInverseAdd(this, IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE__PROPERTY, IntermediateTechnologySpecificPropertyValue.class, msgs);
+			msgs = basicSetPropertyValue(newPropertyValue, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE, newIntermediateTechnologySpecificPropertyValue, newIntermediateTechnologySpecificPropertyValue));
+			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__PROPERTY_VALUE, newPropertyValue, newPropertyValue));
 	}
 
 	/**
@@ -264,8 +264,8 @@ public class IntermediateTechnologySpecificPropertyImpl extends MinimalEObjectIm
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public IntermediateOperationTechnology getIntermediateOperationTechnology() {
-		if (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__INTERMEDIATE_OPERATION_TECHNOLOGY) return null;
+	public IntermediateOperationTechnology getOperationTechnology() {
+		if (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__OPERATION_TECHNOLOGY) return null;
 		return (IntermediateOperationTechnology)eContainer();
 	}
 
@@ -274,8 +274,8 @@ public class IntermediateTechnologySpecificPropertyImpl extends MinimalEObjectIm
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public IntermediateOperationTechnology basicGetIntermediateOperationTechnology() {
-		if (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__INTERMEDIATE_OPERATION_TECHNOLOGY) return null;
+	public IntermediateOperationTechnology basicGetOperationTechnology() {
+		if (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__OPERATION_TECHNOLOGY) return null;
 		return (IntermediateOperationTechnology)eInternalContainer();
 	}
 
@@ -284,8 +284,8 @@ public class IntermediateTechnologySpecificPropertyImpl extends MinimalEObjectIm
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetIntermediateOperationTechnology(IntermediateOperationTechnology newIntermediateOperationTechnology, NotificationChain msgs) {
-		msgs = eBasicSetContainer((InternalEObject)newIntermediateOperationTechnology, IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__INTERMEDIATE_OPERATION_TECHNOLOGY, msgs);
+	public NotificationChain basicSetOperationTechnology(IntermediateOperationTechnology newOperationTechnology, NotificationChain msgs) {
+		msgs = eBasicSetContainer((InternalEObject)newOperationTechnology, IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__OPERATION_TECHNOLOGY, msgs);
 		return msgs;
 	}
 
@@ -294,20 +294,20 @@ public class IntermediateTechnologySpecificPropertyImpl extends MinimalEObjectIm
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setIntermediateOperationTechnology(IntermediateOperationTechnology newIntermediateOperationTechnology) {
-		if (newIntermediateOperationTechnology != eInternalContainer() || (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__INTERMEDIATE_OPERATION_TECHNOLOGY && newIntermediateOperationTechnology != null)) {
-			if (EcoreUtil.isAncestor(this, newIntermediateOperationTechnology))
+	public void setOperationTechnology(IntermediateOperationTechnology newOperationTechnology) {
+		if (newOperationTechnology != eInternalContainer() || (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__OPERATION_TECHNOLOGY && newOperationTechnology != null)) {
+			if (EcoreUtil.isAncestor(this, newOperationTechnology))
 				throw new IllegalArgumentException("Recursive containment not allowed for " + toString());
 			NotificationChain msgs = null;
 			if (eInternalContainer() != null)
 				msgs = eBasicRemoveFromContainer(msgs);
-			if (newIntermediateOperationTechnology != null)
-				msgs = ((InternalEObject)newIntermediateOperationTechnology).eInverseAdd(this, IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY, IntermediateOperationTechnology.class, msgs);
-			msgs = basicSetIntermediateOperationTechnology(newIntermediateOperationTechnology, msgs);
+			if (newOperationTechnology != null)
+				msgs = ((InternalEObject)newOperationTechnology).eInverseAdd(this, IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__PROPERTYS, IntermediateOperationTechnology.class, msgs);
+			msgs = basicSetOperationTechnology(newOperationTechnology, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__INTERMEDIATE_OPERATION_TECHNOLOGY, newIntermediateOperationTechnology, newIntermediateOperationTechnology));
+			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__OPERATION_TECHNOLOGY, newOperationTechnology, newOperationTechnology));
 	}
 
 	/**
@@ -318,14 +318,14 @@ public class IntermediateTechnologySpecificPropertyImpl extends MinimalEObjectIm
 	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE:
-				if (intermediateTechnologySpecificPropertyValue != null)
-					msgs = ((InternalEObject)intermediateTechnologySpecificPropertyValue).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE, null, msgs);
-				return basicSetIntermediateTechnologySpecificPropertyValue((IntermediateTechnologySpecificPropertyValue)otherEnd, msgs);
-			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__INTERMEDIATE_OPERATION_TECHNOLOGY:
+			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__PROPERTY_VALUE:
+				if (propertyValue != null)
+					msgs = ((InternalEObject)propertyValue).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__PROPERTY_VALUE, null, msgs);
+				return basicSetPropertyValue((IntermediateTechnologySpecificPropertyValue)otherEnd, msgs);
+			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__OPERATION_TECHNOLOGY:
 				if (eInternalContainer() != null)
 					msgs = eBasicRemoveFromContainer(msgs);
-				return basicSetIntermediateOperationTechnology((IntermediateOperationTechnology)otherEnd, msgs);
+				return basicSetOperationTechnology((IntermediateOperationTechnology)otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -338,10 +338,10 @@ public class IntermediateTechnologySpecificPropertyImpl extends MinimalEObjectIm
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE:
-				return basicSetIntermediateTechnologySpecificPropertyValue(null, msgs);
-			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__INTERMEDIATE_OPERATION_TECHNOLOGY:
-				return basicSetIntermediateOperationTechnology(null, msgs);
+			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__PROPERTY_VALUE:
+				return basicSetPropertyValue(null, msgs);
+			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__OPERATION_TECHNOLOGY:
+				return basicSetOperationTechnology(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -354,8 +354,8 @@ public class IntermediateTechnologySpecificPropertyImpl extends MinimalEObjectIm
 	@Override
 	public NotificationChain eBasicRemoveFromContainerFeature(NotificationChain msgs) {
 		switch (eContainerFeatureID()) {
-			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__INTERMEDIATE_OPERATION_TECHNOLOGY:
-				return eInternalContainer().eInverseRemove(this, IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY, IntermediateOperationTechnology.class, msgs);
+			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__OPERATION_TECHNOLOGY:
+				return eInternalContainer().eInverseRemove(this, IntermediatePackage.INTERMEDIATE_OPERATION_TECHNOLOGY__PROPERTYS, IntermediateOperationTechnology.class, msgs);
 		}
 		return super.eBasicRemoveFromContainerFeature(msgs);
 	}
@@ -376,11 +376,11 @@ public class IntermediateTechnologySpecificPropertyImpl extends MinimalEObjectIm
 				return getDefaultValue();
 			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__FEATUREAMES:
 				return getFeatureames();
-			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE:
-				return getIntermediateTechnologySpecificPropertyValue();
-			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__INTERMEDIATE_OPERATION_TECHNOLOGY:
-				if (resolve) return getIntermediateOperationTechnology();
-				return basicGetIntermediateOperationTechnology();
+			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__PROPERTY_VALUE:
+				return getPropertyValue();
+			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__OPERATION_TECHNOLOGY:
+				if (resolve) return getOperationTechnology();
+				return basicGetOperationTechnology();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -407,11 +407,11 @@ public class IntermediateTechnologySpecificPropertyImpl extends MinimalEObjectIm
 				getFeatureames().clear();
 				getFeatureames().addAll((Collection<? extends String>)newValue);
 				return;
-			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE:
-				setIntermediateTechnologySpecificPropertyValue((IntermediateTechnologySpecificPropertyValue)newValue);
+			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__PROPERTY_VALUE:
+				setPropertyValue((IntermediateTechnologySpecificPropertyValue)newValue);
 				return;
-			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__INTERMEDIATE_OPERATION_TECHNOLOGY:
-				setIntermediateOperationTechnology((IntermediateOperationTechnology)newValue);
+			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__OPERATION_TECHNOLOGY:
+				setOperationTechnology((IntermediateOperationTechnology)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -437,11 +437,11 @@ public class IntermediateTechnologySpecificPropertyImpl extends MinimalEObjectIm
 			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__FEATUREAMES:
 				getFeatureames().clear();
 				return;
-			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE:
-				setIntermediateTechnologySpecificPropertyValue((IntermediateTechnologySpecificPropertyValue)null);
+			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__PROPERTY_VALUE:
+				setPropertyValue((IntermediateTechnologySpecificPropertyValue)null);
 				return;
-			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__INTERMEDIATE_OPERATION_TECHNOLOGY:
-				setIntermediateOperationTechnology((IntermediateOperationTechnology)null);
+			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__OPERATION_TECHNOLOGY:
+				setOperationTechnology((IntermediateOperationTechnology)null);
 				return;
 		}
 		super.eUnset(featureID);
@@ -463,10 +463,10 @@ public class IntermediateTechnologySpecificPropertyImpl extends MinimalEObjectIm
 				return DEFAULT_VALUE_EDEFAULT == null ? defaultValue != null : !DEFAULT_VALUE_EDEFAULT.equals(defaultValue);
 			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__FEATUREAMES:
 				return featureames != null && !featureames.isEmpty();
-			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY_VALUE:
-				return intermediateTechnologySpecificPropertyValue != null;
-			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__INTERMEDIATE_OPERATION_TECHNOLOGY:
-				return basicGetIntermediateOperationTechnology() != null;
+			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__PROPERTY_VALUE:
+				return propertyValue != null;
+			case IntermediatePackage.INTERMEDIATE_TECHNOLOGY_SPECIFIC_PROPERTY__OPERATION_TECHNOLOGY:
+				return basicGetOperationTechnology() != null;
 		}
 		return super.eIsSet(featureID);
 	}

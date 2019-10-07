@@ -19,8 +19,8 @@ import org.eclipse.emf.ecore.EObject;
  * </p>
  * <ul>
  *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificPropertyValue#getValue <em>Value</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificPropertyValue#getIntermediateServiceDeploymentSpecification <em>Intermediate Service Deployment Specification</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificPropertyValue#getIntermediateTechnologySpecificProperty <em>Intermediate Technology Specific Property</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificPropertyValue#getSpecification <em>Specification</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificPropertyValue#getProperty <em>Property</em>}</li>
  * </ul>
  *
  * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateTechnologySpecificPropertyValue()
@@ -51,51 +51,51 @@ public interface IntermediateTechnologySpecificPropertyValue extends EObject {
 	void setValue(String value);
 
 	/**
-	 * Returns the value of the '<em><b>Intermediate Service Deployment Specification</b></em>' container reference.
-	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getIntermediateTechnologySpecificPropertyValue <em>Intermediate Technology Specific Property Value</em>}'.
+	 * Returns the value of the '<em><b>Specification</b></em>' container reference.
+	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getPropertyValues <em>Property Values</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Intermediate Service Deployment Specification</em>' container reference.
-	 * @see #setIntermediateServiceDeploymentSpecification(IntermediateServiceDeploymentSpecification)
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateTechnologySpecificPropertyValue_IntermediateServiceDeploymentSpecification()
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getIntermediateTechnologySpecificPropertyValue
-	 * @model opposite="intermediateTechnologySpecificPropertyValue" transient="false"
+	 * @return the value of the '<em>Specification</em>' container reference.
+	 * @see #setSpecification(IntermediateServiceDeploymentSpecification)
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateTechnologySpecificPropertyValue_Specification()
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateServiceDeploymentSpecification#getPropertyValues
+	 * @model opposite="propertyValues" transient="false"
 	 * @generated
 	 */
-	IntermediateServiceDeploymentSpecification getIntermediateServiceDeploymentSpecification();
+	IntermediateServiceDeploymentSpecification getSpecification();
 
 	/**
-	 * Sets the value of the '{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificPropertyValue#getIntermediateServiceDeploymentSpecification <em>Intermediate Service Deployment Specification</em>}' container reference.
+	 * Sets the value of the '{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificPropertyValue#getSpecification <em>Specification</em>}' container reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Intermediate Service Deployment Specification</em>' container reference.
-	 * @see #getIntermediateServiceDeploymentSpecification()
+	 * @param value the new value of the '<em>Specification</em>' container reference.
+	 * @see #getSpecification()
 	 * @generated
 	 */
-	void setIntermediateServiceDeploymentSpecification(IntermediateServiceDeploymentSpecification value);
+	void setSpecification(IntermediateServiceDeploymentSpecification value);
 
 	/**
-	 * Returns the value of the '<em><b>Intermediate Technology Specific Property</b></em>' container reference.
-	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty#getIntermediateTechnologySpecificPropertyValue <em>Intermediate Technology Specific Property Value</em>}'.
+	 * Returns the value of the '<em><b>Property</b></em>' container reference.
+	 * It is bidirectional and its opposite is '{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty#getPropertyValue <em>Property Value</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Intermediate Technology Specific Property</em>' container reference.
-	 * @see #setIntermediateTechnologySpecificProperty(IntermediateTechnologySpecificProperty)
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateTechnologySpecificPropertyValue_IntermediateTechnologySpecificProperty()
-	 * @see de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty#getIntermediateTechnologySpecificPropertyValue
-	 * @model opposite="intermediateTechnologySpecificPropertyValue" transient="false"
+	 * @return the value of the '<em>Property</em>' container reference.
+	 * @see #setProperty(IntermediateTechnologySpecificProperty)
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediatePackage#getIntermediateTechnologySpecificPropertyValue_Property()
+	 * @see de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificProperty#getPropertyValue
+	 * @model opposite="propertyValue" transient="false"
 	 * @generated
 	 */
-	IntermediateTechnologySpecificProperty getIntermediateTechnologySpecificProperty();
+	IntermediateTechnologySpecificProperty getProperty();
 
 	/**
-	 * Sets the value of the '{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificPropertyValue#getIntermediateTechnologySpecificProperty <em>Intermediate Technology Specific Property</em>}' container reference.
+	 * Sets the value of the '{@link de.fhdo.lemma.operation.intermediate.IntermediateTechnologySpecificPropertyValue#getProperty <em>Property</em>}' container reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Intermediate Technology Specific Property</em>' container reference.
-	 * @see #getIntermediateTechnologySpecificProperty()
+	 * @param value the new value of the '<em>Property</em>' container reference.
+	 * @see #getProperty()
 	 * @generated
 	 */
-	void setIntermediateTechnologySpecificProperty(IntermediateTechnologySpecificProperty value);
+	void setProperty(IntermediateTechnologySpecificProperty value);
 
 } // IntermediateTechnologySpecificPropertyValue

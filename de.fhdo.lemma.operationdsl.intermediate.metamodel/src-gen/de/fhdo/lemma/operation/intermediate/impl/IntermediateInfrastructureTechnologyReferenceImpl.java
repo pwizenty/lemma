@@ -28,33 +28,33 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * The following features are implemented:
  * </p>
  * <ul>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateInfrastructureTechnologyReferenceImpl#getIntermediateImport <em>Intermediate Import</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateInfrastructureTechnologyReferenceImpl#getIntermediateInfrastructureTechnology <em>Intermediate Infrastructure Technology</em>}</li>
- *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateInfrastructureTechnologyReferenceImpl#getIntermediateInfrastructureNode <em>Intermediate Infrastructure Node</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateInfrastructureTechnologyReferenceImpl#getImport <em>Import</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateInfrastructureTechnologyReferenceImpl#getInfrastructureTechnology <em>Infrastructure Technology</em>}</li>
+ *   <li>{@link de.fhdo.lemma.operation.intermediate.impl.IntermediateInfrastructureTechnologyReferenceImpl#getInfrastructureNode <em>Infrastructure Node</em>}</li>
  * </ul>
  *
  * @generated
  */
 public class IntermediateInfrastructureTechnologyReferenceImpl extends MinimalEObjectImpl.Container implements IntermediateInfrastructureTechnologyReference {
 	/**
-	 * The cached value of the '{@link #getIntermediateImport() <em>Intermediate Import</em>}' reference.
+	 * The cached value of the '{@link #getImport() <em>Import</em>}' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getIntermediateImport()
+	 * @see #getImport()
 	 * @generated
 	 * @ordered
 	 */
-	protected IntermediateImport intermediateImport;
+	protected IntermediateImport import_;
 
 	/**
-	 * The cached value of the '{@link #getIntermediateInfrastructureTechnology() <em>Intermediate Infrastructure Technology</em>}' reference.
+	 * The cached value of the '{@link #getInfrastructureTechnology() <em>Infrastructure Technology</em>}' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getIntermediateInfrastructureTechnology()
+	 * @see #getInfrastructureTechnology()
 	 * @generated
 	 * @ordered
 	 */
-	protected IntermediateInfrastructureTechnology intermediateInfrastructureTechnology;
+	protected IntermediateInfrastructureTechnology infrastructureTechnology;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -80,16 +80,16 @@ public class IntermediateInfrastructureTechnologyReferenceImpl extends MinimalEO
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public IntermediateImport getIntermediateImport() {
-		if (intermediateImport != null && intermediateImport.eIsProxy()) {
-			InternalEObject oldIntermediateImport = (InternalEObject)intermediateImport;
-			intermediateImport = (IntermediateImport)eResolveProxy(oldIntermediateImport);
-			if (intermediateImport != oldIntermediateImport) {
+	public IntermediateImport getImport() {
+		if (import_ != null && import_.eIsProxy()) {
+			InternalEObject oldImport = (InternalEObject)import_;
+			import_ = (IntermediateImport)eResolveProxy(oldImport);
+			if (import_ != oldImport) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_IMPORT, oldIntermediateImport, intermediateImport));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__IMPORT, oldImport, import_));
 			}
 		}
-		return intermediateImport;
+		return import_;
 	}
 
 	/**
@@ -97,8 +97,8 @@ public class IntermediateInfrastructureTechnologyReferenceImpl extends MinimalEO
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public IntermediateImport basicGetIntermediateImport() {
-		return intermediateImport;
+	public IntermediateImport basicGetImport() {
+		return import_;
 	}
 
 	/**
@@ -106,11 +106,11 @@ public class IntermediateInfrastructureTechnologyReferenceImpl extends MinimalEO
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setIntermediateImport(IntermediateImport newIntermediateImport) {
-		IntermediateImport oldIntermediateImport = intermediateImport;
-		intermediateImport = newIntermediateImport;
+	public void setImport(IntermediateImport newImport) {
+		IntermediateImport oldImport = import_;
+		import_ = newImport;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_IMPORT, oldIntermediateImport, intermediateImport));
+			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__IMPORT, oldImport, import_));
 	}
 
 	/**
@@ -118,16 +118,16 @@ public class IntermediateInfrastructureTechnologyReferenceImpl extends MinimalEO
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public IntermediateInfrastructureTechnology getIntermediateInfrastructureTechnology() {
-		if (intermediateInfrastructureTechnology != null && intermediateInfrastructureTechnology.eIsProxy()) {
-			InternalEObject oldIntermediateInfrastructureTechnology = (InternalEObject)intermediateInfrastructureTechnology;
-			intermediateInfrastructureTechnology = (IntermediateInfrastructureTechnology)eResolveProxy(oldIntermediateInfrastructureTechnology);
-			if (intermediateInfrastructureTechnology != oldIntermediateInfrastructureTechnology) {
+	public IntermediateInfrastructureTechnology getInfrastructureTechnology() {
+		if (infrastructureTechnology != null && infrastructureTechnology.eIsProxy()) {
+			InternalEObject oldInfrastructureTechnology = (InternalEObject)infrastructureTechnology;
+			infrastructureTechnology = (IntermediateInfrastructureTechnology)eResolveProxy(oldInfrastructureTechnology);
+			if (infrastructureTechnology != oldInfrastructureTechnology) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY, oldIntermediateInfrastructureTechnology, intermediateInfrastructureTechnology));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INFRASTRUCTURE_TECHNOLOGY, oldInfrastructureTechnology, infrastructureTechnology));
 			}
 		}
-		return intermediateInfrastructureTechnology;
+		return infrastructureTechnology;
 	}
 
 	/**
@@ -135,8 +135,8 @@ public class IntermediateInfrastructureTechnologyReferenceImpl extends MinimalEO
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public IntermediateInfrastructureTechnology basicGetIntermediateInfrastructureTechnology() {
-		return intermediateInfrastructureTechnology;
+	public IntermediateInfrastructureTechnology basicGetInfrastructureTechnology() {
+		return infrastructureTechnology;
 	}
 
 	/**
@@ -144,11 +144,11 @@ public class IntermediateInfrastructureTechnologyReferenceImpl extends MinimalEO
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setIntermediateInfrastructureTechnology(IntermediateInfrastructureTechnology newIntermediateInfrastructureTechnology) {
-		IntermediateInfrastructureTechnology oldIntermediateInfrastructureTechnology = intermediateInfrastructureTechnology;
-		intermediateInfrastructureTechnology = newIntermediateInfrastructureTechnology;
+	public void setInfrastructureTechnology(IntermediateInfrastructureTechnology newInfrastructureTechnology) {
+		IntermediateInfrastructureTechnology oldInfrastructureTechnology = infrastructureTechnology;
+		infrastructureTechnology = newInfrastructureTechnology;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY, oldIntermediateInfrastructureTechnology, intermediateInfrastructureTechnology));
+			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INFRASTRUCTURE_TECHNOLOGY, oldInfrastructureTechnology, infrastructureTechnology));
 	}
 
 	/**
@@ -156,8 +156,8 @@ public class IntermediateInfrastructureTechnologyReferenceImpl extends MinimalEO
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public IntermediateInfrastructureNode getIntermediateInfrastructureNode() {
-		if (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_INFRASTRUCTURE_NODE) return null;
+	public IntermediateInfrastructureNode getInfrastructureNode() {
+		if (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INFRASTRUCTURE_NODE) return null;
 		return (IntermediateInfrastructureNode)eContainer();
 	}
 
@@ -166,8 +166,8 @@ public class IntermediateInfrastructureTechnologyReferenceImpl extends MinimalEO
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public IntermediateInfrastructureNode basicGetIntermediateInfrastructureNode() {
-		if (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_INFRASTRUCTURE_NODE) return null;
+	public IntermediateInfrastructureNode basicGetInfrastructureNode() {
+		if (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INFRASTRUCTURE_NODE) return null;
 		return (IntermediateInfrastructureNode)eInternalContainer();
 	}
 
@@ -176,8 +176,8 @@ public class IntermediateInfrastructureTechnologyReferenceImpl extends MinimalEO
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetIntermediateInfrastructureNode(IntermediateInfrastructureNode newIntermediateInfrastructureNode, NotificationChain msgs) {
-		msgs = eBasicSetContainer((InternalEObject)newIntermediateInfrastructureNode, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_INFRASTRUCTURE_NODE, msgs);
+	public NotificationChain basicSetInfrastructureNode(IntermediateInfrastructureNode newInfrastructureNode, NotificationChain msgs) {
+		msgs = eBasicSetContainer((InternalEObject)newInfrastructureNode, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INFRASTRUCTURE_NODE, msgs);
 		return msgs;
 	}
 
@@ -186,20 +186,20 @@ public class IntermediateInfrastructureTechnologyReferenceImpl extends MinimalEO
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setIntermediateInfrastructureNode(IntermediateInfrastructureNode newIntermediateInfrastructureNode) {
-		if (newIntermediateInfrastructureNode != eInternalContainer() || (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_INFRASTRUCTURE_NODE && newIntermediateInfrastructureNode != null)) {
-			if (EcoreUtil.isAncestor(this, newIntermediateInfrastructureNode))
+	public void setInfrastructureNode(IntermediateInfrastructureNode newInfrastructureNode) {
+		if (newInfrastructureNode != eInternalContainer() || (eContainerFeatureID() != IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INFRASTRUCTURE_NODE && newInfrastructureNode != null)) {
+			if (EcoreUtil.isAncestor(this, newInfrastructureNode))
 				throw new IllegalArgumentException("Recursive containment not allowed for " + toString());
 			NotificationChain msgs = null;
 			if (eInternalContainer() != null)
 				msgs = eBasicRemoveFromContainer(msgs);
-			if (newIntermediateInfrastructureNode != null)
-				msgs = ((InternalEObject)newIntermediateInfrastructureNode).eInverseAdd(this, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE, IntermediateInfrastructureNode.class, msgs);
-			msgs = basicSetIntermediateInfrastructureNode(newIntermediateInfrastructureNode, msgs);
+			if (newInfrastructureNode != null)
+				msgs = ((InternalEObject)newInfrastructureNode).eInverseAdd(this, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__REFERENCE, IntermediateInfrastructureNode.class, msgs);
+			msgs = basicSetInfrastructureNode(newInfrastructureNode, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_INFRASTRUCTURE_NODE, newIntermediateInfrastructureNode, newIntermediateInfrastructureNode));
+			eNotify(new ENotificationImpl(this, Notification.SET, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INFRASTRUCTURE_NODE, newInfrastructureNode, newInfrastructureNode));
 	}
 
 	/**
@@ -210,10 +210,10 @@ public class IntermediateInfrastructureTechnologyReferenceImpl extends MinimalEO
 	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_INFRASTRUCTURE_NODE:
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INFRASTRUCTURE_NODE:
 				if (eInternalContainer() != null)
 					msgs = eBasicRemoveFromContainer(msgs);
-				return basicSetIntermediateInfrastructureNode((IntermediateInfrastructureNode)otherEnd, msgs);
+				return basicSetInfrastructureNode((IntermediateInfrastructureNode)otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -226,8 +226,8 @@ public class IntermediateInfrastructureTechnologyReferenceImpl extends MinimalEO
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_INFRASTRUCTURE_NODE:
-				return basicSetIntermediateInfrastructureNode(null, msgs);
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INFRASTRUCTURE_NODE:
+				return basicSetInfrastructureNode(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -240,8 +240,8 @@ public class IntermediateInfrastructureTechnologyReferenceImpl extends MinimalEO
 	@Override
 	public NotificationChain eBasicRemoveFromContainerFeature(NotificationChain msgs) {
 		switch (eContainerFeatureID()) {
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_INFRASTRUCTURE_NODE:
-				return eInternalContainer().eInverseRemove(this, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE, IntermediateInfrastructureNode.class, msgs);
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INFRASTRUCTURE_NODE:
+				return eInternalContainer().eInverseRemove(this, IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_NODE__REFERENCE, IntermediateInfrastructureNode.class, msgs);
 		}
 		return super.eBasicRemoveFromContainerFeature(msgs);
 	}
@@ -254,15 +254,15 @@ public class IntermediateInfrastructureTechnologyReferenceImpl extends MinimalEO
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_IMPORT:
-				if (resolve) return getIntermediateImport();
-				return basicGetIntermediateImport();
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY:
-				if (resolve) return getIntermediateInfrastructureTechnology();
-				return basicGetIntermediateInfrastructureTechnology();
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_INFRASTRUCTURE_NODE:
-				if (resolve) return getIntermediateInfrastructureNode();
-				return basicGetIntermediateInfrastructureNode();
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__IMPORT:
+				if (resolve) return getImport();
+				return basicGetImport();
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INFRASTRUCTURE_TECHNOLOGY:
+				if (resolve) return getInfrastructureTechnology();
+				return basicGetInfrastructureTechnology();
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INFRASTRUCTURE_NODE:
+				if (resolve) return getInfrastructureNode();
+				return basicGetInfrastructureNode();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -275,14 +275,14 @@ public class IntermediateInfrastructureTechnologyReferenceImpl extends MinimalEO
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_IMPORT:
-				setIntermediateImport((IntermediateImport)newValue);
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__IMPORT:
+				setImport((IntermediateImport)newValue);
 				return;
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY:
-				setIntermediateInfrastructureTechnology((IntermediateInfrastructureTechnology)newValue);
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INFRASTRUCTURE_TECHNOLOGY:
+				setInfrastructureTechnology((IntermediateInfrastructureTechnology)newValue);
 				return;
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_INFRASTRUCTURE_NODE:
-				setIntermediateInfrastructureNode((IntermediateInfrastructureNode)newValue);
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INFRASTRUCTURE_NODE:
+				setInfrastructureNode((IntermediateInfrastructureNode)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -296,14 +296,14 @@ public class IntermediateInfrastructureTechnologyReferenceImpl extends MinimalEO
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_IMPORT:
-				setIntermediateImport((IntermediateImport)null);
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__IMPORT:
+				setImport((IntermediateImport)null);
 				return;
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY:
-				setIntermediateInfrastructureTechnology((IntermediateInfrastructureTechnology)null);
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INFRASTRUCTURE_TECHNOLOGY:
+				setInfrastructureTechnology((IntermediateInfrastructureTechnology)null);
 				return;
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_INFRASTRUCTURE_NODE:
-				setIntermediateInfrastructureNode((IntermediateInfrastructureNode)null);
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INFRASTRUCTURE_NODE:
+				setInfrastructureNode((IntermediateInfrastructureNode)null);
 				return;
 		}
 		super.eUnset(featureID);
@@ -317,12 +317,12 @@ public class IntermediateInfrastructureTechnologyReferenceImpl extends MinimalEO
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_IMPORT:
-				return intermediateImport != null;
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY:
-				return intermediateInfrastructureTechnology != null;
-			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INTERMEDIATE_INFRASTRUCTURE_NODE:
-				return basicGetIntermediateInfrastructureNode() != null;
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__IMPORT:
+				return import_ != null;
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INFRASTRUCTURE_TECHNOLOGY:
+				return infrastructureTechnology != null;
+			case IntermediatePackage.INTERMEDIATE_INFRASTRUCTURE_TECHNOLOGY_REFERENCE__INFRASTRUCTURE_NODE:
+				return basicGetInfrastructureNode() != null;
 		}
 		return super.eIsSet(featureID);
 	}
