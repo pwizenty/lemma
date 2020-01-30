@@ -23,6 +23,7 @@ class OperationModel {
      *     (C1) Model must contain at least one container or infrastructure node.
      *          Ensured by: DSL validator.
      */
+     String t_modelUri
 
     contains Import[1..*] imports
     contains Container[] containers opposite operationModel

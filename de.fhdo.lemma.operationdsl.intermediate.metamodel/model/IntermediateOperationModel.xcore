@@ -2,10 +2,11 @@
 package de.fhdo.lemma.operation.intermediate
 
 import de.fhdo.lemma.data.intermediate.IntermediateImport
-import de.fhdo.lemma.service.intermediate.IntermediateEndpoint
+import de.fhdo.lemma.data.intermediate.IntermediateImportedAspect
 import de.fhdo.lemma.service.intermediate.MicroserviceReference
 import de.fhdo.lemma.service.MicroserviceType
 import de.fhdo.lemma.service.Visibility
+import de.fhdo.lemma.technology.CommunicationType
 
 /**
  * Metamodel of intermediate operation models.
@@ -18,6 +19,7 @@ class IntermediateOperationModel {
     String sourceModelUri
 
     contains IntermediateImport[] imports
+    contains IntermediateOperationTechnology[] technologies opposite operationModel
     contains IntermediateContainer[] containers opposite operationModel
     contains IntermediateInfrastructureNode[] infrastructureNodes opposite operationModel
 }
@@ -31,9 +33,12 @@ abstract class IntermediateOperationNode {
 
     refers IntermediateImport[1..*] imports
     refers IntermediateOperationEnvironment operationEnvironment
-    contains OperationMicroserviceReference[] deployedServices opposite service
-    contains IntermediateEndpoint[1..*] endpoints
-    contains IntermediateServiceDeploymentSpecification[] specifications opposite operationNode
+
+    contains OperationMicroserviceReference[] deployedServices opposite node
+    contains IntermediateEndpoint[1..*] endpoints opposite operationNode
+    contains IntermediateServiceDeploymentSpecification[] specifications
+    contains IntermediateTechnologySpecificPropertyValue[] propertyValues opposite operationNode
+    contains IntermediateImportedAspect[] aspects
 }
 
 /**
@@ -68,11 +73,11 @@ class IntermediateInfrastructureNode extends IntermediateOperationNode {
  * intermediate operation node
  */
 class IntermediateServiceDeploymentSpecification {
-    contains OperationMicroserviceReference service opposite specification
-    contains IntermediateTechnologySpecificPropertyValue[] propertyValues opposite specification
-    contains IntermediateEndpoint[1..*] endpoints
+    refers IntermediateOperationNode operationNode
+    refers OperationMicroserviceReference operationMicroserviceReference
 
-    container IntermediateOperationNode operationNode opposite specifications
+    contains IntermediateEndpoint[] endpoints opposite specification
+    contains IntermediateTechnologySpecificPropertyValue[] propertyValues opposite specification
 }
 
 /**
@@ -83,7 +88,7 @@ class IntermediateOperationEnvironment {
     String environmentName
     boolean ^default="false"
 
-    container IntermediateOperationTechnology operationTechnology opposite environments
+    container IntermediateOperationTechnology operationTechnology opposite environment
 }
 
 /**
@@ -92,8 +97,10 @@ class IntermediateOperationEnvironment {
 abstract class IntermediateOperationTechnology {
     String name
 
-    contains IntermediateOperationEnvironment[1..*] environments opposite operationTechnology
+    contains IntermediateOperationEnvironment environment opposite operationTechnology
     contains IntermediateTechnologySpecificProperty[] propertys opposite operationTechnology
+
+    container IntermediateOperationModel operationModel opposite technologies
 }
 
 /**
@@ -136,9 +143,7 @@ class IntermediateTechnologySpecificProperty {
     String name
     String ^type
     String defaultValue
-    String[] featureames
-
-    contains IntermediateTechnologySpecificPropertyValue[0..1] propertyValue opposite property
+    String[] featureNames
 
     container IntermediateOperationTechnology operationTechnology opposite propertys
 }
@@ -149,8 +154,10 @@ class IntermediateTechnologySpecificProperty {
 class IntermediateTechnologySpecificPropertyValue {
     String value
 
+    refers IntermediateTechnologySpecificProperty technologySpecificProperty
+
     container IntermediateServiceDeploymentSpecification specification opposite propertyValues
-    container IntermediateTechnologySpecificProperty property opposite propertyValue
+    container IntermediateOperationNode operationNode opposite propertyValues
 }
 
 /**
@@ -161,8 +168,19 @@ class OperationMicroserviceReference extends MicroserviceReference {
     MicroserviceType microserviceType
     Visibility visibility
 
-    refers IntermediateImport intermediateImport
+    container IntermediateOperationNode node opposite deployedServices
 
-    container IntermediateOperationNode service opposite deployedServices
-    container IntermediateServiceDeploymentSpecification specification opposite service
+}
+
+/**
+ * Endpoint
+ */
+ class IntermediateEndpoint {
+    CommunicationType communicationType
+    String protocol
+    String dataFormat
+    String[*] addresses
+
+    container IntermediateServiceDeploymentSpecification specification opposite endpoints
+    container IntermediateOperationNode operationNode opposite endpoints
 }
