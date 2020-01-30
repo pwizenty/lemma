@@ -11,6 +11,7 @@
     <modules>
         <module>../de.fhdo.lemma.data.intermediate.metamodel</module>
         <module>../de.fhdo.lemma.service.intermediate.metamodel</module>
+        <module>../de.fhdo.lemma.operationdsl.intermediate.metamodel</module>
         <module>../de.fhdo.lemma.intermediate.transformations</module>
     </modules>
 
@@ -23,6 +24,7 @@
         <data-viewpoint-metamodel-version>0.0.1-SNAPSHOT</data-viewpoint-metamodel-version>
         <intermediate-data-metamodel-version>0.0.1-SNAPSHOT</intermediate-data-metamodel-version>
         <intermediate-service-metamodel-version>0.0.1-SNAPSHOT</intermediate-service-metamodel-version>
+        <intermediate-operation-metamodel-version>0.0.1-SNAPSHOT</intermediate-operation-metamodel-version>
         <maven-clean-plugin-version>3.1.0</maven-clean-plugin-version>
         <maven-compiler-plugin-version>3.8.0</maven-compiler-plugin-version>
         <service-viewpoint-metamodel-version>0.0.1-SNAPSHOT</service-viewpoint-metamodel-version>
