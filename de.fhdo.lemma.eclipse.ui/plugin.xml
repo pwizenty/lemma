@@ -13,6 +13,11 @@
             id="de.fhdo.lemma.eclipse.ui.commands.generateIntermediateModels">
       </command>
       <command
+            name="Generate Operation Intermediate Models"
+            categoryId="de.fhdo.lemma.eclipse.ui.category.lemmaCommands"
+            id="de.fhdo.lemma.eclipse.ui.commands.generateOperationIntermediateModels">
+      </command>
+      <command
             name="About"
             categoryId="de.fhdo.lemma.eclipse.ui.category.lemmaCommands"
             id="de.fhdo.lemma.eclipse.ui.commands.about">
@@ -23,6 +28,10 @@
       <handler
             commandId="de.fhdo.lemma.eclipse.ui.commands.generateIntermediateModels"
             class="de.fhdo.lemma.eclipse.ui.IntermediateModelTransformationController">
+      </handler>
+      <handler
+            commandId="de.fhdo.lemma.eclipse.ui.commands.generateOperationIntermediateModels"
+            class="de.fhdo.lemma.eclipse.ui.IntermediateOperationModelTransformationController">
       </handler>
       <handler
             commandId="de.fhdo.lemma.eclipse.ui.commands.about"
@@ -74,6 +83,15 @@
                   icon="icons/generateIntermediateModels.gif"
                   tooltip="Generate Intermediate Models"
                   id="de.fhdo.lemma.eclipse.ui.toolbars.generateIntermediateModels">
+            </command>
+         </toolbar>
+         <toolbar
+               id="de.fhdo.lemma.eclipse.ui.lemmaToolbar">
+            <command
+                  commandId="de.fhdo.lemma.eclipse.ui.commands.generateOperationIntermediateModels"
+                  icon="icons/generateIntermediateModels.gif"
+                  tooltip="Generate Intermediate Models"
+                  id="de.fhdo.lemma.eclipse.ui.toolbars.generateOperationIntermediateModels">
             </command>
          </toolbar>
       </menuContribution>
