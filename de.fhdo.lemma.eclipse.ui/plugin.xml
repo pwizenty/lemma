@@ -46,6 +46,12 @@
             sequence="M1+5"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
       </key>
+      <key
+            commandId="de.fhdo.lemma.eclipse.ui.commands.generateOperationIntermediateModels"
+            contextId="org.eclipse.ui.contexts.window"
+            sequence="M1+6"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -58,9 +64,16 @@
             <command
                   commandId="de.fhdo.lemma.eclipse.ui.commands.generateIntermediateModels"
                   mnemonic="M"
-                  icon="icons/generateIntermediateModels.gif"
+                  icon="icons/serviceTransformation.gif"
                   id="de.fhdo.lemma.eclipse.ui.lemmaMenu.generateIntermediateModels"
-                  label="Generate Intermediate Models...">
+                  label="Generate Intermediate Service Models...">
+            </command>
+            <command
+                  commandId="de.fhdo.lemma.eclipse.ui.commands.generateOperationIntermediateModels"
+                  mnemonic="M"
+                  icon="icons/operationTransformation.gif"
+                  id="de.fhdo.lemma.eclipse.ui.lemmaMenu.generateIntermediateModels"
+                  label="Generate Intermediate Operation Models...">
             </command>
             <separator
                   name="aboutSeparator"
@@ -80,7 +93,7 @@
                id="de.fhdo.lemma.eclipse.ui.lemmaToolbar">
             <command
                   commandId="de.fhdo.lemma.eclipse.ui.commands.generateIntermediateModels"
-                  icon="icons/generateIntermediateModels.gif"
+                  icon="icons/serviceTransformation.gif"
                   tooltip="Generate Intermediate Models"
                   id="de.fhdo.lemma.eclipse.ui.toolbars.generateIntermediateModels">
             </command>
@@ -89,7 +102,7 @@
                id="de.fhdo.lemma.eclipse.ui.lemmaToolbar">
             <command
                   commandId="de.fhdo.lemma.eclipse.ui.commands.generateOperationIntermediateModels"
-                  icon="icons/generateIntermediateModels.gif"
+                  icon="icons/operationTransformation.gif"
                   tooltip="Generate Intermediate Models"
                   id="de.fhdo.lemma.eclipse.ui.toolbars.generateOperationIntermediateModels">
             </command>
