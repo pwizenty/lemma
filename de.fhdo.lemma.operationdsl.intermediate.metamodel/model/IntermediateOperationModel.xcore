@@ -37,8 +37,32 @@ abstract class IntermediateOperationNode {
     contains OperationMicroserviceReference[] deployedServices opposite node
     contains IntermediateEndpoint[1..*] endpoints opposite operationNode
     contains IntermediateServiceDeploymentSpecification[] specifications
-    contains IntermediateTechnologySpecificPropertyValue[] propertyValues opposite operationNode
+    contains IntermediateTechnologySpecificPropertyValue[] defaultValues opposite operationNode
     contains IntermediateImportedAspect[] aspects
+
+	op IntermediateTechnologySpecificPropertyValue[] getEffectiveConfigurationValues(
+		OperationMicroserviceReference deployedService) {
+
+		var IntermediateTechnologySpecificPropertyValue[] effectiveConfigurationValues =
+			defaultValues
+
+		specifications.filter[specification |
+			specification.operationMicroserviceReference.name.equals(deployedService.name)
+		].asEList.get(0).propertyValues
+
+		effectiveConfigurationValues.forEach[ value |
+			specifications.filter[specification |
+			specification.operationMicroserviceReference.name.equals(deployedService.name)
+			].asEList.get(0).propertyValues.forEach[ propertyValue |
+				if (value.technologySpecificProperty.equals(propertyValue.technologySpecificProperty))
+					value.value = propertyValue.value
+			]
+		]
+		return effectiveConfigurationValues.asEList
+
+
+
+	}
 }
 
 /**
@@ -157,7 +181,7 @@ class IntermediateTechnologySpecificPropertyValue {
     refers IntermediateTechnologySpecificProperty technologySpecificProperty
 
     container IntermediateServiceDeploymentSpecification specification opposite propertyValues
-    container IntermediateOperationNode operationNode opposite propertyValues
+    container IntermediateOperationNode operationNode opposite defaultValues
 }
 
 /**

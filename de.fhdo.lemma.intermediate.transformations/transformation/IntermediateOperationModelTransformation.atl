@@ -70,6 +70,11 @@ rule IntermediateContainer {
               t.operationEnvironment <- t.technologyReference.deploymentTechnology.environment;
         }
 
+        -- Assign the DeployedServices of the contaier
+        for (deployedService in s.deployedServices) {
+           t.deployedServices <- thisModule.OperationMicroserviceReference(deployedService);
+        }
+
         -- Assign a ServiceDeplymentSpecification to the container
         for (deploymentSpecification in s.deploymentSpecifications) {
             t.specifications <- thisModule.IntermediateServiceDeploymentSpecification(t,
@@ -83,15 +88,10 @@ rule IntermediateContainer {
             }
         }
 
-        -- Assign the DeployedServices of the contaier
-        for (deployedService in s.deployedServices) {
-           t.deployedServices <- thisModule.OperationMicroserviceReference(deployedService);
-        }
-
         -- Assign the DefaultServicePropertyValues to the Container
-        for (propertyValue in s.defaultServicePropertyValues) {
-            t.propertyValues <- thisModule.IntermediateTechnologySpecificPropertyValue(
-                OclUndefined, propertyValue);
+        for (defaultValue in s.defaultServicePropertyValues) {
+            t.defaultValues <- thisModule.IntermediateTechnologySpecificPropertyValue(
+                OclUndefined, defaultValue);
         }
 
         -- Assign the operational Aspect to the container
@@ -192,9 +192,9 @@ rule IntermediateInfrastructureNode {
         -- Assign DefaultServicePropertyValues to the InfrastructureNode
         -- The ServiceDeploymentSpecification is oclUndefined in this use of the called rule
         -- but necessary to reuse it in the ServiceDeploymentSpecificatio called rule
-        for (propertyValue in s.defaultServicePropertyValues) {
-            t.propertyValues <- thisModule.IntermediateTechnologySpecificPropertyValue(
-                OclUndefined, propertyValue);
+        for (defaultValue in s.defaultServicePropertyValues) {
+            t.defaultValues <- thisModule.IntermediateTechnologySpecificPropertyValue(
+                OclUndefined, defaultValue);
         }
 
         -- Assign OperationAspects to the InfrastructureNode
@@ -281,7 +281,9 @@ rule IntermediateServiceDeploymentSpecification(
     sourceDeploymentSpecification :Operation!ServiceDeploymentSpecification) {
         to
             t : Intermediate!IntermediateServiceDeploymentSpecification(
-                operationNode <- targetContainer
+                operationNode <- targetContainer,
+				operationMicroserviceReference <- Intermediate!OperationMicroserviceReference
+				.allInstances()->any(p | p.name = sourceDeploymentSpecification.service.microservice.name)
             )
         do{
             -- Assign a TechnologySpecificPropertyValue to a DeploymentSpecification
