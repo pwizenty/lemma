@@ -43,25 +43,22 @@ abstract class IntermediateOperationNode {
 	op IntermediateTechnologySpecificPropertyValue[] getEffectiveConfigurationValues(
 		OperationMicroserviceReference deployedService) {
 
-		var IntermediateTechnologySpecificPropertyValue[] effectiveConfigurationValues =
+		val IntermediateTechnologySpecificPropertyValue[] effectiveConfigurationValues =
 			defaultValues
 
-		specifications.filter[specification |
-			specification.operationMicroserviceReference.name.equals(deployedService.name)
-		].asEList.get(0).propertyValues
-
-		effectiveConfigurationValues.forEach[ value |
-			specifications.filter[specification |
-			specification.operationMicroserviceReference.name.equals(deployedService.name)
-			].asEList.get(0).propertyValues.forEach[ propertyValue |
-				if (value.technologySpecificProperty.equals(propertyValue.technologySpecificProperty))
-					value.value = propertyValue.value
-			]
+		specifications.forEach[specification |
+			if (specification.operationMicroserviceReference.equals(deployedService.name)) {
+				effectiveConfigurationValues.forEach[ value |
+				specifications.filter[spec |
+				spec.operationMicroserviceReference.name.equals(deployedService.name)
+				].asEList.get(0).propertyValues.forEach[ propertyValue |
+					if (value.technologySpecificProperty.equals(propertyValue.technologySpecificProperty))
+						value.value = propertyValue.value
+					]
+				]
+			}
 		]
 		return effectiveConfigurationValues.asEList
-
-
-
 	}
 }
 
