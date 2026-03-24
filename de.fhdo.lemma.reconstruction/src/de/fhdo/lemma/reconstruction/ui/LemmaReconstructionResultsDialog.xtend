@@ -18,6 +18,9 @@ import org.eclipse.swt.layout.GridLayout
 import org.eclipse.swt.widgets.Composite
 import org.eclipse.swt.widgets.Shell
 import org.eclipse.xtend.lib.annotations.Accessors
+import de.fhdo.lemma.reconstruction.service.Microservice
+import de.fhdo.lemma.reconstruction.service.Interface
+import de.fhdo.lemma.reconstruction.service.Operation
 
 /**
  * User Interface class for displaying information about the reconstructed architecture,
@@ -27,14 +30,19 @@ import org.eclipse.xtend.lib.annotations.Accessors
  */
 class LemmaReconstructionResultsDialog extends TitleAreaDialog {
 	TreeViewer treeViewer
-	List<Context> contexts;
+	List<Context> contexts
+	List<Microservice> microservices
 
 	@Accessors
 	List<Context> selectedContexts = newLinkedList
+	
+	@Accessors
+	List<Microservice> selectedMicroservices= newLinkedList
 
-	new(Shell parentShell, List<Context> contexts) {
+	new(Shell parentShell, List<Context> contexts, List<Microservice> microservices) {
 		super(parentShell)
 		this.contexts = contexts
+		this.microservices = microservices
 	}
 
 	/**
@@ -87,6 +95,7 @@ class LemmaReconstructionResultsDialog extends TitleAreaDialog {
 		createTypeColumn
 		val input = newLinkedList
 		input.addAll(contexts)
+		input.addAll(microservices)
 		treeViewer.input = input as List<?>
 		treeViewer.selection
 	}
@@ -106,20 +115,23 @@ class LemmaReconstructionResultsDialog extends TitleAreaDialog {
 	 * Create schema type tree column
 	 */
 	private def void createTypeColumn() {
-		val column = new TreeViewerColumn(treeViewer, SWT.NONE)
-		column.column.width = 300
-		column.column.text = "Schema type"
-		column.labelProvider = new ColumnLabelProvider() {
-			override getText(Object element) {
-				return switch (element) {
-					Context: "Context"
-					DataStructure: "Entity"
-					Field: "Attribute"
-					default: ""
-				}
-			}
-		}
-	}	
+        val column = new TreeViewerColumn(treeViewer, SWT.NONE)
+        column.column.width = 300
+        column.column.text = "Schema type"
+        column.labelProvider = new ColumnLabelProvider() {
+            override getText(Object element) {
+                return switch (element) {
+                	Context: "Context"
+                	DataStructure: "Entity"
+                	Field: "Attribute"
+                	Microservice: "Microservice"
+                	Interface: "Interface"
+                	Operation: "Operation"
+                	default: ""
+                }
+            }
+        }
+    }
 		
 	/**
 	 * Create buttons to continue the dialog
@@ -151,6 +163,7 @@ class LemmaReconstructionResultsDialog extends TitleAreaDialog {
 		treeViewer.structuredSelection.forEach [
 			switch (it) {
 				Context: selectedContexts.add(it)
+				Microservice: selectedMicroservices.add(it)
 			}
 		]
 	}

@@ -11,6 +11,9 @@ import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelP
 import org.eclipse.jface.viewers.LabelProvider
 import org.eclipse.jface.viewers.StyledString
 import org.eclipse.swt.graphics.Image
+import de.fhdo.lemma.reconstruction.service.Microservice
+import de.fhdo.lemma.reconstruction.service.Interface
+import de.fhdo.lemma.reconstruction.service.Operation
 
 /**
  * User Interface class for displaying lables for the ReconstructionTreeProvider
@@ -38,6 +41,9 @@ class ReconstructionTreeLableProvider  extends LabelProvider implements IStyledL
             Context: element.qualifiedName
             DataStructure: element.name
             Field: element.name
+            Microservice: element.name
+            Interface: element.name
+            Operation: element.name
             default: "default"
         })
     }

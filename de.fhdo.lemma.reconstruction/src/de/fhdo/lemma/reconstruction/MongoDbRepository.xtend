@@ -7,6 +7,7 @@ import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoClients
 import de.fhdo.lemma.reconstruction.domain.Context
 import java.util.List
+import de.fhdo.lemma.reconstruction.service.Microservice
 
 /**
  * Class for restoring reconstructed architecture information from a database.
@@ -41,5 +42,22 @@ class MongoDbRepository {
         	contexts.add(context)
 		]
 		contexts
+	}
+	
+	/**
+	 * Read reconstructed microservice information from the database 
+	 */
+	def List<Microservice> getReconstructedMicroservices() {
+		val microserviceDatabase = mongoClient.getDatabase("mrf")
+		val microserviceCollection = microserviceDatabase.getCollection("microservice")
+		val List<Microservice> microservices = newLinkedList
+		
+		microserviceCollection.find().forEach[
+			val mapper = new ObjectMapper()
+			mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+			val microservice = mapper.readValue(it.toJson(), Microservice)
+			microservices.add(microservice)
+		]
+		microservices
 	}
 }

@@ -7,7 +7,7 @@ import org.eclipse.xtend.lib.annotations.Accessors
  * 
  * @author <a href="mailto:philip.wizenty@fh-dortmund.de">Philip Wizenty</a>
  */
-class PrimitiveType {
+ class PrimitiveType {
 	@Accessors
 	String name
 	

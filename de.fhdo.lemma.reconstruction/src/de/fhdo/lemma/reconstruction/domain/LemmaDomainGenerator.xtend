@@ -187,7 +187,7 @@ class LemmaDomainGenerator {
 	/**
 	 * Get a LEMMA domain model primitive type based on 
 	 */
-    private def getPrimitiveFrom(String type) {
+    def getPrimitiveFrom(String type) {
         return switch type.toLowerCase {
             case "boolean": DATA_FACTORY.createPrimitiveBoolean
             case "byte": DATA_FACTORY.createPrimitiveByte

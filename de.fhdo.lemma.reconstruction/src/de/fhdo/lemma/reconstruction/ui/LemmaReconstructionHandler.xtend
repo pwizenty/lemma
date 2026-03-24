@@ -29,6 +29,12 @@ import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.resource.XtextResourceSet
 import org.eclipse.xtext.util.CancelIndicator
 import org.eclipse.xtext.validation.CheckMode
+import de.fhdo.lemma.reconstruction.service.Microservice
+import de.fhdo.lemma.service.ServiceModel
+import de.fhdo.lemma.reconstruction.service.LemmaServiceGenerator
+import de.fhdo.lemma.servicedsl.extractor.ServiceDslExtractor
+import de.fhdo.lemma.service.ServicePackage
+import de.fhdo.lemma.ServiceDslStandaloneSetup
 
 /**
  * Handler for orchestrating the reconstruction process of LEMMA models
@@ -47,10 +53,14 @@ class LemmaReconstructionHandler extends AbstractHandler {
 
     List<Context> initialContexts
     List<Context> selectedContexts
+    
+    List<Microservice> initialMicroservices = newLinkedList
+    List<Microservice> selectedMicroservices = newLinkedList
 
     String reconstructionPath
 
     List<DataModel> domainDataModels
+    List<ServiceModel> serviceModels = newLinkedList
 
 	/**
 	 * Executing the model generation process
@@ -59,6 +69,7 @@ class LemmaReconstructionHandler extends AbstractHandler {
     	init
         receiveMongoDbEndpoints
         loadContextInformationFromMongoDb
+        loadMicroservicesFromMongoDB
 
         displayReconstructionInforation
         selectTargetFolderForModelGeneration
@@ -94,10 +105,11 @@ class LemmaReconstructionHandler extends AbstractHandler {
 	 * Display the reconstructed architecture information, loaded from the database 
 	 */
     private def displayReconstructionInforation() {
-        val dialog = new LemmaReconstructionResultsDialog(SHELL, initialContexts)
+        val dialog = new LemmaReconstructionResultsDialog(SHELL, initialContexts, initialMicroservices)
         dialog.create
         dialog.open
         selectedContexts = dialog.selectedContexts
+        selectedMicroservices = dialog.selectedMicroservices
     }
 
 	/** 
@@ -106,6 +118,14 @@ class LemmaReconstructionHandler extends AbstractHandler {
     private def loadContextInformationFromMongoDb() {
         val repository = new MongoDbRepository(mongoDbHostname, Integer::parseInt(mongoDbPort))
         initialContexts.addAll(repository.getReconstructedContexts)
+    }
+    
+    /** 
+	 * Load reconstructed domain information from the MongoDB database 
+	 */
+    private def loadMicroservicesFromMongoDB() {
+        val repository = new MongoDbRepository(mongoDbHostname, Integer::parseInt(mongoDbPort))
+        initialMicroservices.addAll(repository.reconstructedMicroservices)
     }
 
 	/**
@@ -122,6 +142,7 @@ class LemmaReconstructionHandler extends AbstractHandler {
     private def generateModels() {
     	if (!selectedContexts.nullOrEmpty)
         	generateDomainModels
+        	generateServiceModels
     }
 
 	/**
@@ -131,6 +152,17 @@ class LemmaReconstructionHandler extends AbstractHandler {
         val generator = new LemmaDomainGenerator
         selectedContexts.forEach[
             domainDataModels.addAll(generator.generateDataModel(it))
+        ]
+    }
+    
+    /**
+	 * Generate LEMMA service models
+	 */
+    private def generateServiceModels() {
+        val generator = new LemmaServiceGenerator
+        selectedMicroservices.forEach[
+            val model = generator.generateModelFrom(it)
+            serviceModels.add(model)
         ]
     }
 
@@ -176,6 +208,37 @@ class LemmaReconstructionHandler extends AbstractHandler {
    			Files.write(Path.of(path), maskedModel, Charset.defaultCharset)
    		}
    	}
+   		/** 
+	 * Configuration and specific execution to write LEMMA service models to the selected folder 
+	 */
+	private def writeServiceModel(ServiceModel model) {
+        val serviceModel = new ServiceDslExtractor().extractToString(model)
+        val fileName = model.microservices.get(0).qualifiedNameParts.lastOrNull
+        val filePath
+            = '''«reconstructionPath»«File.separator»service«File.separator»«fileName».services'''
+        Files.createDirectories(Paths.get('''«reconstructionPath»«File.separator»service'''))
+        Files.write(Paths.get(filePath), serviceModel.bytes)
+        validateServiceModel(filePath)
+    }
+    
+    /**
+	 * Validated the created LEMMA service model and adjust potential issues
+	 */
+    private def validateServiceModel(String path) {
+    	EPackage.Registry.INSTANCE.put(ServicePackage.eNS_URI, DataPackage.eINSTANCE)
+    	val setup = new ServiceDslStandaloneSetup
+    	val injector = setup.createInjectorAndDoEMFRegistration
+   		val resourceSet = injector.getInstance(XtextResourceSet)
+   		val resource = resourceSet.createResource(URI.createURI(path)) as XtextResource
+   		resource.load(new FileInputStream(path), resourceSet.getLoadOptions())
+   		val validator = resource.getResourceServiceProvider().getResourceValidator()
+   		val issues = validator.validate(resource, CheckMode.ALL, CancelIndicator.NullImpl)
+   		
+   		if (!issues.nullOrEmpty) {
+   			val maskedModel = Util.maskModel(path, issues)
+   			Files.write(Path.of(path), maskedModel, Charset.defaultCharset)
+   		}
+    }
 
 	/**
 	 * Display the information about the generated LEMMA models
@@ -188,6 +251,10 @@ class LemmaReconstructionHandler extends AbstractHandler {
             models.contexts.forEach[context |
                 generatedLemmaModels.add('''«context.name».data''')
             ]
+        ]
+        
+        selectedMicroservices.forEach[
+            generatedLemmaModels.add('''«it.name.split("\\W").lastOrNull».services''')
         ]
 
         val messageText = "Generated Models:"
@@ -209,5 +276,9 @@ class LemmaReconstructionHandler extends AbstractHandler {
         initialContexts.clear
         selectedContexts.clear
         domainDataModels.clear
+        
+        initialMicroservices.clear
+        selectedMicroservices.clear
+        serviceModels.clear
     }
 }
