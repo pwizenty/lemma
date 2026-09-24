@@ -9,6 +9,9 @@ class Microservice {
 	@Accessors
 	String name
 	@Accessors
+	@JsonProperty("qualified_name")
+	String qualifedName
+	@Accessors
 	String version
 	@Accessors
 	String type

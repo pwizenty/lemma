@@ -23,6 +23,9 @@ class Context {
 	@Accessors
 	@JsonProperty("enums")
 	List<EnumType> enums= newLinkedList
+	@Accessors
+	@JsonProperty("collections")
+	List<Collection> collections= newLinkedList
 	
 	new () {
 

@@ -12,6 +12,7 @@ class ComplexType {
 	@Accessors
 	String name
 	@Accessors
+	@JsonProperty("qualified_name")
 	String qualifiedName
 	@Accessors
 	@JsonProperty("class_type")

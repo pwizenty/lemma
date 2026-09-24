@@ -74,7 +74,7 @@ class LemmaReconstructionHandler extends AbstractHandler {
         displayReconstructionInforation
         selectTargetFolderForModelGeneration
         generateModels
-        writeModelsToFolder
+	        writeModelsToFolder
         showReconstructionInformationMessage
 
         resetDialogHandler
@@ -173,6 +173,9 @@ class LemmaReconstructionHandler extends AbstractHandler {
         domainDataModels.forEach[
             writeDomainDataModel(it)
         ]
+        serviceModels.forEach[
+        	writeServiceModel(it)
+        ]
     }
 
 	/** 
@@ -225,11 +228,12 @@ class LemmaReconstructionHandler extends AbstractHandler {
 	 * Validated the created LEMMA service model and adjust potential issues
 	 */
     private def validateServiceModel(String path) {
-    	EPackage.Registry.INSTANCE.put(ServicePackage.eNS_URI, DataPackage.eINSTANCE)
+    	EPackage.Registry.INSTANCE.put(ServicePackage.eNS_URI, ServicePackage.eINSTANCE)
     	val setup = new ServiceDslStandaloneSetup
     	val injector = setup.createInjectorAndDoEMFRegistration
    		val resourceSet = injector.getInstance(XtextResourceSet)
-   		val resource = resourceSet.createResource(URI.createURI(path)) as XtextResource
+   		val uri = LemmaUtils.convertToAbsoluteFileUri(URI.createURI(path).toString, path)
+   		val resource = resourceSet.createResource(URI.createURI(uri)) as XtextResource
    		resource.load(new FileInputStream(path), resourceSet.getLoadOptions())
    		val validator = resource.getResourceServiceProvider().getResourceValidator()
    		val issues = validator.validate(resource, CheckMode.ALL, CancelIndicator.NullImpl)

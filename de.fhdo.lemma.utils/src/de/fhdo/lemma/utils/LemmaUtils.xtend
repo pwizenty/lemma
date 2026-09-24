@@ -211,7 +211,7 @@ final class LemmaUtils {
         if (relativeFilePathWithoutScheme.representsAbsolutePath)
             return relativeFilePathWithoutScheme
 
-        val absoluteBaseFile = new File(absoluteBaseFilePath)
+	        val absoluteBaseFile = new File(absoluteBaseFilePath)
         val absoluteBaseFolder = new File(absoluteBaseFile.getParent())
         return absoluteBaseFolder + File.separator + relativeFilePathWithoutScheme
     }

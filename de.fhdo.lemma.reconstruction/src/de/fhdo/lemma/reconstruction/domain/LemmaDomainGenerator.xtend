@@ -5,6 +5,7 @@ import de.fhdo.lemma.data.DataFactory
 import de.fhdo.lemma.data.DataFieldFeature
 import de.fhdo.lemma.data.Enumeration
 import de.fhdo.lemma.data.PrimitiveUnspecified
+import de.fhdo.lemma.data.CollectionType
 
 /**
  * Class for generating LEMMA domain data models based on reconstructed Context.  
@@ -34,6 +35,14 @@ class LemmaDomainGenerator {
                 context.complexTypes.add(createDataStructureFrom(it))
             }
         ]
+        
+        reconstructedContext.collections.forEach[
+        	if (context.complexTypes.findFirst[ complexType |
+        		complexType.name.toLowerCase == it.name.toLowerCase
+        	] === null) {
+        		context.complexTypes.add(createCollectionFrom(it))
+        	}
+        ]
 
         reconstructedContext.enums.forEach[
             context.complexTypes.add(createEnumFrom(it))
@@ -58,6 +67,16 @@ class LemmaDomainGenerator {
              ] as Enumeration
 
             context.complexTypes.add(assignEnumFieldsToStructure(enum, reconstructedEnum))
+         ]
+         
+         reconstructedContext.collections.forEach[reconstructedCollection | 
+         	val collection = context.complexTypes.findFirst[lemmaCollection | 
+         		lemmaCollection == reconstructedCollection.name
+         	] as CollectionType
+         	if (collection !== null) {
+         		context.complexTypes.add(assignCollectionFieldsToStructure(collection, reconstructedCollection))	
+         	}
+         	
          ]
 
 
@@ -89,6 +108,18 @@ class LemmaDomainGenerator {
         ]
 
         return dataStructure
+    }
+    
+    private def createCollectionFrom(Collection reconstructedCollection) {
+    	val collection = DATA_FACTORY.createCollectionType
+    	collection.name = reconstructedCollection.name
+    	if (reconstructedCollection.primitiveType !== null) {
+    		collection.primitiveType = getPrimitiveFrom(reconstructedCollection.primitiveType.toString.toLowerCase)	
+    	} else {
+    		collection.primitiveType = DATA_FACTORY.createPrimitiveUnspecified
+    	}
+    
+    	return collection
     }
 
 	/**
@@ -157,6 +188,25 @@ class LemmaDomainGenerator {
         return lemmaStructure
 
     }
+    
+	/**
+     * Assign data fields to a data structure
+     */
+    private def assignCollectionFieldsToStructure(de.fhdo.lemma.data.CollectionType lemmaCollection, 
+    	Collection collection) {
+        lemmaCollection.primitiveType = DATA_FACTORY.createPrimitiveUnspecified
+        if (lemmaCollection.dataFields.size > 0) {
+            return lemmaCollection
+        } else if (collection.primitiveType !== null) {
+        	return lemmaCollection
+        }
+        lemmaCollection.dataFields.forEach[
+            lemmaCollection.primitiveType = DATA_FACTORY.createPrimitiveUnspecified
+        ]
+
+        return lemmaCollection
+
+    }    
 
 	/**
      * Assign data fields to a data structure
@@ -201,6 +251,7 @@ class LemmaDomainGenerator {
             case "string": DATA_FACTORY.createPrimitiveString
             case "bigdecimal": DATA_FACTORY.createPrimitiveFloat
             case "integer": DATA_FACTORY.createPrimitiveInteger
+            case "instant": DATA_FACTORY.createPrimitiveDate
             default: DATA_FACTORY.createPrimitiveUnspecified
 
         }

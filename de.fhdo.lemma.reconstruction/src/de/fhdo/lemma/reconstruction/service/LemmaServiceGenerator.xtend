@@ -29,7 +29,7 @@ class LemmaServiceGenerator {
 
     private def generateMicroserviceFrom(Microservice reconstructedMicroservice) {
         val microservice = SERVICE_FACTORY.createMicroservice
-        microservice.name = reconstructedMicroservice.name
+        microservice.name = reconstructedMicroservice.qualifedName
         microservice.version = reconstructedMicroservice.version
         microservice.visibility = deriveLemmaVisibility(reconstructedMicroservice.visibility)
         microservice.type = deriveMicroserviceType(reconstructedMicroservice.type)
@@ -42,6 +42,10 @@ class LemmaServiceGenerator {
     }
 
     private def deriveMicroserviceType(String type) {
+        if (type === null) {
+        	return MicroserviceType.FUNCTIONAL
+        }
+        
         return switch(type.toLowerCase) {
             case "functional": MicroserviceType.FUNCTIONAL
             case "utility": MicroserviceType.UTILITY
@@ -62,6 +66,9 @@ class LemmaServiceGenerator {
     }
 
     private def deriveLemmaVisibility(String visibility) {
+		if (visibility === null) {
+			return Visibility.NONE
+		}
         return switch (visibility.toLowerCase) {
             case "internal": Visibility.INTERNAL
             case "in_model": Visibility.IN_MODEL
@@ -94,7 +101,6 @@ class LemmaServiceGenerator {
     }
 
     private def generateParameterFrom(Parameter reconstructedParameter) {
-    	println("Test - 567")
         val parameter = SERVICE_FACTORY.createParameter
         parameter.name = reconstructedParameter.name.toFirstLower
         if (parameter.name == "list") {
@@ -107,7 +113,7 @@ class LemmaServiceGenerator {
 
         if (reconstructedParameter.primitiveType !== null) {
             parameter.primitiveType
-                = Util.getPrimitiveFrom(reconstructedParameter.primitiveType.typeName)
+                = Util.getPrimitiveFrom(reconstructedParameter.primitiveType.name)
         } else if (reconstructedParameter.complexType.classType === ClassType.UNSPECIFIED) {
             parameter.primitiveType = DATA_FACTORY.createPrimitiveUnspecified
         } else {
@@ -177,7 +183,7 @@ class LemmaServiceGenerator {
 
     private def handleCollectionType(ComplexType type) {
         val collection = DATA_FACTORY.createCollectionType
-        collection.name = "data" + type.name.toFirstUpper
+        collection.name = type.name.toFirstUpper
         return collection
     }
 

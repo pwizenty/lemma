@@ -55,7 +55,7 @@ class Util {
 	 */
     static def getContextNameFromQualifedName(String qualifedName) {
         val nameParts = qualifedName.split("\\W")
-        val contextName = nameParts.get(nameParts.size - 2).toFirstUpper
+        val contextName = nameParts.get(nameParts.size - 2)
         return contextName
     }
 	
