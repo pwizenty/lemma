@@ -17,6 +17,15 @@ import de.fhdo.lemma.service.ImportedType
 class LemmaServiceGenerator {
     static val SERVICE_FACTORY = ServiceFactory.eINSTANCE
     static val DATA_FACTORY = DataFactory.eINSTANCE
+
+    /**
+     * Meta-data names under which MRF conveys the visibility and the type of a
+     * microservice. Both are reconstructed as meta-data entries rather than as
+     * dedicated fields of the microservice document.
+     */
+    static val VISIBILITY_NAMES = #{"public", "internal", "architecture"}
+    static val MICROSERVICE_TYPE_NAMES = #{"functional", "utility", "infrastructure"}
+
     val model = SERVICE_FACTORY.createServiceModel
 
     def ServiceModel generateModelFrom(Microservice reconstructedMicroservice) {
@@ -31,8 +40,16 @@ class LemmaServiceGenerator {
         val microservice = SERVICE_FACTORY.createMicroservice
         microservice.name = reconstructedMicroservice.qualifedName
         microservice.version = reconstructedMicroservice.version
-        microservice.visibility = deriveLemmaVisibility(reconstructedMicroservice.visibility)
-        microservice.type = deriveMicroserviceType(reconstructedMicroservice.type)
+        microservice.visibility = deriveLemmaVisibility(
+            reconstructedMicroservice.visibility
+                ?: reconstructedMicroservice.metaData.findFirst[
+                    VISIBILITY_NAMES.contains(name.toLowerCase)
+                ]?.name)
+        microservice.type = deriveMicroserviceType(
+            reconstructedMicroservice.type
+                ?: reconstructedMicroservice.metaData.findFirst[
+                    MICROSERVICE_TYPE_NAMES.contains(name.toLowerCase)
+                ]?.name)
 
         reconstructedMicroservice.interfaces.forEach[
             microservice.interfaces.add(generateInterfaceFrom(it))
@@ -58,23 +75,30 @@ class LemmaServiceGenerator {
         val interfaze = SERVICE_FACTORY.createInterface
         interfaze.name = generatedInterface.name.split("\\W").lastOrNull
         interfaze.version = generatedInterface.version
-        interfaze.visibility = deriveLemmaVisibility(generatedInterface.version)
+        interfaze.visibility = deriveLemmaVisibility(generatedInterface.visibility)
         generatedInterface.operations.forall[
             interfaze.operations.add(generateOperationFrom(it))
         ]
         return interfaze
     }
 
+    /**
+     * Derive the LEMMA visibility of a microservice or interface.
+     *
+     * The Service DSL extractor can only render ARCHITECTURE, INTERNAL and
+     * PUBLIC; NONE and IN_MODEL make it fail with "Type ... is not supported."
+     * An unknown or missing visibility therefore falls back to PUBLIC instead
+     * of to the NONE default of the meta-model.
+     */
     private def deriveLemmaVisibility(String visibility) {
 		if (visibility === null) {
-			return Visibility.NONE
+			return Visibility.PUBLIC
 		}
         return switch (visibility.toLowerCase) {
             case "internal": Visibility.INTERNAL
-            case "in_model": Visibility.IN_MODEL
             case "architecture": Visibility.ARCHITECTURE
             case "public": Visibility.PUBLIC
-            default: Visibility.NONE
+            default: Visibility.PUBLIC
         }
     }
 
