@@ -104,7 +104,10 @@ class LemmaDomainGenerator {
         val dataStructure = DATA_FACTORY.createDataStructure
         dataStructure.name = reconstructedDataStructure.name
         reconstructedDataStructure.metaData.forEach[data |
-            dataStructure.features.add(assignFeaturesToDataStructure(data))
+            val feature = assignFeaturesToDataStructure(data)
+            if (feature !== null) {
+                dataStructure.features.add(feature)
+            }
         ]
 
         return dataStructure
@@ -126,10 +129,7 @@ class LemmaDomainGenerator {
 	 * Assign a LEMMA domain model feature to a data structure
 	 */
     private def assignFeaturesToDataStructure(MetaData data) {
-        if (!data.values.empty || data.values !== null)
-            return getTypeFeatureFrom(data.name)
-        else
-            return null
+        return getTypeFeatureFrom(data.name)
     }
 	
 	/**
@@ -229,7 +229,9 @@ class LemmaDomainGenerator {
 
         reconstructedAttribute.metaData.forEach[
             val feature = getDataFieldFeatureFrom(it.name)
-            dataFild.features.add(feature)
+            if (feature !== null) {
+                dataFild.features.add(feature)
+            }
         ]
         dataFild
     }
@@ -299,19 +301,30 @@ class LemmaDomainGenerator {
 
 
         val list = DATA_FACTORY.createCollectionType
-        val data = field.metaData.findFirst[ it.name == "CollectionType" ]
-
-        val collectionInfo = data.values.entrySet.findFirst[ it.key == "Type" ]
-
-        val reconstrcutionType = collectionInfo.value
         list.name = field.name.toFirstUpper
-        val lemmaType = getPrimitiveFrom(reconstrcutionType)
+
+        // MRF conveys the element type of a collection in the complex type of
+        // the field itself. A "CollectionType" meta-data entry is honoured as
+        // well, but the reconstruction does not currently emit one, so relying
+        // on it alone leaves the element type unresolved.
+        val elementTypeName = field.metaData
+            .findFirst[ it.name == "CollectionType" ]
+            ?.values?.get("Type")
+            ?: field.complexType?.name
+
+        if (elementTypeName === null) {
+            list.primitiveType = DATA_FACTORY.createPrimitiveUnspecified
+            context.complexTypes.add(list)
+            return list
+        }
+
+        val lemmaType = getPrimitiveFrom(elementTypeName)
         if (!(lemmaType instanceof PrimitiveUnspecified)) {
             list.primitiveType = lemmaType
         } else {
             val dataField = DATA_FACTORY.createDataField
             val complexType = context.complexTypes.findFirst[
-            	it.name.toLowerCase == reconstrcutionType.toLowerCase]
+            	it.name.toLowerCase == elementTypeName.toLowerCase]
             if (complexType !== null) {
                 dataField.complexType = complexType
                 dataField.name = field.name
@@ -319,7 +332,7 @@ class LemmaDomainGenerator {
             } else {
                 list.primitiveType = DATA_FACTORY.createPrimitiveUnspecified
             }
-        }   
+        }
     	context.complexTypes.add(list)
         return list
 
