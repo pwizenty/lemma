@@ -29,6 +29,7 @@ import org.eclipse.xtext.resource.XtextResourceSet
 import org.eclipse.xtext.util.CancelIndicator
 import org.eclipse.core.runtime.FileLocator
 import org.eclipse.xtext.validation.CheckMode
+import org.eclipse.xtend.lib.annotations.Accessors
 import org.osgi.framework.FrameworkUtil
 
 /**
@@ -153,6 +154,7 @@ class ReconstructionModelWriter {
         if (copied.empty) {
             val bundleRoot = FileLocator.getBundleFile(bundle)
             val modelFolder = new File(bundleRoot, TECHNOLOGY_MODEL_FOLDER)
+            lastLookupLocation = modelFolder.absolutePath
             val models = modelFolder.listFiles
             if (models !== null) {
                 models.filter[name.endsWith(TECHNOLOGY_MODEL_SUFFIX)].forEach[
@@ -160,11 +162,23 @@ class ReconstructionModelWriter {
                         StandardCopyOption.REPLACE_EXISTING)
                     copied.add(name)
                 ]
+            } else {
+                lastLookupLocation = '''«modelFolder.absolutePath» (does not exist)'''.toString
             }
         }
 
         return copied
     }
+
+    /**
+     * Where the last copy looked for the technology models on the file system.
+     *
+     * Reported when nothing was copied: whether the folder is missing from the
+     * bundle or the bundle itself is a different one than expected cannot be
+     * told apart without the path that was tried.
+     */
+    @Accessors(PUBLIC_GETTER)
+    static String lastLookupLocation = "not attempted"
 
     /**
      * Load a written model, validate it and mask the parts the validation

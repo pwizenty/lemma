@@ -154,9 +154,13 @@ class LemmaReconstructionHandler extends AbstractHandler {
             reconstructionPath, technologyFolder)
         if (copiedTechnologyModels.empty)
             MessageDialog.openWarning(SHELL, "Reconstruction Information Message",
-                "No technology model was copied. The import of the generated operation " +
-                "model will not resolve until a technology model is placed in the folder " +
-                '''"«technologyFolder»".''')
+                '''
+                No technology model was copied, so the import of the generated operation
+                model will not resolve until one is placed in "«technologyFolder»".
+
+                Looked for them in:
+                «ReconstructionModelWriter.lastLookupLocation»
+                '''.toString)
     }
 
 	/**
