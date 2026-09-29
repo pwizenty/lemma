@@ -52,3 +52,6 @@ de.fhdo.lemma.service.openapi.tests/test-model-gen/*
 
 **/xtend-gen/
 **/src-gen/
+
+# Eclipse projects created when browsing the regression test models
+de.fhdo.lemma.reconstruction/test/**/.project

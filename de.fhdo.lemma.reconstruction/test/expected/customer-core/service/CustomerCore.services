@@ -1,0 +1,17 @@
+import datatypes from "../domain/CustomerCore.data" as CustomerCore
+
+public functional microservice com.lakesidemutual.customercore.CustomerCore {
+    interface CityReferenceDataHolder {
+        getCitiesForPostalCode( sync in postalCode : string,  sync out citiesResponseDto : CustomerCore::CustomerCore.CitiesResponseDto);
+    }
+    interface CustomerInformationHolder {
+        getCustomers( sync in filter : string,  sync in limit : int,  sync in offset : int,  sync in ^fields : string,  sync out paginatedCustomerResponseDto : CustomerCore::CustomerCore.PaginatedCustomerResponseDto);
+        getCustomer( sync in ids : string,  sync in ^fields : string,  sync out customersResponseDto : CustomerCore::CustomerCore.CustomersResponseDto);
+        updateCustomer( sync in customerId : CustomerCore::CustomerCore.CustomerId,  sync in requestDto : CustomerCore::CustomerCore.CustomerProfileUpdateRequestDto,  sync out customerResponseDto : CustomerCore::CustomerCore.CustomerResponseDto);
+        changeAddress( sync in customerId : CustomerCore::CustomerCore.CustomerId,  sync in requestDto : CustomerCore::CustomerCore.AddressDto,  sync out addressDto : CustomerCore::CustomerCore.AddressDto);
+        createCustomer( sync in requestDto : CustomerCore::CustomerCore.CustomerProfileUpdateRequestDto,  sync out customerResponseDto : CustomerCore::CustomerCore.CustomerResponseDto);
+    }
+    interface OldCustomerInformationHolder {
+        getCustomer( sync in ids : string,  sync in ^fields : string,  sync out responseEntity : unspecified);
+    }
+}
