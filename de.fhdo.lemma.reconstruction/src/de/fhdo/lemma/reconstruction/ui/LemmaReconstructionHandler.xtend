@@ -16,6 +16,9 @@ import org.eclipse.ui.PlatformUI
 import de.fhdo.lemma.reconstruction.service.Microservice
 import de.fhdo.lemma.service.ServiceModel
 import de.fhdo.lemma.reconstruction.service.LemmaServiceGenerator
+import de.fhdo.lemma.reconstruction.operation.LemmaOperationGenerator
+import de.fhdo.lemma.reconstruction.operation.OperationNode
+import de.fhdo.lemma.operation.OperationModel
 
 /**
  * Handler for orchestrating the reconstruction process of LEMMA models
@@ -43,6 +46,9 @@ class LemmaReconstructionHandler extends AbstractHandler {
     List<DataModel> domainDataModels
     List<ServiceModel> serviceModels = newLinkedList
 
+    List<OperationNode> operationNodes = newLinkedList
+    List<OperationModel> operationModels = newLinkedList
+
 	/**
 	 * Executing the model generation process
 	 */
@@ -51,6 +57,7 @@ class LemmaReconstructionHandler extends AbstractHandler {
         receiveMongoDbEndpoints
         loadContextInformationFromMongoDb
         loadMicroservicesFromMongoDB
+        loadOperationNodesFromMongoDb
 
         displayReconstructionInforation
         selectTargetFolderForModelGeneration
@@ -104,6 +111,14 @@ class LemmaReconstructionHandler extends AbstractHandler {
     /** 
 	 * Load reconstructed domain information from the MongoDB database 
 	 */
+    /** 
+	 * Load reconstructed operation information from the MongoDB database 
+	 */
+    private def loadOperationNodesFromMongoDb() {
+        val repository = new MongoDbRepository(mongoDbHostname, Integer::parseInt(mongoDbPort))
+        operationNodes.addAll(repository.reconstructedOperationNodes)
+    }
+
     private def loadMicroservicesFromMongoDB() {
         val repository = new MongoDbRepository(mongoDbHostname, Integer::parseInt(mongoDbPort))
         initialMicroservices.addAll(repository.reconstructedMicroservices)
@@ -124,6 +139,7 @@ class LemmaReconstructionHandler extends AbstractHandler {
     	if (!selectedContexts.nullOrEmpty)
         	generateDomainModels
         	generateServiceModels
+        	generateOperationModels
     }
 
 	/**
@@ -152,12 +168,29 @@ class LemmaReconstructionHandler extends AbstractHandler {
 	/**
 	 * Write LEMMA models to the selected folder
 	 */
+    /**
+	 * Generate LEMMA operation models. All nodes go into one model, because a
+	 * node refers to the nodes it depends on by name, and a reference across
+	 * models would need an import of the other model.
+	 */
+    private def generateOperationModels() {
+        if (operationNodes.nullOrEmpty || selectedMicroservices.nullOrEmpty)
+            return
+        val serviceModelName = selectedMicroservices.get(0).name.split("\\W").lastOrNull
+        val model = new LemmaOperationGenerator().generateModelFrom(operationNodes,
+            serviceModelName)
+        operationModels.add(model)
+    }
+
     private def writeModelsToFolder() {
         domainDataModels.forEach[
             writeDomainDataModel(it)
         ]
         serviceModels.forEach[
         	writeServiceModel(it)
+        ]
+        operationModels.forEach[
+        	writeOperationModel(it)
         ]
     }
 
@@ -173,6 +206,14 @@ class LemmaReconstructionHandler extends AbstractHandler {
 	 */
 	private def writeServiceModel(ServiceModel model) {
         ReconstructionModelWriter.writeServiceModel(model, reconstructionPath)
+    }
+
+	/** 
+	 * Configuration and specific execution to write LEMMA operation models to the selected folder 
+	 */
+	private def writeOperationModel(OperationModel model) {
+        val fileName = selectedMicroservices.get(0).name.split("\\W").lastOrNull
+        ReconstructionModelWriter.writeOperationModel(model, fileName, reconstructionPath)
     }
 
 	/**
@@ -215,5 +256,7 @@ class LemmaReconstructionHandler extends AbstractHandler {
         initialMicroservices.clear
         selectedMicroservices.clear
         serviceModels.clear
+        operationNodes.clear
+        operationModels.clear
     }
 }

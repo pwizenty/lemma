@@ -2,6 +2,10 @@ package de.fhdo.lemma.reconstruction.io
 
 import de.fhdo.lemma.ServiceDslStandaloneSetup
 import de.fhdo.lemma.data.DataDslStandaloneSetup
+import de.fhdo.lemma.operation.OperationModel
+import de.fhdo.lemma.operation.OperationPackage
+import de.fhdo.lemma.operationdsl.OperationDslStandaloneSetup
+import de.fhdo.lemma.operationdsl.extractor.OperationDslExtractor
 import de.fhdo.lemma.data.DataModel
 import de.fhdo.lemma.data.DataPackage
 import de.fhdo.lemma.data.datadsl.extractor.DataDslExtractor
@@ -70,6 +74,26 @@ class ReconstructionModelWriter {
 
         EPackage.Registry.INSTANCE.put(ServicePackage.eNS_URI, ServicePackage.eINSTANCE)
         val injector = new ServiceDslStandaloneSetup().createInjectorAndDoEMFRegistration
+        maskIssues(filePath, injector.getInstance(XtextResourceSet))
+
+        return filePath
+    }
+
+    /**
+     * Write a LEMMA operation model to the "operation" sub folder of the given
+     * target folder and return the path of the written file.
+     */
+    def static String writeOperationModel(OperationModel model, String fileName,
+        String targetFolder) {
+        val extractedModel = new OperationDslExtractor().extractToString(model)
+        val folder = '''«targetFolder»«File.separator»operation'''
+        val filePath = '''«folder»«File.separator»«fileName».operation'''
+
+        Files.createDirectories(Paths.get(folder))
+        Files.write(Paths.get(filePath), extractedModel.bytes)
+
+        EPackage.Registry.INSTANCE.put(OperationPackage.eNS_URI, OperationPackage.eINSTANCE)
+        val injector = new OperationDslStandaloneSetup().createInjectorAndDoEMFRegistration
         maskIssues(filePath, injector.getInstance(XtextResourceSet))
 
         return filePath
