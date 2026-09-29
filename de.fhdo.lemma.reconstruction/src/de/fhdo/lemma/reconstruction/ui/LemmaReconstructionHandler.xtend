@@ -192,7 +192,8 @@ class LemmaReconstructionHandler extends AbstractHandler {
             // A generator collects its microservices in one service model, so
             // every microservice needs its own generator to end up in its own
             // model and therefore in its own file.
-            val model = new LemmaServiceGenerator().generateModelFrom(it)
+            val model = new LemmaServiceGenerator().generateModelFrom(it,
+                technologyFolder)
             serviceModels.add(model)
         ]
     }

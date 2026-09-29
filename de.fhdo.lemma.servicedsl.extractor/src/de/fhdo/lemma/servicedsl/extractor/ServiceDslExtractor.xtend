@@ -16,6 +16,9 @@ import de.fhdo.lemma.service.Visibility
 import de.fhdo.lemma.technology.CommunicationType
 import de.fhdo.lemma.technology.ExchangePattern
 import de.fhdo.lemma.technology.Protocol
+import de.fhdo.lemma.technology.TechnologySpecificCollectionType
+import de.fhdo.lemma.technology.TechnologySpecificDataStructure
+import de.fhdo.lemma.technology.TechnologySpecificPrimitiveType
 import de.fhdo.lemma.service.ImportedServiceAspect
 
 
@@ -269,6 +272,15 @@ class ServiceDslExtractor {
     private def generate(ImportedType importedType) {
         val type = importedType.type
         return switch(type) {
+            // A type of a technology model is referenced by its qualified name,
+            // which is what the scope of the Service DSL is built from. It
+            // carries no type name, so the branches below would write none.
+            TechnologySpecificPrimitiveType:
+                '''«importedType.import.name»::«type.qualifiedNameParts.join(".")»'''
+            TechnologySpecificCollectionType:
+                '''«importedType.import.name»::«type.qualifiedNameParts.join(".")»'''
+            TechnologySpecificDataStructure:
+                '''«importedType.import.name»::«type.qualifiedNameParts.join(".")»'''
             PrimitiveType: '''«importedType.import.name»::«type.typeName»'''
             ComplexType: '''«importedType.import.name»::«type.buildQualifiedName(".")»'''
             default:
