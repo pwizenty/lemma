@@ -47,6 +47,7 @@ class LemmaReconstructionHandler extends AbstractHandler {
     List<ServiceModel> serviceModels = newLinkedList
 
     List<OperationNode> operationNodes = newLinkedList
+    List<OperationNode> selectedOperationNodes = newLinkedList
     List<OperationModel> operationModels = newLinkedList
 
 	/**
@@ -93,11 +94,13 @@ class LemmaReconstructionHandler extends AbstractHandler {
 	 * Display the reconstructed architecture information, loaded from the database 
 	 */
     private def displayReconstructionInforation() {
-        val dialog = new LemmaReconstructionResultsDialog(SHELL, initialContexts, initialMicroservices)
+        val dialog = new LemmaReconstructionResultsDialog(SHELL, initialContexts,
+            initialMicroservices, operationNodes)
         dialog.create
         dialog.open
         selectedContexts = dialog.selectedContexts
         selectedMicroservices = dialog.selectedMicroservices
+        selectedOperationNodes = dialog.selectedOperationNodes
     }
 
 	/** 
@@ -174,10 +177,10 @@ class LemmaReconstructionHandler extends AbstractHandler {
 	 * models would need an import of the other model.
 	 */
     private def generateOperationModels() {
-        if (operationNodes.nullOrEmpty || selectedMicroservices.nullOrEmpty)
+        if (selectedOperationNodes.nullOrEmpty || selectedMicroservices.nullOrEmpty)
             return
         val serviceModelName = selectedMicroservices.get(0).name.split("\\W").lastOrNull
-        val model = new LemmaOperationGenerator().generateModelFrom(operationNodes,
+        val model = new LemmaOperationGenerator().generateModelFrom(selectedOperationNodes,
             serviceModelName)
         operationModels.add(model)
     }
@@ -233,6 +236,10 @@ class LemmaReconstructionHandler extends AbstractHandler {
             generatedLemmaModels.add('''«it.name.split("\\W").lastOrNull».services''')
         ]
 
+        if (!operationModels.nullOrEmpty && !selectedMicroservices.nullOrEmpty)
+            generatedLemmaModels.add(
+                '''«selectedMicroservices.get(0).name.split("\\W").lastOrNull».operation''')
+
         val messageText = "Generated Models:"
         val messageModels = messageText + "\n\t- " + generatedLemmaModels.join("\n\t- ") + "\n\n"
         showInfoDialogMessage(title, messageModels)
@@ -257,6 +264,7 @@ class LemmaReconstructionHandler extends AbstractHandler {
         selectedMicroservices.clear
         serviceModels.clear
         operationNodes.clear
+        selectedOperationNodes.clear
         operationModels.clear
     }
 }

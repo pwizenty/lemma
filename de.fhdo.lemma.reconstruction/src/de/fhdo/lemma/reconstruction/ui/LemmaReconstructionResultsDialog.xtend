@@ -21,6 +21,9 @@ import org.eclipse.xtend.lib.annotations.Accessors
 import de.fhdo.lemma.reconstruction.service.Microservice
 import de.fhdo.lemma.reconstruction.service.Interface
 import de.fhdo.lemma.reconstruction.service.Operation
+import de.fhdo.lemma.reconstruction.operation.OperationNode
+import de.fhdo.lemma.reconstruction.operation.DeployedService
+import de.fhdo.lemma.reconstruction.operation.NodeType
 
 /**
  * User Interface class for displaying information about the reconstructed architecture,
@@ -32,6 +35,7 @@ class LemmaReconstructionResultsDialog extends TitleAreaDialog {
 	TreeViewer treeViewer
 	List<Context> contexts
 	List<Microservice> microservices
+	List<OperationNode> operationNodes
 
 	@Accessors
 	List<Context> selectedContexts = newLinkedList
@@ -39,10 +43,15 @@ class LemmaReconstructionResultsDialog extends TitleAreaDialog {
 	@Accessors
 	List<Microservice> selectedMicroservices= newLinkedList
 
-	new(Shell parentShell, List<Context> contexts, List<Microservice> microservices) {
+	@Accessors
+	List<OperationNode> selectedOperationNodes = newLinkedList
+
+	new(Shell parentShell, List<Context> contexts, List<Microservice> microservices,
+		List<OperationNode> operationNodes) {
 		super(parentShell)
 		this.contexts = contexts
 		this.microservices = microservices
+		this.operationNodes = operationNodes
 	}
 
 	/**
@@ -96,6 +105,7 @@ class LemmaReconstructionResultsDialog extends TitleAreaDialog {
 		val input = newLinkedList
 		input.addAll(contexts)
 		input.addAll(microservices)
+		input.addAll(operationNodes)
 		treeViewer.input = input as List<?>
 		treeViewer.selection
 	}
@@ -127,6 +137,11 @@ class LemmaReconstructionResultsDialog extends TitleAreaDialog {
                 	Microservice: "Microservice"
                 	Interface: "Interface"
                 	Operation: "Operation"
+                	OperationNode: if (element.nodeType === NodeType.INFRASTRUCTURE)
+                			"Infrastructure node"
+                		else
+                			"Container"
+                	DeployedService: "Deployed microservice"
                 	default: ""
                 }
             }
@@ -164,6 +179,7 @@ class LemmaReconstructionResultsDialog extends TitleAreaDialog {
 			switch (it) {
 				Context: selectedContexts.add(it)
 				Microservice: selectedMicroservices.add(it)
+				OperationNode: selectedOperationNodes.add(it)
 			}
 		]
 	}

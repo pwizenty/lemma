@@ -14,6 +14,8 @@ import org.eclipse.swt.graphics.Image
 import de.fhdo.lemma.reconstruction.service.Microservice
 import de.fhdo.lemma.reconstruction.service.Interface
 import de.fhdo.lemma.reconstruction.service.Operation
+import de.fhdo.lemma.reconstruction.operation.OperationNode
+import de.fhdo.lemma.reconstruction.operation.DeployedService
 
 /**
  * User Interface class for displaying lables for the ReconstructionTreeProvider
@@ -44,6 +46,8 @@ class ReconstructionTreeLableProvider  extends LabelProvider implements IStyledL
             Microservice: element.name
             Interface: element.name
             Operation: element.name
+            OperationNode: element.name
+            DeployedService: element.name
             default: "default"
         })
     }
