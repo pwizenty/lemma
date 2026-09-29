@@ -20,12 +20,15 @@ import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
+import java.util.List
 import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.EPackage
 import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.resource.XtextResourceSet
 import org.eclipse.xtext.util.CancelIndicator
 import org.eclipse.xtext.validation.CheckMode
+import org.osgi.framework.FrameworkUtil
 
 /**
  * Writing of generated LEMMA models into a target folder.
@@ -39,6 +42,13 @@ import org.eclipse.xtext.validation.CheckMode
  * @author <a href="mailto:philip.wizenty@fh-dortmund.de">Philip Wizenty</a>
  */
 class ReconstructionModelWriter {
+    /**
+     * Folder of this bundle holding the hand-written technology models, and
+     * the suffix of such a model.
+     */
+    static val TECHNOLOGY_MODEL_FOLDER = "models/technology"
+    static val TECHNOLOGY_MODEL_SUFFIX = ".technology"
+
     /**
      * Write a LEMMA domain model to the "domain" sub folder of the given
      * target folder and return the path of the written file.
@@ -97,6 +107,46 @@ class ReconstructionModelWriter {
         maskIssues(filePath, injector.getInstance(XtextResourceSet))
 
         return filePath
+    }
+
+    /**
+     * Copy the technology models of this bundle into a sub folder of the
+     * target folder, and return the names of the copied files.
+     *
+     * A generated operation model imports its technology model by a relative
+     * path, so the model has to exist next to the generated one. Copying it
+     * here keeps the generated models self-contained: the folder the wizard
+     * writes to opens on its own, without a reference into this bundle.
+     */
+    def static List<String> copyTechnologyModels(String targetFolder, String subFolder) {
+        val copied = <String>newLinkedList
+        val bundle = FrameworkUtil.getBundle(ReconstructionModelWriter)
+        if (bundle === null) {
+            return copied
+        }
+
+        val entries = bundle.findEntries(TECHNOLOGY_MODEL_FOLDER, "*" + TECHNOLOGY_MODEL_SUFFIX,
+            false)
+        if (entries === null) {
+            return copied
+        }
+
+        val folder = Paths.get('''«targetFolder»«File.separator»«subFolder»'''.toString)
+        Files.createDirectories(folder)
+
+        while (entries.hasMoreElements) {
+            val entry = entries.nextElement
+            val fileName = entry.path.substring(entry.path.lastIndexOf("/") + 1)
+            val stream = entry.openStream
+            try {
+                Files.copy(stream, folder.resolve(fileName),
+                    StandardCopyOption.REPLACE_EXISTING)
+                copied.add(fileName)
+            } finally {
+                stream.close
+            }
+        }
+        return copied
     }
 
     /**

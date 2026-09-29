@@ -30,8 +30,7 @@ class LemmaOperationGenerator {
      * and the strict model marks two of them as mandatory.
      */
     static val TECHNOLOGY_ALIAS = "deploymentBase"
-    static val TECHNOLOGY_IMPORT_URI =
-        '''..«File.separator»technology«File.separator»deployment_base_relaxed.technology'''
+    static val TECHNOLOGY_MODEL = "deployment_base_relaxed.technology"
     static val DEPLOYMENT_TECHNOLOGY = "Kubernetes"
 
     /**
@@ -51,9 +50,10 @@ class LemmaOperationGenerator {
      * that model rather than a plain name.
      */
     def OperationModel generateModelFrom(List<OperationNode> reconstructedNodes,
-        String serviceModelName) {
+        String serviceModelName, String technologyFolder) {
         val technologyImport = createImport(TECHNOLOGY_ALIAS,
-            TECHNOLOGY_IMPORT_URI.toString, ImportType.TECHNOLOGY)
+            '''..«File.separator»«technologyFolder»«File.separator»«TECHNOLOGY_MODEL»'''.toString,
+            ImportType.TECHNOLOGY)
         model.imports.add(technologyImport)
 
         val serviceImport = createImport(serviceModelName,

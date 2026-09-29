@@ -15,8 +15,11 @@ import org.eclipse.jface.viewers.TreeViewerColumn
 import org.eclipse.swt.SWT
 import org.eclipse.swt.layout.GridData
 import org.eclipse.swt.layout.GridLayout
+import org.eclipse.swt.widgets.Button
 import org.eclipse.swt.widgets.Composite
+import org.eclipse.swt.widgets.Label
 import org.eclipse.swt.widgets.Shell
+import org.eclipse.swt.widgets.Text
 import org.eclipse.xtend.lib.annotations.Accessors
 import de.fhdo.lemma.reconstruction.service.Microservice
 import de.fhdo.lemma.reconstruction.service.Interface
@@ -32,6 +35,8 @@ import de.fhdo.lemma.reconstruction.operation.NodeType
  * @author <a href="mailto:philip.wizenty@fh-dortmund.de">Philip Wizenty</a>
  */
 class LemmaReconstructionResultsDialog extends TitleAreaDialog {
+	static val DEFAULT_TECHNOLOGY_FOLDER = "technology"
+
 	TreeViewer treeViewer
 	List<Context> contexts
 	List<Microservice> microservices
@@ -45,6 +50,21 @@ class LemmaReconstructionResultsDialog extends TitleAreaDialog {
 
 	@Accessors
 	List<OperationNode> selectedOperationNodes = newLinkedList
+
+	Button copyTechnologyModelsButton
+	Text technologyFolderText
+
+	/**
+	 * Whether the technology models are copied next to the generated models,
+	 * and the folder they are copied into. An operation model imports its
+	 * technology model relative to itself, so the folder is also what the
+	 * generated import points at.
+	 */
+	@Accessors
+	boolean copyTechnologyModels = true
+
+	@Accessors
+	String technologyFolder = DEFAULT_TECHNOLOGY_FOLDER
 
 	new(Shell parentShell, List<Context> contexts, List<Microservice> microservices,
 		List<OperationNode> operationNodes) {
@@ -74,6 +94,7 @@ class LemmaReconstructionResultsDialog extends TitleAreaDialog {
 		container.layout = new GridLayout(2, false)
 
 		createReconstructionTree(container)
+		createTechnologyModelOption(container)
 		return area
 	}
 
@@ -108,6 +129,28 @@ class LemmaReconstructionResultsDialog extends TitleAreaDialog {
 		input.addAll(operationNodes)
 		treeViewer.input = input as List<?>
 		treeViewer.selection
+	}
+
+	/**
+	 * Create the option to copy the technology models next to the generated
+	 * ones, and the folder they are copied into
+	 */
+	private def createTechnologyModelOption(Composite parent) {
+		copyTechnologyModelsButton = new Button(parent, SWT.CHECK)
+		copyTechnologyModelsButton.text = "Copy technology models into the generated models"
+		copyTechnologyModelsButton.selection = copyTechnologyModels
+		copyTechnologyModelsButton.layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false)
+
+		val folderComposite = new Composite(parent, SWT.NONE)
+		folderComposite.layout = new GridLayout(2, false)
+		folderComposite.layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false)
+
+		val label = new Label(folderComposite, SWT.NONE)
+		label.text = "Sub folder:"
+
+		technologyFolderText = new Text(folderComposite, SWT.BORDER)
+		technologyFolderText.text = technologyFolder
+		technologyFolderText.layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false)
 	}
 
 	/**
@@ -175,6 +218,10 @@ class LemmaReconstructionResultsDialog extends TitleAreaDialog {
 	 * Save the selected input
 	 */
 	private def saveInput() {
+		copyTechnologyModels = copyTechnologyModelsButton.selection
+		val folder = technologyFolderText.text
+		technologyFolder = if (folder.nullOrEmpty) DEFAULT_TECHNOLOGY_FOLDER else folder.trim
+
 		treeViewer.structuredSelection.forEach [
 			switch (it) {
 				Context: selectedContexts.add(it)

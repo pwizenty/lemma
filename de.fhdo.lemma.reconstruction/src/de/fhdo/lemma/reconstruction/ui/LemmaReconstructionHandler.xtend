@@ -48,6 +48,9 @@ class LemmaReconstructionHandler extends AbstractHandler {
 
     List<OperationNode> operationNodes = newLinkedList
     List<OperationNode> selectedOperationNodes = newLinkedList
+
+    boolean copyTechnologyModels = true
+    String technologyFolder
     List<OperationModel> operationModels = newLinkedList
 
 	/**
@@ -62,6 +65,7 @@ class LemmaReconstructionHandler extends AbstractHandler {
 
         displayReconstructionInforation
         selectTargetFolderForModelGeneration
+        copyTechnologyModelsToTargetFolder
         generateModels
 	        writeModelsToFolder
         showReconstructionInformationMessage
@@ -101,6 +105,8 @@ class LemmaReconstructionHandler extends AbstractHandler {
         selectedContexts = dialog.selectedContexts
         selectedMicroservices = dialog.selectedMicroservices
         selectedOperationNodes = dialog.selectedOperationNodes
+        copyTechnologyModels = dialog.copyTechnologyModels
+        technologyFolder = dialog.technologyFolder
     }
 
 	/** 
@@ -112,9 +118,6 @@ class LemmaReconstructionHandler extends AbstractHandler {
     }
     
     /** 
-	 * Load reconstructed domain information from the MongoDB database 
-	 */
-    /** 
 	 * Load reconstructed operation information from the MongoDB database 
 	 */
     private def loadOperationNodesFromMongoDb() {
@@ -122,6 +125,9 @@ class LemmaReconstructionHandler extends AbstractHandler {
         operationNodes.addAll(repository.reconstructedOperationNodes)
     }
 
+    /** 
+	 * Load reconstructed microservice information from the MongoDB database 
+	 */
     private def loadMicroservicesFromMongoDB() {
         val repository = new MongoDbRepository(mongoDbHostname, Integer::parseInt(mongoDbPort))
         initialMicroservices.addAll(repository.reconstructedMicroservices)
@@ -133,6 +139,16 @@ class LemmaReconstructionHandler extends AbstractHandler {
     private def selectTargetFolderForModelGeneration() {
         val fileDialog = new DirectoryDialog( SHELL, SWT.OPEN );
         reconstructionPath = fileDialog.open
+    }
+
+	/**
+	 * Copy the technology models next to the models about to be generated, so
+	 * that the import an operation model carries resolves
+	 */
+    private def copyTechnologyModelsToTargetFolder() {
+        if (!copyTechnologyModels || reconstructionPath.nullOrEmpty)
+            return
+        ReconstructionModelWriter.copyTechnologyModels(reconstructionPath, technologyFolder)
     }
 
 	/**
@@ -168,9 +184,6 @@ class LemmaReconstructionHandler extends AbstractHandler {
         ]
     }
 
-	/**
-	 * Write LEMMA models to the selected folder
-	 */
     /**
 	 * Generate LEMMA operation models. All nodes go into one model, because a
 	 * node refers to the nodes it depends on by name, and a reference across
@@ -181,10 +194,13 @@ class LemmaReconstructionHandler extends AbstractHandler {
             return
         val serviceModelName = selectedMicroservices.get(0).name.split("\\W").lastOrNull
         val model = new LemmaOperationGenerator().generateModelFrom(selectedOperationNodes,
-            serviceModelName)
+            serviceModelName, technologyFolder)
         operationModels.add(model)
     }
 
+	/**
+	 * Write LEMMA models to the selected folder
+	 */
     private def writeModelsToFolder() {
         domainDataModels.forEach[
             writeDomainDataModel(it)
@@ -265,6 +281,7 @@ class LemmaReconstructionHandler extends AbstractHandler {
         serviceModels.clear
         operationNodes.clear
         selectedOperationNodes.clear
+        technologyFolder = null
         operationModels.clear
     }
 }
