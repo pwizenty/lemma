@@ -1,7 +1,28 @@
 {
   "context": [
     {
-      "collections": [],
+      "collections": [
+        {
+          "complex_field_type": null,
+          "data": [],
+          "name": "CitiesList",
+          "primitive_field_type": {
+            "name": "String"
+          },
+          "qualified_name": "com.lakesidemutual.customercore.CitiesList"
+        },
+        {
+          "complex_field_type": {
+            "class_type": "COLLECTION",
+            "name": "CustomerResponseDto",
+            "qualified_name": "com.lakesidemutual.customercore.interfaces.dtos.customer.CustomerResponseDto"
+          },
+          "data": [],
+          "name": "CustomersList",
+          "primitive_field_type": null,
+          "qualified_name": "com.lakesidemutual.customercore.CustomersList"
+        }
+      ],
       "data": [],
       "data_structures": [
         {
@@ -75,94 +96,6 @@
           ],
           "name": "CustomerId",
           "qualified_name": "com.lakesidemutual.customercore.CustomerCore.CustomerId"
-        },
-        {
-          "data": [],
-          "fields": [
-            {
-              "complex_field_type": null,
-              "data": [],
-              "name": "serialVersionUID",
-              "primitive_field_type": {
-                "name": "long"
-              }
-            },
-            {
-              "complex_field_type": null,
-              "data": [
-                {
-                  "name": "Identifier",
-                  "values": {}
-                }
-              ],
-              "name": "id",
-              "primitive_field_type": {
-                "name": "long"
-              }
-            },
-            {
-              "complex_field_type": null,
-              "data": [],
-              "name": "firstname",
-              "primitive_field_type": {
-                "name": "string"
-              }
-            },
-            {
-              "complex_field_type": null,
-              "data": [],
-              "name": "lastname",
-              "primitive_field_type": {
-                "name": "string"
-              }
-            },
-            {
-              "complex_field_type": null,
-              "data": [],
-              "name": "birthday",
-              "primitive_field_type": {
-                "name": "date"
-              }
-            },
-            {
-              "complex_field_type": null,
-              "data": [],
-              "name": "email",
-              "primitive_field_type": {
-                "name": "string"
-              }
-            },
-            {
-              "complex_field_type": null,
-              "data": [],
-              "name": "phoneNumber",
-              "primitive_field_type": {
-                "name": "string"
-              }
-            },
-            {
-              "complex_field_type": {
-                "class_type": "DATA_STRUCTURE",
-                "name": "Address",
-                "qualified_name": "com.lakesidemutual.customercore.domain.customer.Address"
-              },
-              "data": [],
-              "name": "currentAddress",
-              "primitive_field_type": null
-            },
-            {
-              "complex_field_type": {
-                "class_type": "UNSPECIFIED",
-                "name": "java.util.Collection",
-                "qualified_name": "Collection"
-              },
-              "data": [],
-              "name": "moveHistory",
-              "primitive_field_type": null
-            }
-          ],
-          "name": "CustomerProfileEntity",
-          "qualified_name": "com.lakesidemutual.customercore.CustomerCore.CustomerProfileEntity"
         },
         {
           "data": [
@@ -293,6 +226,278 @@
           ],
           "name": "CustomerProfileEntity",
           "qualified_name": "com.lakesidemutual.customercore.CustomerCore.CustomerProfileEntity"
+        },
+        {
+          "data": [],
+          "fields": [
+            {
+              "complex_field_type": null,
+              "data": [],
+              "name": "CitiesList",
+              "primitive_field_type": {
+                "name": "String"
+              }
+            }
+          ],
+          "name": "CitiesResponseDto",
+          "qualified_name": "com.lakesidemutual.customercore.CustomerCore.CitiesResponseDto"
+        },
+        {
+          "data": [],
+          "fields": [
+            {
+              "complex_field_type": null,
+              "data": [],
+              "name": "customerId",
+              "primitive_field_type": {
+                "name": "string"
+              }
+            },
+            {
+              "complex_field_type": null,
+              "data": [],
+              "name": "firstname",
+              "primitive_field_type": {
+                "name": "string"
+              }
+            },
+            {
+              "complex_field_type": null,
+              "data": [],
+              "name": "lastname",
+              "primitive_field_type": {
+                "name": "string"
+              }
+            },
+            {
+              "complex_field_type": null,
+              "data": [],
+              "name": "birthday",
+              "primitive_field_type": {
+                "name": "date"
+              }
+            },
+            {
+              "complex_field_type": null,
+              "data": [],
+              "name": "streetAddress",
+              "primitive_field_type": {
+                "name": "string"
+              }
+            },
+            {
+              "complex_field_type": null,
+              "data": [],
+              "name": "postalCode",
+              "primitive_field_type": {
+                "name": "string"
+              }
+            },
+            {
+              "complex_field_type": null,
+              "data": [],
+              "name": "city",
+              "primitive_field_type": {
+                "name": "string"
+              }
+            },
+            {
+              "complex_field_type": null,
+              "data": [],
+              "name": "email",
+              "primitive_field_type": {
+                "name": "string"
+              }
+            },
+            {
+              "complex_field_type": null,
+              "data": [],
+              "name": "phoneNumber",
+              "primitive_field_type": {
+                "name": "string"
+              }
+            },
+            {
+              "complex_field_type": {
+                "class_type": "UNSPECIFIED",
+                "name": "java.util.Collection",
+                "qualified_name": "Collection"
+              },
+              "data": [],
+              "name": "moveHistory",
+              "primitive_field_type": null
+            }
+          ],
+          "name": "CustomerResponseDto",
+          "qualified_name": "com.lakesidemutual.customercore.CustomerCore.CustomerResponseDto"
+        },
+        {
+          "data": [],
+          "fields": [
+            {
+              "complex_field_type": null,
+              "data": [],
+              "name": "filter",
+              "primitive_field_type": {
+                "name": "string"
+              }
+            },
+            {
+              "complex_field_type": null,
+              "data": [],
+              "name": "limit",
+              "primitive_field_type": {
+                "name": "int"
+              }
+            },
+            {
+              "complex_field_type": null,
+              "data": [],
+              "name": "offset",
+              "primitive_field_type": {
+                "name": "int"
+              }
+            },
+            {
+              "complex_field_type": null,
+              "data": [],
+              "name": "size",
+              "primitive_field_type": {
+                "name": "int"
+              }
+            },
+            {
+              "complex_field_type": {
+                "class_type": "COLLECTION",
+                "name": "CustomerResponseDto",
+                "qualified_name": "com.lakesidemutual.customercore.interfaces.dtos.customer.CustomerResponseDto"
+              },
+              "data": [],
+              "name": "CustomersList",
+              "primitive_field_type": null
+            }
+          ],
+          "name": "PaginatedCustomerResponseDto",
+          "qualified_name": "com.lakesidemutual.customercore.CustomerCore.PaginatedCustomerResponseDto"
+        },
+        {
+          "data": [],
+          "fields": [
+            {
+              "complex_field_type": {
+                "class_type": "COLLECTION",
+                "name": "CustomerResponseDto",
+                "qualified_name": "com.lakesidemutual.customercore.interfaces.dtos.customer.CustomerResponseDto"
+              },
+              "data": [],
+              "name": "CustomersList",
+              "primitive_field_type": null
+            }
+          ],
+          "name": "CustomersResponseDto",
+          "qualified_name": "com.lakesidemutual.customercore.CustomerCore.CustomersResponseDto"
+        },
+        {
+          "data": [],
+          "fields": [
+            {
+              "complex_field_type": null,
+              "data": [],
+              "name": "firstname",
+              "primitive_field_type": {
+                "name": "string"
+              }
+            },
+            {
+              "complex_field_type": null,
+              "data": [],
+              "name": "lastname",
+              "primitive_field_type": {
+                "name": "string"
+              }
+            },
+            {
+              "complex_field_type": null,
+              "data": [],
+              "name": "birthday",
+              "primitive_field_type": {
+                "name": "date"
+              }
+            },
+            {
+              "complex_field_type": null,
+              "data": [],
+              "name": "streetAddress",
+              "primitive_field_type": {
+                "name": "string"
+              }
+            },
+            {
+              "complex_field_type": null,
+              "data": [],
+              "name": "postalCode",
+              "primitive_field_type": {
+                "name": "string"
+              }
+            },
+            {
+              "complex_field_type": null,
+              "data": [],
+              "name": "city",
+              "primitive_field_type": {
+                "name": "string"
+              }
+            },
+            {
+              "complex_field_type": null,
+              "data": [],
+              "name": "email",
+              "primitive_field_type": {
+                "name": "string"
+              }
+            },
+            {
+              "complex_field_type": null,
+              "data": [],
+              "name": "phoneNumber",
+              "primitive_field_type": {
+                "name": "string"
+              }
+            }
+          ],
+          "name": "CustomerProfileUpdateRequestDto",
+          "qualified_name": "com.lakesidemutual.customercore.CustomerCore.CustomerProfileUpdateRequestDto"
+        },
+        {
+          "data": [],
+          "fields": [
+            {
+              "complex_field_type": null,
+              "data": [],
+              "name": "streetAddress",
+              "primitive_field_type": {
+                "name": "string"
+              }
+            },
+            {
+              "complex_field_type": null,
+              "data": [],
+              "name": "postalCode",
+              "primitive_field_type": {
+                "name": "string"
+              }
+            },
+            {
+              "complex_field_type": null,
+              "data": [],
+              "name": "city",
+              "primitive_field_type": {
+                "name": "string"
+              }
+            }
+          ],
+          "name": "AddressDto",
+          "qualified_name": "com.lakesidemutual.customercore.CustomerCore.AddressDto"
         }
       ],
       "enums": [],
@@ -661,7 +866,7 @@
                 {
                   "communication_type": "Synchronous",
                   "complex_parameter_type": {
-                    "class_type": "DATA_STRUCTURE",
+                    "class_type": "UNSPECIFIED",
                     "name": "ResponseEntity",
                     "qualified_name": "UnknownContext.ResponseEntity"
                   },
