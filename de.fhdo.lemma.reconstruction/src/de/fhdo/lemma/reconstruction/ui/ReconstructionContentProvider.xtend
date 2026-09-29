@@ -3,6 +3,7 @@ package de.fhdo.lemma.reconstruction.ui
 import de.fhdo.lemma.reconstruction.domain.Context
 import de.fhdo.lemma.reconstruction.domain.DataStructure
 import de.fhdo.lemma.reconstruction.domain.Field
+import de.fhdo.lemma.reconstruction.operation.OperationNode
 import java.util.List
 import org.eclipse.jface.viewers.ITreeContentProvider
 
@@ -22,6 +23,7 @@ class ReconstructionContentProvider implements ITreeContentProvider {
         return switch (parentElement) {
         	Context: parentElement.dataStructures
         	DataStructure: parentElement.fields
+        	OperationNode: parentElement.deployedServices
         }
 	}
 
@@ -51,6 +53,7 @@ class ReconstructionContentProvider implements ITreeContentProvider {
 		switch (element) {
 			Context: return !element.dataStructures.empty
 			DataStructure: return !element.fields.empty
+			OperationNode: return !element.deployedServices.empty
 			default: false
 		}
 	}

@@ -30,7 +30,8 @@ Require-Bundle: com.google.guava,
  de.fhdo.lemma.data.datadsl,
  de.fhdo.lemma.servicedsl,
  de.fhdo.lemma.operationdsl,
- de.fhdo.lemma.operationdsl.metamodel;bundle-version="0.8.6"
+ de.fhdo.lemma.operationdsl.metamodel;bundle-version="0.8.6",
+ de.fhdo.lemma.operationdsl.extractor
 Bundle-ClassPath: .,
  lib/avro-1.10.0.jar,
  lib/jackson-databind-2.11.0.jar,

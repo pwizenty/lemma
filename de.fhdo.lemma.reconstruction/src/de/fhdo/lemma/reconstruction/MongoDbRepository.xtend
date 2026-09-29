@@ -6,6 +6,7 @@ import com.mongodb.ConnectionString
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoClients
 import de.fhdo.lemma.reconstruction.domain.Context
+import de.fhdo.lemma.reconstruction.operation.OperationNode
 import java.util.List
 import de.fhdo.lemma.reconstruction.service.Microservice
 
@@ -45,7 +46,24 @@ class MongoDbRepository {
 	}
 	
 	/**
-	 * Read reconstructed microservice information from the database 
+	 * Read reconstructed operation information from the database
+	 */
+	def List<OperationNode> getReconstructedOperationNodes() {
+		val operationDatabase = mongoClient.getDatabase("mrf")
+		val operationCollection = operationDatabase.getCollection("operation")
+		val List<OperationNode> nodes = newLinkedList
+
+		operationCollection.find().forEach[
+			val mapper = new ObjectMapper()
+			mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+			val node = mapper.readValue(it.toJson(), OperationNode)
+			nodes.add(node)
+		]
+		nodes
+	}
+
+	/**
+	 * Read reconstructed microservice information from the database
 	 */
 	def List<Microservice> getReconstructedMicroservices() {
 		val microserviceDatabase = mongoClient.getDatabase("mrf")

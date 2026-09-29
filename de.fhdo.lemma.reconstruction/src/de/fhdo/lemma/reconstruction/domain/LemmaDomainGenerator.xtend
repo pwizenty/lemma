@@ -222,10 +222,20 @@ class LemmaDomainGenerator {
     private def generateDataFildFrom(Field reconstructedAttribute) {
         val dataFild = DATA_FACTORY.createDataField
         dataFild.name = reconstructedAttribute.name
-        if (reconstructedAttribute.primitiveType !== null)
+        if (reconstructedAttribute.primitiveType !== null) {
             dataFild.primitiveType = getPrimitiveFrom(reconstructedAttribute.primitiveType.name)
-        else
-            dataFild.complexType = getComplexTypefrom(reconstructedAttribute)
+        } else {
+            val complexType = getComplexTypefrom(reconstructedAttribute)
+            if (complexType !== null) {
+                dataFild.complexType = complexType
+            } else {
+                // The field refers to a type this context does not hold, for
+                // instance because the reconstruction placed it in the context
+                // of another microservice. A field without any type is not a
+                // model, so it becomes unspecified and stays visible as a gap.
+                dataFild.primitiveType = DATA_FACTORY.createPrimitiveUnspecified
+            }
+        }
 
         reconstructedAttribute.metaData.forEach[
             val feature = getDataFieldFeatureFrom(it.name)

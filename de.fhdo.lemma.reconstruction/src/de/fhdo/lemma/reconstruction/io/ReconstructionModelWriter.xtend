@@ -2,6 +2,10 @@ package de.fhdo.lemma.reconstruction.io
 
 import de.fhdo.lemma.ServiceDslStandaloneSetup
 import de.fhdo.lemma.data.DataDslStandaloneSetup
+import de.fhdo.lemma.operation.OperationModel
+import de.fhdo.lemma.operation.OperationPackage
+import de.fhdo.lemma.operationdsl.OperationDslStandaloneSetup
+import de.fhdo.lemma.operationdsl.extractor.OperationDslExtractor
 import de.fhdo.lemma.data.DataModel
 import de.fhdo.lemma.data.DataPackage
 import de.fhdo.lemma.data.datadsl.extractor.DataDslExtractor
@@ -16,12 +20,17 @@ import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
+import java.util.List
 import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.EPackage
 import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.resource.XtextResourceSet
 import org.eclipse.xtext.util.CancelIndicator
+import org.eclipse.core.runtime.FileLocator
 import org.eclipse.xtext.validation.CheckMode
+import org.eclipse.xtend.lib.annotations.Accessors
+import org.osgi.framework.FrameworkUtil
 
 /**
  * Writing of generated LEMMA models into a target folder.
@@ -35,6 +44,13 @@ import org.eclipse.xtext.validation.CheckMode
  * @author <a href="mailto:philip.wizenty@fh-dortmund.de">Philip Wizenty</a>
  */
 class ReconstructionModelWriter {
+    /**
+     * Folder of this bundle holding the hand-written technology models, and
+     * the suffix of such a model.
+     */
+    static val TECHNOLOGY_MODEL_FOLDER = "models/technology"
+    static val TECHNOLOGY_MODEL_SUFFIX = ".technology"
+
     /**
      * Write a LEMMA domain model to the "domain" sub folder of the given
      * target folder and return the path of the written file.
@@ -74,6 +90,95 @@ class ReconstructionModelWriter {
 
         return filePath
     }
+
+    /**
+     * Write a LEMMA operation model to the "operation" sub folder of the given
+     * target folder and return the path of the written file.
+     */
+    def static String writeOperationModel(OperationModel model, String fileName,
+        String targetFolder) {
+        val extractedModel = new OperationDslExtractor().extractToString(model)
+        val folder = '''«targetFolder»«File.separator»operation'''
+        val filePath = '''«folder»«File.separator»«fileName».operation'''
+
+        Files.createDirectories(Paths.get(folder))
+        Files.write(Paths.get(filePath), extractedModel.bytes)
+
+        EPackage.Registry.INSTANCE.put(OperationPackage.eNS_URI, OperationPackage.eINSTANCE)
+        val injector = new OperationDslStandaloneSetup().createInjectorAndDoEMFRegistration
+        maskIssues(filePath, injector.getInstance(XtextResourceSet))
+
+        return filePath
+    }
+
+    /**
+     * Copy the technology models of this bundle into a sub folder of the
+     * target folder, and return the names of the copied files.
+     *
+     * A generated operation model imports its technology model by a relative
+     * path, so the model has to exist next to the generated one. Copying it
+     * here keeps the generated models self-contained: the folder the wizard
+     * writes to opens on its own, without a reference into this bundle.
+     */
+    def static List<String> copyTechnologyModels(String targetFolder, String subFolder) {
+        val copied = <String>newLinkedList
+        val bundle = FrameworkUtil.getBundle(ReconstructionModelWriter)
+        if (bundle === null) {
+            return copied
+        }
+
+        val folder = Paths.get('''«targetFolder»«File.separator»«subFolder»'''.toString)
+        Files.createDirectories(folder)
+
+        // The models are a plain folder of the bundle rather than a source
+        // folder. A launched workbench does not necessarily expose such a
+        // folder as a bundle entry, so the file system of the bundle is read
+        // when the entries yield nothing.
+        val entries = bundle.findEntries(TECHNOLOGY_MODEL_FOLDER, "*" + TECHNOLOGY_MODEL_SUFFIX,
+            false)
+        if (entries !== null) {
+            while (entries.hasMoreElements) {
+                val entry = entries.nextElement
+                val fileName = entry.path.substring(entry.path.lastIndexOf("/") + 1)
+                val stream = entry.openStream
+                try {
+                    Files.copy(stream, folder.resolve(fileName),
+                        StandardCopyOption.REPLACE_EXISTING)
+                    copied.add(fileName)
+                } finally {
+                    stream.close
+                }
+            }
+        }
+
+        if (copied.empty) {
+            val bundleRoot = FileLocator.getBundleFile(bundle)
+            val modelFolder = new File(bundleRoot, TECHNOLOGY_MODEL_FOLDER)
+            lastLookupLocation = modelFolder.absolutePath
+            val models = modelFolder.listFiles
+            if (models !== null) {
+                models.filter[name.endsWith(TECHNOLOGY_MODEL_SUFFIX)].forEach[
+                    Files.copy(toPath, folder.resolve(name),
+                        StandardCopyOption.REPLACE_EXISTING)
+                    copied.add(name)
+                ]
+            } else {
+                lastLookupLocation = '''«modelFolder.absolutePath» (does not exist)'''.toString
+            }
+        }
+
+        return copied
+    }
+
+    /**
+     * Where the last copy looked for the technology models on the file system.
+     *
+     * Reported when nothing was copied: whether the folder is missing from the
+     * bundle or the bundle itself is a different one than expected cannot be
+     * told apart without the path that was tried.
+     */
+    @Accessors(PUBLIC_GETTER)
+    static String lastLookupLocation = "not attempted"
 
     /**
      * Load a written model, validate it and mask the parts the validation
