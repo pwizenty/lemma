@@ -27,6 +27,7 @@ import org.eclipse.emf.ecore.EPackage
 import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.resource.XtextResourceSet
 import org.eclipse.xtext.util.CancelIndicator
+import org.eclipse.core.runtime.FileLocator
 import org.eclipse.xtext.validation.CheckMode
 import org.osgi.framework.FrameworkUtil
 
@@ -125,27 +126,43 @@ class ReconstructionModelWriter {
             return copied
         }
 
-        val entries = bundle.findEntries(TECHNOLOGY_MODEL_FOLDER, "*" + TECHNOLOGY_MODEL_SUFFIX,
-            false)
-        if (entries === null) {
-            return copied
-        }
-
         val folder = Paths.get('''«targetFolder»«File.separator»«subFolder»'''.toString)
         Files.createDirectories(folder)
 
-        while (entries.hasMoreElements) {
-            val entry = entries.nextElement
-            val fileName = entry.path.substring(entry.path.lastIndexOf("/") + 1)
-            val stream = entry.openStream
-            try {
-                Files.copy(stream, folder.resolve(fileName),
-                    StandardCopyOption.REPLACE_EXISTING)
-                copied.add(fileName)
-            } finally {
-                stream.close
+        // The models are a plain folder of the bundle rather than a source
+        // folder. A launched workbench does not necessarily expose such a
+        // folder as a bundle entry, so the file system of the bundle is read
+        // when the entries yield nothing.
+        val entries = bundle.findEntries(TECHNOLOGY_MODEL_FOLDER, "*" + TECHNOLOGY_MODEL_SUFFIX,
+            false)
+        if (entries !== null) {
+            while (entries.hasMoreElements) {
+                val entry = entries.nextElement
+                val fileName = entry.path.substring(entry.path.lastIndexOf("/") + 1)
+                val stream = entry.openStream
+                try {
+                    Files.copy(stream, folder.resolve(fileName),
+                        StandardCopyOption.REPLACE_EXISTING)
+                    copied.add(fileName)
+                } finally {
+                    stream.close
+                }
             }
         }
+
+        if (copied.empty) {
+            val bundleRoot = FileLocator.getBundleFile(bundle)
+            val modelFolder = new File(bundleRoot, TECHNOLOGY_MODEL_FOLDER)
+            val models = modelFolder.listFiles
+            if (models !== null) {
+                models.filter[name.endsWith(TECHNOLOGY_MODEL_SUFFIX)].forEach[
+                    Files.copy(toPath, folder.resolve(name),
+                        StandardCopyOption.REPLACE_EXISTING)
+                    copied.add(name)
+                ]
+            }
+        }
+
         return copied
     }
 

@@ -5,6 +5,7 @@ import de.fhdo.lemma.reconstruction.io.ReconstructionModelWriter
 import de.fhdo.lemma.reconstruction.MongoDbRepository
 import de.fhdo.lemma.reconstruction.domain.Context
 import de.fhdo.lemma.reconstruction.domain.LemmaDomainGenerator
+import java.io.File
 import java.util.List
 import org.eclipse.core.commands.AbstractHandler
 import org.eclipse.core.commands.ExecutionEvent
@@ -51,6 +52,7 @@ class LemmaReconstructionHandler extends AbstractHandler {
 
     boolean copyTechnologyModels = true
     String technologyFolder
+    List<String> copiedTechnologyModels = newLinkedList
     List<OperationModel> operationModels = newLinkedList
 
 	/**
@@ -148,7 +150,13 @@ class LemmaReconstructionHandler extends AbstractHandler {
     private def copyTechnologyModelsToTargetFolder() {
         if (!copyTechnologyModels || reconstructionPath.nullOrEmpty)
             return
-        ReconstructionModelWriter.copyTechnologyModels(reconstructionPath, technologyFolder)
+        copiedTechnologyModels = ReconstructionModelWriter.copyTechnologyModels(
+            reconstructionPath, technologyFolder)
+        if (copiedTechnologyModels.empty)
+            MessageDialog.openWarning(SHELL, "Reconstruction Information Message",
+                "No technology model was copied. The import of the generated operation " +
+                "model will not resolve until a technology model is placed in the folder " +
+                '''"«technologyFolder»".''')
     }
 
 	/**
@@ -256,6 +264,10 @@ class LemmaReconstructionHandler extends AbstractHandler {
             generatedLemmaModels.add(
                 '''«selectedMicroservices.get(0).name.split("\\W").lastOrNull».operation''')
 
+        copiedTechnologyModels.forEach[
+            generatedLemmaModels.add('''«technologyFolder»«File.separator»«it» (copied)''')
+        ]
+
         val messageText = "Generated Models:"
         val messageModels = messageText + "\n\t- " + generatedLemmaModels.join("\n\t- ") + "\n\n"
         showInfoDialogMessage(title, messageModels)
@@ -282,6 +294,7 @@ class LemmaReconstructionHandler extends AbstractHandler {
         operationNodes.clear
         selectedOperationNodes.clear
         technologyFolder = null
+        copiedTechnologyModels.clear
         operationModels.clear
     }
 }
