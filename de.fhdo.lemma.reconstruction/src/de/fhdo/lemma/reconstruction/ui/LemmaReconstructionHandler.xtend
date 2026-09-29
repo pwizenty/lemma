@@ -148,8 +148,9 @@ class LemmaReconstructionHandler extends AbstractHandler {
 	 * that the import an operation model carries resolves
 	 */
     private def copyTechnologyModelsToTargetFolder() {
-        if (!copyTechnologyModels || reconstructionPath.nullOrEmpty)
+        if (!copyTechnologyModels || reconstructionPath.nullOrEmpty) {
             return
+        }
         copiedTechnologyModels = ReconstructionModelWriter.copyTechnologyModels(
             reconstructionPath, technologyFolder)
         if (copiedTechnologyModels.empty)
@@ -202,8 +203,9 @@ class LemmaReconstructionHandler extends AbstractHandler {
 	 * models would need an import of the other model.
 	 */
     private def generateOperationModels() {
-        if (selectedOperationNodes.nullOrEmpty || selectedMicroservices.nullOrEmpty)
+        if (selectedOperationNodes.nullOrEmpty || selectedMicroservices.nullOrEmpty) {
             return
+        }
         val serviceModelName = selectedMicroservices.get(0).name.split("\\W").lastOrNull
         val model = new LemmaOperationGenerator().generateModelFrom(selectedOperationNodes,
             serviceModelName, technologyFolder)

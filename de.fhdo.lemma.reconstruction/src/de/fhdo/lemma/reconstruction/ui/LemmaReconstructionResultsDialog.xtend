@@ -111,8 +111,9 @@ class LemmaReconstructionResultsDialog extends TitleAreaDialog {
 		// Toggle element collapse state on double click
 		treeViewer.addDoubleClickListener([
 			if (treeViewer.selection.empty || 
-				!(treeViewer.selection instanceof IStructuredSelection))
+				!(treeViewer.selection instanceof IStructuredSelection)) {
 				return
+			}
 
 			val selectedElement = (treeViewer.selection as IStructuredSelection).firstElement
 			if (treeViewer.getExpandedState(selectedElement))
