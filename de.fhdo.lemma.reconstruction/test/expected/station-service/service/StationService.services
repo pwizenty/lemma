@@ -1,0 +1,16 @@
+import datatypes from "../domain/StationService.data" as StationService
+
+public functional microservice de.dmsa.parkandcharge.station.StationService {
+    interface StationEvent {
+        receive( sync in event : StationService::StationService.BookingEventMessage);
+    }
+    interface Station {
+        create( sync in request : StationService::StationService.CreateStationRequest,  sync out stationResponse : StationService::StationService.StationResponse);
+        list( sync in ownerId : long,  sync in city : string,  sync in connectorType : StationService::StationService.ConnectorType,  sync in activeOnly : boolean,  sync out dataList : StationService::StationService.StationResponseList);
+        byIds( sync in ids : StationService::StationService.LongList,  sync out dataList : StationService::StationService.StationResponseList);
+        get( sync in id : long,  sync out stationResponse : StationService::StationService.StationResponse);
+        status( sync in id : long,  sync out stationStatusResponse : StationService::StationService.StationStatusResponse);
+        update( sync in id : long,  sync in request : StationService::StationService.UpdateStationRequest,  sync out stationResponse : StationService::StationService.StationResponse);
+        delete( sync in id : long);
+    }
+}
