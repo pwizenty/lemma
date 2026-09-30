@@ -8,6 +8,7 @@ import de.fhdo.lemma.service.ImportType
 import de.fhdo.lemma.service.ServiceFactory
 import de.fhdo.lemma.technology.TechnologyFactory
 import java.io.File
+import java.math.BigDecimal
 import java.util.HashMap
 import java.util.List
 import org.eclipse.xtend.lib.annotations.Accessors
@@ -209,7 +210,8 @@ class LemmaOperationGenerator {
         val configuration = reconstructedNode.metaData.findFirst[
             name == SERVICE_PROPERTIES
         ]
-        if (configuration === null || configuration.values.nullOrEmpty) {
+        if (configuration === null || configuration.values === null ||
+            configuration.values.empty) {
             return
         }
 
@@ -232,7 +234,7 @@ class LemmaOperationGenerator {
     private def createPrimitiveValue(String value) {
         val primitiveValue = DATA_FACTORY.createPrimitiveValue
         try {
-            primitiveValue.numericValue = new java.math.BigDecimal(value)
+            primitiveValue.numericValue = new BigDecimal(value)
         } catch (NumberFormatException e) {
             primitiveValue.stringValue = value
         }
