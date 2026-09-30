@@ -11,6 +11,7 @@ import de.fhdo.lemma.reconstruction.domain.ComplexType
 import java.io.File
 import de.fhdo.lemma.service.ImportType
 import de.fhdo.lemma.data.DataFactory
+import de.fhdo.lemma.data.PrimitiveUnspecified
 import de.fhdo.lemma.reconstruction.domain.ClassType
 import de.fhdo.lemma.service.ImportedType
 import de.fhdo.lemma.technology.TechnologyFactory
@@ -149,6 +150,15 @@ class LemmaServiceGenerator {
             }
 
         ]
+
+        // A parameter of an unspecified type is only allowed in an operation
+        // that is marked as not implemented, so a reconstruction that could
+        // not resolve a type says so rather than writing a model the Service
+        // DSL rejects.
+        if (operation.parameters.exists[primitiveType instanceof PrimitiveUnspecified]) {
+            operation.notImplemented = true
+        }
+
         return operation
     }
 
