@@ -219,16 +219,30 @@ class LemmaServiceGenerator {
             return null
         }
 
-        val type = switch (kind) {
-            case PRIMITIVE: TECHNOLOGY_FACTORY.createTechnologySpecificPrimitiveType
-            case COLLECTION: TECHNOLOGY_FACTORY.createTechnologySpecificCollectionType
-            case STRUCTURE: TECHNOLOGY_FACTORY.createTechnologySpecificDataStructure
-        }
-        type.name = name
-
         val importedType = SERVICE_FACTORY.createImportedType
         importedType.^import = technologyImport
-        importedType.type = type
+
+        // The name is set in each branch on purpose: the three types share
+        // only de.fhdo.lemma.data.Type, which carries no name, so a common
+        // variable for them could not be named.
+        switch (kind) {
+            case PRIMITIVE: {
+                val type = TECHNOLOGY_FACTORY.createTechnologySpecificPrimitiveType
+                type.name = name
+                importedType.type = type
+            }
+            case COLLECTION: {
+                val type = TECHNOLOGY_FACTORY.createTechnologySpecificCollectionType
+                type.name = name
+                importedType.type = type
+            }
+            case STRUCTURE: {
+                val type = TECHNOLOGY_FACTORY.createTechnologySpecificDataStructure
+                type.name = name
+                importedType.type = type
+            }
+        }
+
         return importedType
     }
 
