@@ -209,7 +209,12 @@ technology javaWithSpring {
 
     infrastructure technologies {
         SpringBootAdmin {
-            operation environments = "spring-boot-admin" default;
+            // An environment can only be referenced once it is declared here.
+            // openjdk:21-slim-buster is the base image the reconstruction reads
+            // from the Dockerfile of Lakeside Mutual's monitoring service.
+            operation environments = "spring-boot-admin" default,
+                "openjdk:21-slim-buster",
+                "openjdk:11-jdk-slim";
 
             service properties {
                 string applicationName<singleval>;
