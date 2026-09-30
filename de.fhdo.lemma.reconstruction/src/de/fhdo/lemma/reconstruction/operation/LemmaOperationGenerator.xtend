@@ -30,9 +30,11 @@ class LemmaOperationGenerator {
 
     /**
      * Alias and location of the technology model the generated nodes
-     * reference. The relaxed model is used because a reconstructed container
-     * carries no values for the service properties of its microservices yet,
-     * and the strict model marks two of them as mandatory.
+     * reference. The strict model marks springApplicationName and serverPort
+     * as mandatory, which a container may be held to because the
+     * reconstruction reads both from its application.properties, and a
+     * container for which it reads neither deploys no microservice and is left
+     * out anyway.
      */
     static val TECHNOLOGY_ALIAS = "deploymentBase"
     static val TECHNOLOGY_MODEL = "deployment_base.technology"
