@@ -212,11 +212,11 @@ technology javaWithSpring {
             operation environments = "spring-boot-admin" default;
 
             service properties {
-                string applicationName<mandatory, singleval>;
-                int port<mandatory, singleval>;
-                boolean enableAutoConfiguration<mandatory, singleval>;
-                string eurekaClientServiceUrlDefaultZone<mandatory, singleval>;
-                boolean eurekaInstancePreferIpAddress<mandatory, singleval>;
+                string applicationName<singleval>;
+                int port<singleval>;
+                boolean enableAutoConfiguration<singleval>;
+                string eurekaClientServiceUrlDefaultZone<singleval>;
+                boolean eurekaInstancePreferIpAddress<singleval>;
             }
         }
 
@@ -227,14 +227,14 @@ technology javaWithSpring {
                 "openjdk:21-slim-buster";
 
             service properties {
-                string hostname<mandatory>;
-                int port<mandatory>;
-                string imageType<mandatory>;
-                string mavenGroupId<mandatory>;
-                string mavenArtifactId<mandatory>;
-                string mavenVersion<mandatory>;
-                string mavenName<mandatory>;
-                string programmingLanguage<mandatory>;
+                string hostname;
+                int port;
+                string imageType;
+                string mavenGroupId;
+                string mavenArtifactId;
+                string mavenVersion;
+                string mavenName;
+                string programmingLanguage;
             }
         }
 
@@ -245,15 +245,15 @@ technology javaWithSpring {
                 "openjdk:21-slim-buster";
 
             service properties {
-                string hostname<mandatory>;
-                int port<mandatory>;
-                string imageType<mandatory>;
-                string mavenGroupId<mandatory>;
-                string mavenArtifactId<mandatory>;
-                string mavenVersion<mandatory>;
-                string mavenName<mandatory>;
-                string eurekaUri<mandatory>;
-                string programmingLanguage<mandatory>;
+                string hostname;
+                int port;
+                string imageType;
+                string mavenGroupId;
+                string mavenArtifactId;
+                string mavenVersion;
+                string mavenName;
+                string eurekaUri;
+                string programmingLanguage;
             }
         }
 

@@ -68,7 +68,20 @@ generator.
 declare the same properties. `Proxy` does not: nothing in the examples covers a
 reverse proxy, and one is declared here only because the reconstruction
 recognises nginx in Lakeside Mutual and an infrastructure node must name a
-technology. Its properties are a guess and are not mandatory.
+technology. Its properties are a guess.
+
+**No service property of an infrastructure technology is mandatory**, for the
+same reason `DeploymentBaseRelaxed` exists: the reconstruction reads none of
+their values yet, and a mandatory property without a value is a validation
+error on a node that is otherwise right. The examples of LEMMA declare them as
+mandatory, so restoring the markers is what to do once the values are
+reconstructed.
+
+The properties of the aspects and protocols earlier in the model **stay
+mandatory**. They belong to an aspect a model applies deliberately, not to a
+node the reconstruction emits, so nothing the reconstruction produces trips
+over them - the same division `deployment_base_relaxed.technology` keeps, where
+the aspects also kept theirs.
 
 A node whose name no technology matches yields a reference that does not
 resolve, which the editor reports on the generated model. That is deliberate:
