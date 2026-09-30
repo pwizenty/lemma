@@ -219,5 +219,56 @@ technology javaWithSpring {
                 boolean eurekaInstancePreferIpAddress<mandatory, singleval>;
             }
         }
+
+        // Service discovery. The properties follow the Eureka technology model
+        // of LEMMA's own examples.
+        Eureka {
+            operation environments = "openjdk:11-jdk-slim" default,
+                "openjdk:21-slim-buster";
+
+            service properties {
+                string hostname<mandatory>;
+                int port<mandatory>;
+                string imageType<mandatory>;
+                string mavenGroupId<mandatory>;
+                string mavenArtifactId<mandatory>;
+                string mavenVersion<mandatory>;
+                string mavenName<mandatory>;
+                string programmingLanguage<mandatory>;
+            }
+        }
+
+        // API gateway. Beside the properties of a service discovery it carries
+        // the address of the registry it reads its routes from.
+        Zuul {
+            operation environments = "openjdk:11-jdk-slim" default,
+                "openjdk:21-slim-buster";
+
+            service properties {
+                string hostname<mandatory>;
+                int port<mandatory>;
+                string imageType<mandatory>;
+                string mavenGroupId<mandatory>;
+                string mavenArtifactId<mandatory>;
+                string mavenVersion<mandatory>;
+                string mavenName<mandatory>;
+                string eurekaUri<mandatory>;
+                string programmingLanguage<mandatory>;
+            }
+        }
+
+        // Reverse proxy. Declared because the reconstruction recognises one in
+        // Lakeside Mutual and an infrastructure node needs a technology; the
+        // properties are the ones a proxy is configured with, not taken from an
+        // example of LEMMA. Rename or remove it if the vocabulary should differ.
+        Proxy {
+            operation environments = "nginx" default;
+
+            service properties {
+                string hostname;
+                int port;
+                string imageType;
+            }
+        }
     }
 }

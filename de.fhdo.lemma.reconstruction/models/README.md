@@ -45,7 +45,32 @@ else, so a reconstruction that emits containers alone produces a model that
 validates. Both declare the deployment technology as `Kubernetes`, so moving
 from one to the other changes the import, not the references into it.
 
-An infrastructure node is unaffected either way: it deploys nothing, the check
-reads `0 < 0`, and `spring.technology` already declares a `SpringBootAdmin`
-infrastructure technology for the node the reconstruction finds in Lakeside
-Mutual's Compose specification.
+An infrastructure node is unaffected either way: it deploys nothing, so the
+check reads `0 < 0`.
+
+## Infrastructure technologies
+
+`spring.technology` declares one per kind of infrastructure the reconstruction
+recognises, and **the name matters**: the generator assigns a node the
+technology of the node's own name, so `Eureka` becomes
+`javaWithSpring::_infrastructure.Eureka`. Supporting another kind of
+infrastructure is therefore a declaration here rather than a change to the
+generator.
+
+| Technology | Role |
+|---|---|
+| `SpringBootAdmin` | monitoring |
+| `Eureka` | service discovery |
+| `Zuul` | API gateway |
+| `Proxy` | reverse proxy |
+
+`Eureka` and `Zuul` follow the technology models of LEMMA's own examples, which
+declare the same properties. `Proxy` does not: nothing in the examples covers a
+reverse proxy, and one is declared here only because the reconstruction
+recognises nginx in Lakeside Mutual and an infrastructure node must name a
+technology. Its properties are a guess and are not mandatory.
+
+A node whose name no technology matches yields a reference that does not
+resolve, which the editor reports on the generated model. That is deliberate:
+it names the declaration that is missing, rather than silently assigning the
+wrong technology.
