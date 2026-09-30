@@ -1,6 +1,8 @@
 package de.fhdo.lemma.reconstruction.operation
 
 import de.fhdo.lemma.operation.OperationModel
+import de.fhdo.lemma.data.DataFactory
+import de.fhdo.lemma.operation.Container
 import de.fhdo.lemma.operation.OperationFactory
 import de.fhdo.lemma.service.ImportType
 import de.fhdo.lemma.service.ServiceFactory
@@ -24,6 +26,7 @@ class LemmaOperationGenerator {
     static val OPERATION_FACTORY = OperationFactory.eINSTANCE
     static val SERVICE_FACTORY = ServiceFactory.eINSTANCE
     static val TECHNOLOGY_FACTORY = TechnologyFactory.eINSTANCE
+    static val DATA_FACTORY = DataFactory.eINSTANCE
 
     /**
      * Alias and location of the technology model the generated nodes
@@ -32,7 +35,13 @@ class LemmaOperationGenerator {
      * and the strict model marks two of them as mandatory.
      */
     static val TECHNOLOGY_ALIAS = "deploymentBase"
-    static val TECHNOLOGY_MODEL = "deployment_base_relaxed.technology"
+    static val TECHNOLOGY_MODEL = "deployment_base.technology"
+
+    /**
+     * Meta-data name under which the reconstruction reports the configuration
+     * of a node, already keyed by the names a technology model declares.
+     */
+    static val SERVICE_PROPERTIES = "ServiceProperties"
     static val DEPLOYMENT_TECHNOLOGY = "Kubernetes"
 
     /**
@@ -137,6 +146,8 @@ class LemmaOperationGenerator {
         container.operationEnvironment =
             createOperationEnvironment(reconstructedNode.operationEnvironment)
 
+        assignDefaultValues(container, reconstructedNode)
+
         reconstructedNode.deployedServices.forEach[
             val importedMicroservice = OPERATION_FACTORY.createImportedMicroservice
             // Every microservice lives in its own service model, so each needs
@@ -172,7 +183,58 @@ class LemmaOperationGenerator {
         node.operationEnvironment =
             createOperationEnvironment(reconstructedNode.operationEnvironment)
 
+        // The configuration is not carried over to an infrastructure node. Its
+        // service properties are declared by its infrastructure technology,
+        // which names them differently - SpringBootAdmin declares
+        // applicationName and port where a deployment technology declares
+        // springApplicationName and serverPort - so the values the
+        // reconstruction reports would refer to properties that do not exist.
+
         return node
+    }
+
+    /**
+     * Assign the configuration of a node as the default values of its service
+     * properties.
+     *
+     * The reconstruction reports them under the names a technology model
+     * declares, so the name is carried over unchanged. A value the model does
+     * not declare is written all the same and reported by the editor, which
+     * names the missing declaration rather than dropping what was found.
+     */
+    private def assignDefaultValues(Container container,
+        OperationNode reconstructedNode) {
+        val configuration = reconstructedNode.metaData.findFirst[
+            name == SERVICE_PROPERTIES
+        ]
+        if (configuration === null || configuration.values.nullOrEmpty) {
+            return
+        }
+
+        configuration.values.forEach[ propertyName, value |
+            val property = TECHNOLOGY_FACTORY.createTechnologySpecificProperty
+            property.name = propertyName
+
+            val assignment = TECHNOLOGY_FACTORY
+                .createTechnologySpecificPropertyValueAssignment
+            assignment.property = property
+            assignment.value = createPrimitiveValue(value)
+            container.defaultServicePropertyValues.add(assignment)
+        ]
+    }
+
+    /**
+     * Create the value of a property. A configuration is text, so a number is
+     * recognised here rather than reported as one by the reconstruction.
+     */
+    private def createPrimitiveValue(String value) {
+        val primitiveValue = DATA_FACTORY.createPrimitiveValue
+        try {
+            primitiveValue.numericValue = new java.math.BigDecimal(value)
+        } catch (NumberFormatException e) {
+            primitiveValue.stringValue = value
+        }
+        return primitiveValue
     }
 
     /**
