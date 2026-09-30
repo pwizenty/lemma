@@ -6,7 +6,9 @@ import de.fhdo.lemma.service.ImportType
 import de.fhdo.lemma.service.ServiceFactory
 import de.fhdo.lemma.technology.TechnologyFactory
 import java.io.File
+import java.util.HashMap
 import java.util.List
+import org.eclipse.xtend.lib.annotations.Accessors
 
 /**
  * Generator of a LEMMA operation model from reconstructed operation nodes.
@@ -34,13 +36,35 @@ class LemmaOperationGenerator {
     static val DEPLOYMENT_TECHNOLOGY = "Kubernetes"
 
     /**
-     * Name of the infrastructure technology an infrastructure node is assigned
-     * to. Reconstructing which technology a node actually runs is future work,
-     * see the follow-ups of ADR-0008.
+     * Technology model an infrastructure node is assigned a technology from.
+     * The node's own name is the name of the technology, so Eureka becomes
+     * javaWithSpring::_infrastructure.Eureka: a node the reconstruction
+     * recognises by name is one the technology model is expected to declare
+     * under that name, and adding a kind of infrastructure is a change to the
+     * model rather than to this generator.
      */
-    static val INFRASTRUCTURE_TECHNOLOGY = "SpringBootAdmin"
+    static val INFRASTRUCTURE_TECHNOLOGY_ALIAS = "javaWithSpring"
+    static val INFRASTRUCTURE_TECHNOLOGY_MODEL = "spring.technology"
 
     val model = OPERATION_FACTORY.createOperationModel
+
+    /**
+     * Import of the service model of each microservice, by its name. A
+     * microservice is defined in the model named after it, so a container
+     * deploying several of them needs several imports.
+     */
+    val serviceImports = new HashMap<String, de.fhdo.lemma.service.Import>
+
+    /**
+     * Nodes left out because they deploy no microservice, reported by the
+     * wizard so that their absence is visible.
+     */
+    @Accessors(PUBLIC_GETTER)
+    val skippedNodes = <String>newLinkedList
+
+    var de.fhdo.lemma.service.Import infrastructureImport
+
+    var String technologyFolder
 
     /**
      * Generate an operation model from the reconstructed nodes of a system.
@@ -50,24 +74,27 @@ class LemmaOperationGenerator {
      * that model rather than a plain name.
      */
     def OperationModel generateModelFrom(List<OperationNode> reconstructedNodes,
-        String serviceModelName, String technologyFolder) {
+        String technologyFolder) {
+        this.technologyFolder = technologyFolder
         val technologyImport = createImport(TECHNOLOGY_ALIAS,
             '''..«File.separator»«technologyFolder»«File.separator»«TECHNOLOGY_MODEL»'''.toString,
             ImportType.TECHNOLOGY)
         model.imports.add(technologyImport)
 
-        val serviceImport = createImport(serviceModelName,
-            '''..«File.separator»service«File.separator»«serviceModelName».services'''.toString,
-            ImportType.MICROSERVICES)
-        model.imports.add(serviceImport)
-
         reconstructedNodes.forEach[
-            if (nodeType === NodeType.INFRASTRUCTURE)
+            if (nodeType === NodeType.INFRASTRUCTURE) {
                 model.infrastructureNodes.add(
                     generateInfrastructureNodeFrom(it, technologyImport))
-            else
+            } else if (deployedServices.empty) {
+                // A container has to deploy a microservice. A Compose service
+                // with none reconstructed for it - a user interface, say -
+                // cannot be expressed, so it is left out rather than written
+                // as a container the Operation DSL rejects.
+                skippedNodes.add(name)
+            } else {
                 model.containers.add(
-                    generateContainerFrom(it, technologyImport, serviceImport))
+                    generateContainerFrom(it, technologyImport))
+            }
         ]
 
         // A node is referenced by name, so the nodes it depends on can only be
@@ -95,8 +122,7 @@ class LemmaOperationGenerator {
      * reconstructed node.
      */
     private def generateContainerFrom(OperationNode reconstructedNode,
-        de.fhdo.lemma.service.Import technologyImport,
-        de.fhdo.lemma.service.Import serviceImport) {
+        de.fhdo.lemma.service.Import technologyImport) {
         val container = OPERATION_FACTORY.createContainer
         container.name = reconstructedNode.name
         container.technologies.add(technologyImport)
@@ -113,7 +139,9 @@ class LemmaOperationGenerator {
 
         reconstructedNode.deployedServices.forEach[
             val importedMicroservice = OPERATION_FACTORY.createImportedMicroservice
-            importedMicroservice.^import = serviceImport
+            // Every microservice lives in its own service model, so each needs
+            // the import of that model rather than one shared import.
+            importedMicroservice.^import = serviceImportFor(name)
             importedMicroservice.microservice = createMicroservice(qualifiedName)
             container.deployedServices.add(importedMicroservice)
         ]
@@ -125,16 +153,19 @@ class LemmaOperationGenerator {
      * Generate an infrastructure node.
      */
     private def generateInfrastructureNodeFrom(OperationNode reconstructedNode,
-        de.fhdo.lemma.service.Import technologyImport) {
+        de.fhdo.lemma.service.Import deploymentImport) {
         val node = OPERATION_FACTORY.createInfrastructureNode
         node.name = reconstructedNode.name
-        node.technologies.add(technologyImport)
+        node.technologies.add(deploymentImport)
+
+        val technologyOfNode = infrastructureTechnologyImport
+        node.technologies.add(technologyOfNode)
 
         val infrastructureTechnology = TECHNOLOGY_FACTORY
             .createInfrastructureTechnology
-        infrastructureTechnology.name = INFRASTRUCTURE_TECHNOLOGY
+        infrastructureTechnology.name = reconstructedNode.name
         val reference = OPERATION_FACTORY.createInfrastructureTechnologyReference
-        reference.^import = technologyImport
+        reference.^import = technologyOfNode
         reference.infrastructureTechnology = infrastructureTechnology
         node.infrastructureTechnology = reference
 
@@ -164,6 +195,37 @@ class LemmaOperationGenerator {
         val microservice = SERVICE_FACTORY.createMicroservice
         microservice.name = qualifiedName
         return microservice
+    }
+
+    /**
+     * The import of the technology model the infrastructure technologies are
+     * declared in, created on first use.
+     */
+    private def getInfrastructureTechnologyImport() {
+        if (infrastructureImport === null) {
+            infrastructureImport = createImport(INFRASTRUCTURE_TECHNOLOGY_ALIAS,
+                '''..«File.separator»«technologyFolder»«File.separator»«
+                    »«INFRASTRUCTURE_TECHNOLOGY_MODEL»'''.toString,
+                ImportType.TECHNOLOGY)
+            model.imports.add(infrastructureImport)
+        }
+        return infrastructureImport
+    }
+
+    /**
+     * The import of the service model a microservice is defined in, created on
+     * first use.
+     */
+    private def serviceImportFor(String microserviceName) {
+        if (!serviceImports.containsKey(microserviceName)) {
+            val ^import = createImport(microserviceName,
+                '''..«File.separator»service«File.separator»«microserviceName».services'''
+                    .toString,
+                ImportType.MICROSERVICES)
+            model.imports.add(^import)
+            serviceImports.put(microserviceName, ^import)
+        }
+        return serviceImports.get(microserviceName)
     }
 
     private def createImport(String name, String importUri, ImportType type) {

@@ -1,5 +1,7 @@
+import technology from "../technology/spring.technology" as javaWithSpring
 import datatypes from "../domain/StationService.data" as StationService
 
+@technology(javaWithSpring)
 public functional microservice de.dmsa.parkandcharge.station.StationService {
     interface StationEvent {
         receive( sync in event : StationService::StationService.BookingEventMessage);

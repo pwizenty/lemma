@@ -32,9 +32,10 @@ import java.util.stream.Collectors
  *
  * <pre>
  * test/
- *   fixtures/&lt;system&gt;/documents.json     the input, exported from MRF
- *   expected/&lt;system&gt;/domain/*.data      the accepted domain models
- *   expected/&lt;system&gt;/service/*.services the accepted service models
+ *   fixtures/&lt;system&gt;/documents.json        the input, exported from MRF
+ *   expected/&lt;system&gt;/domain/*.data         the accepted domain models
+ *   expected/&lt;system&gt;/service/*.services    the accepted service models
+ *   expected/&lt;system&gt;/technology/*.technology  copied, not compared
  * </pre>
  *
  * Arguments:
@@ -50,6 +51,12 @@ import java.util.stream.Collectors
 class ReconstructionRegressionTest {
     static val MAPPER = new ObjectMapper()
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+
+    /**
+     * Folder the technology models are copied into, beside the generated ones.
+     * The generators build their imports from the same name.
+     */
+    static val TECHNOLOGY_FOLDER = "technology"
 
     def static void main(String[] args) {
         val arguments = Arrays.asList(args)
@@ -115,6 +122,11 @@ class ReconstructionRegressionTest {
      */
     private def static void generateModels(JsonNode documents, Path targetFolder) {
         val target = targetFolder.toAbsolutePath.toString
+
+        // A generated model imports its technology model relative to itself, so
+        // the models have to sit beside it here as well - the wizard copies
+        // them for the folder it writes to, and this is that folder.
+        ReconstructionModelWriter.copyTechnologyModels(target, TECHNOLOGY_FOLDER)
 
         documents.get("context")?.forEach[
             val context = MAPPER.treeToValue(it, Context)
@@ -214,7 +226,10 @@ class ReconstructionRegressionTest {
         try {
             models.addAll(stream
                 .filter[Files.isRegularFile(it)]
-                .filter[toString.endsWith(".data") || toString.endsWith(".services")]
+                .filter[
+                    toString.endsWith(".data") || toString.endsWith(".services")
+                        || toString.endsWith(".operation")
+                ]
                 .sorted
                 .collect(Collectors.toList))
         } finally {

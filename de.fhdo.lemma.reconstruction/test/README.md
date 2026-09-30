@@ -8,10 +8,18 @@ Application**, with this bundle as the working directory.
 
 ```
 test/
-  fixtures/<system>/documents.json      input: the documents MRF writes to MongoDB
-  expected/<system>/domain/*.data       accepted domain models
-  expected/<system>/service/*.services  accepted service models
+  fixtures/<system>/documents.json           input: the documents MRF writes to MongoDB
+  expected/<system>/domain/*.data            accepted domain models
+  expected/<system>/service/*.services       accepted service models
+  expected/<system>/technology/*.technology  copied beside them, never compared
 ```
+
+A generated model imports its technology model by a relative path, so the
+technology models are copied into every system's folder, exactly as the wizard
+copies them into the folder it writes to. Without them the imports of an
+accepted model do not resolve and the folder shows errors although the models
+are right. They are inputs rather than output, so the comparison ignores
+them.
 
 The test runs the same generators (`LemmaDomainGenerator`,
 `LemmaServiceGenerator`) and the same writer (`ReconstructionModelWriter`,

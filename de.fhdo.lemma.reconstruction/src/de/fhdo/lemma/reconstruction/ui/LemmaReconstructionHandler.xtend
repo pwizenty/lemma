@@ -30,6 +30,13 @@ import de.fhdo.lemma.operation.OperationModel
  */
 class LemmaReconstructionHandler extends AbstractHandler {
     /**
+     * Name of the generated operation model. All nodes of a system go into one
+     * model, so it is named after the architecture rather than after any of
+     * the microservices it deploys.
+     */
+    static val OPERATION_MODEL_NAME = "architecture"
+
+    /**
      * Current shell
      */
     static val SHELL = PlatformUI.workbench.activeWorkbenchWindow.shell
@@ -49,6 +56,7 @@ class LemmaReconstructionHandler extends AbstractHandler {
 
     List<OperationNode> operationNodes = newLinkedList
     List<OperationNode> selectedOperationNodes = newLinkedList
+    List<String> skippedOperationNodes = newLinkedList
 
     boolean copyTechnologyModels = true
     String technologyFolder
@@ -192,7 +200,8 @@ class LemmaReconstructionHandler extends AbstractHandler {
             // A generator collects its microservices in one service model, so
             // every microservice needs its own generator to end up in its own
             // model and therefore in its own file.
-            val model = new LemmaServiceGenerator().generateModelFrom(it)
+            val model = new LemmaServiceGenerator().generateModelFrom(it,
+                technologyFolder)
             serviceModels.add(model)
         ]
     }
@@ -203,12 +212,12 @@ class LemmaReconstructionHandler extends AbstractHandler {
 	 * models would need an import of the other model.
 	 */
     private def generateOperationModels() {
-        if (selectedOperationNodes.nullOrEmpty || selectedMicroservices.nullOrEmpty) {
+        if (selectedOperationNodes.nullOrEmpty) {
             return
         }
-        val serviceModelName = selectedMicroservices.get(0).name.split("\\W").lastOrNull
-        val model = new LemmaOperationGenerator().generateModelFrom(selectedOperationNodes,
-            serviceModelName, technologyFolder)
+        val generator = new LemmaOperationGenerator()
+        val model = generator.generateModelFrom(selectedOperationNodes, technologyFolder)
+        skippedOperationNodes.addAll(generator.skippedNodes)
         operationModels.add(model)
     }
 
@@ -245,8 +254,8 @@ class LemmaReconstructionHandler extends AbstractHandler {
 	 * Configuration and specific execution to write LEMMA operation models to the selected folder 
 	 */
 	private def writeOperationModel(OperationModel model) {
-        val fileName = selectedMicroservices.get(0).name.split("\\W").lastOrNull
-        ReconstructionModelWriter.writeOperationModel(model, fileName, reconstructionPath)
+        ReconstructionModelWriter.writeOperationModel(model, OPERATION_MODEL_NAME,
+            reconstructionPath)
     }
 
 	/**
@@ -266,12 +275,16 @@ class LemmaReconstructionHandler extends AbstractHandler {
             generatedLemmaModels.add('''«it.name.split("\\W").lastOrNull».services''')
         ]
 
-        if (!operationModels.nullOrEmpty && !selectedMicroservices.nullOrEmpty)
-            generatedLemmaModels.add(
-                '''«selectedMicroservices.get(0).name.split("\\W").lastOrNull».operation''')
+        if (!operationModels.nullOrEmpty)
+            generatedLemmaModels.add('''«OPERATION_MODEL_NAME».operation''')
 
         copiedTechnologyModels.forEach[
             generatedLemmaModels.add('''«technologyFolder»«File.separator»«it» (copied)''')
+        ]
+
+        skippedOperationNodes.forEach[
+            generatedLemmaModels.add(
+                '''«it» (left out, it deploys no reconstructed microservice)''')
         ]
 
         val messageText = "Generated Models:"
@@ -299,6 +312,7 @@ class LemmaReconstructionHandler extends AbstractHandler {
         serviceModels.clear
         operationNodes.clear
         selectedOperationNodes.clear
+        skippedOperationNodes.clear
         technologyFolder = null
         copiedTechnologyModels.clear
         operationModels.clear

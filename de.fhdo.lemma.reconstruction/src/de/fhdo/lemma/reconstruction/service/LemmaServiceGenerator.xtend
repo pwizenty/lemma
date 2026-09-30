@@ -11,8 +11,11 @@ import de.fhdo.lemma.reconstruction.domain.ComplexType
 import java.io.File
 import de.fhdo.lemma.service.ImportType
 import de.fhdo.lemma.data.DataFactory
+import de.fhdo.lemma.data.PrimitiveUnspecified
 import de.fhdo.lemma.reconstruction.domain.ClassType
 import de.fhdo.lemma.service.ImportedType
+import de.fhdo.lemma.technology.TechnologyFactory
+import de.fhdo.lemma.reconstruction.util.TechnologyTypes
 
 class LemmaServiceGenerator {
     static val SERVICE_FACTORY = ServiceFactory.eINSTANCE
@@ -26,9 +29,30 @@ class LemmaServiceGenerator {
     static val VISIBILITY_NAMES = #{"public", "internal", "architecture"}
     static val MICROSERVICE_TYPE_NAMES = #{"functional", "utility", "infrastructure"}
 
+    static val TECHNOLOGY_FACTORY = TechnologyFactory.eINSTANCE
+
+    /**
+     * Alias and model of the technology the generated services reference. A
+     * type the reconstruction has no source for, such as Spring's
+     * Authentication, is left unspecified unless this model declares it.
+     */
+    static val TECHNOLOGY_ALIAS = "javaWithSpring"
+    static val TECHNOLOGY_MODEL = "spring.technology"
+
     val model = SERVICE_FACTORY.createServiceModel
 
+    var de.fhdo.lemma.service.Import technologyImport
+
     def ServiceModel generateModelFrom(Microservice reconstructedMicroservice) {
+        generateModelFrom(reconstructedMicroservice, "technology")
+    }
+
+    /**
+     * Generate a service model, with the technology model in the given folder.
+     */
+    def ServiceModel generateModelFrom(Microservice reconstructedMicroservice,
+        String technologyFolder) {
+        technologyImport = createTechnologyImport(technologyFolder)
 
         val microservice = generateMicroserviceFrom(reconstructedMicroservice)
         model.microservices.add(microservice)
@@ -39,6 +63,11 @@ class LemmaServiceGenerator {
     private def generateMicroserviceFrom(Microservice reconstructedMicroservice) {
         val microservice = SERVICE_FACTORY.createMicroservice
         microservice.name = reconstructedMicroservice.qualifedName
+        if (technologyImport !== null) {
+            val reference = SERVICE_FACTORY.createTechnologyReference
+            reference.technology = technologyImport
+            microservice.technologyReferences.add(reference)
+        }
         microservice.version = reconstructedMicroservice.version
         microservice.visibility = deriveLemmaVisibility(
             reconstructedMicroservice.visibility
@@ -121,6 +150,15 @@ class LemmaServiceGenerator {
             }
 
         ]
+
+        // A parameter of an unspecified type is only allowed in an operation
+        // that is marked as not implemented, so a reconstruction that could
+        // not resolve a type says so rather than writing a model the Service
+        // DSL rejects.
+        if (operation.parameters.exists[primitiveType instanceof PrimitiveUnspecified]) {
+            operation.notImplemented = true
+        }
+
         return operation
     }
 
@@ -139,12 +177,73 @@ class LemmaServiceGenerator {
             parameter.primitiveType
                 = Util.getPrimitiveFrom(reconstructedParameter.primitiveType.name)
         } else if (reconstructedParameter.complexType.classType === ClassType.UNSPECIFIED) {
-            parameter.primitiveType = DATA_FACTORY.createPrimitiveUnspecified
+            // A type the reconstruction has no source for. The technology
+            // model may declare it; otherwise it stays unspecified, because a
+            // reference the model cannot resolve is worse than a known gap.
+            val technologyType = createTechnologyType(reconstructedParameter.complexType.name)
+            if (technologyType !== null) {
+                parameter.importedType = technologyType
+            } else {
+                parameter.primitiveType = DATA_FACTORY.createPrimitiveUnspecified
+            }
         } else {
             parameter.importedType = deriveImportedType(reconstructedParameter.complexType) as ImportedType
         }
 
         return parameter
+    }
+
+    /**
+     * Create the import of the technology model the services reference.
+     */
+    private def createTechnologyImport(String technologyFolder) {
+        val ^import = SERVICE_FACTORY.createImport
+        ^import.name = TECHNOLOGY_ALIAS
+        ^import.importURI =
+            '''..«File.separator»«technologyFolder»«File.separator»«TECHNOLOGY_MODEL»'''.toString
+        ^import.importType = ImportType.TECHNOLOGY
+        model.imports.add(^import)
+        return ^import
+    }
+
+    /**
+     * Create a reference to a type of the technology model, or null when the
+     * model does not declare a type of that name.
+     */
+    private def createTechnologyType(String name) {
+        if (technologyImport === null || name.nullOrEmpty) {
+            return null
+        }
+        val kind = TechnologyTypes.declaredTypes(TECHNOLOGY_MODEL).get(name)
+        if (kind === null) {
+            return null
+        }
+
+        val importedType = SERVICE_FACTORY.createImportedType
+        importedType.^import = technologyImport
+
+        // The name is set in each branch on purpose: the three types share
+        // only de.fhdo.lemma.data.Type, which carries no name, so a common
+        // variable for them could not be named.
+        switch (kind) {
+            case PRIMITIVE: {
+                val type = TECHNOLOGY_FACTORY.createTechnologySpecificPrimitiveType
+                type.name = name
+                importedType.type = type
+            }
+            case COLLECTION: {
+                val type = TECHNOLOGY_FACTORY.createTechnologySpecificCollectionType
+                type.name = name
+                importedType.type = type
+            }
+            case STRUCTURE: {
+                val type = TECHNOLOGY_FACTORY.createTechnologySpecificDataStructure
+                type.name = name
+                importedType.type = type
+            }
+        }
+
+        return importedType
     }
 
     private def deriveExchangePattern(String pattern) {
