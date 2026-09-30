@@ -1,5 +1,7 @@
+import technology from "../technology/spring.technology" as javaWithSpring
 import datatypes from "../domain/CustomerCore.data" as CustomerCore
 
+@technology(javaWithSpring)
 public functional microservice com.lakesidemutual.customercore.CustomerCore {
     interface CityReferenceDataHolder {
         getCitiesForPostalCode( sync in postalCode : string,  sync out citiesResponseDto : CustomerCore::CustomerCore.CitiesResponseDto);
@@ -12,6 +14,6 @@ public functional microservice com.lakesidemutual.customercore.CustomerCore {
         createCustomer( sync in requestDto : CustomerCore::CustomerCore.CustomerProfileUpdateRequestDto,  sync out customerResponseDto : CustomerCore::CustomerCore.CustomerResponseDto);
     }
     interface OldCustomerInformationHolder {
-        getCustomer( sync in ids : string,  sync in ^fields : string,  sync out responseEntity : unspecified);
+        noimpl getCustomer( sync in ids : string,  sync in ^fields : string,  sync out responseEntity : unspecified);
     }
 }
