@@ -92,17 +92,104 @@ class LemmaServiceGenerator {
         generateModelFrom(reconstructedMicroservice, "technology")
     }
 
-    /**
-     * Generate a service model, with the technology model in the given folder.
-     */
     def ServiceModel generateModelFrom(Microservice reconstructedMicroservice,
         String technologyFolder) {
+        generateModelFrom(reconstructedMicroservice, technologyFolder, emptyList)
+    }
+
+    /**
+     * Generate a service model, with the technology model in the given folder.
+     *
+     * The other microservices of the system are needed to state what this one
+     * requires of them: a dependency is resolved against the callee's interfaces
+     * and operations, which only the callee's own reconstruction holds. Passing
+     * none yields a model without dependencies rather than an error, which is
+     * what the two-argument form does.
+     */
+    def ServiceModel generateModelFrom(Microservice reconstructedMicroservice,
+        String technologyFolder, List<Microservice> otherMicroservices) {
         technologyImport = createTechnologyImport(technologyFolder)
 
         val microservice = generateMicroserviceFrom(reconstructedMicroservice)
+        assignRequired(microservice, reconstructedMicroservice, otherMicroservices)
         model.microservices.add(microservice)
 
         return model
+    }
+
+    /**
+     * State what the microservice requires of the others of its system.
+     *
+     * One level per callee, the finest that resolves - see [[ServiceDependencies]].
+     * The levels are alternatives: requiring an operation whose interface or
+     * microservice is also required is redundant, and the validation says so.
+     */
+    private def assignRequired(de.fhdo.lemma.service.Microservice microservice,
+        Microservice reconstructedMicroservice, List<Microservice> otherMicroservices) {
+        ServiceDependencies.of(reconstructedMicroservice, otherMicroservices).forEach[
+            dependency |
+            val ^import = createServiceImport(dependency)
+            switch (dependency.level) {
+                case OPERATION: dependency.required.forEach[ name |
+                    val reference = SERVICE_FACTORY.createPossiblyImportedOperation
+                    reference.^import = ^import
+                    reference.operation = createOperationReference(name)
+                    microservice.requiredOperations.add(reference)
+                ]
+                case INTERFACE: dependency.required.forEach[ name |
+                    val reference = SERVICE_FACTORY.createPossiblyImportedInterface
+                    reference.^import = ^import
+                    reference.^interface = createInterfaceReference(name)
+                    microservice.requiredInterfaces.add(reference)
+                ]
+                case MICROSERVICE: dependency.required.forEach[ name |
+                    val reference = SERVICE_FACTORY.createPossiblyImportedMicroservice
+                    reference.^import = ^import
+                    reference.microservice = createMicroserviceReference(name)
+                    microservice.requiredMicroservices.add(reference)
+                ]
+            }
+        ]
+    }
+
+    /**
+     * Import of the service model of a callee, created once per callee. The
+     * models of a system lie beside each other, so the URI is a file name.
+     */
+    private def createServiceImport(ServiceDependencies.Dependency dependency) {
+        val alias = ServiceDependencies.aliasOf(dependency)
+        var ^import = model.imports.findFirst[name == alias]
+        if (^import === null) {
+            ^import = SERVICE_FACTORY.createImport
+            ^import.name = alias
+            ^import.importURI = ServiceDependencies.importUriOf(dependency)
+            ^import.importType = ImportType.MICROSERVICES
+            model.imports.add(^import)
+        }
+        return ^import
+    }
+
+    /**
+     * The referenced elements are detached, as everywhere in this generator: the
+     * extractor writes their names, and the reference resolves when the written
+     * model is read back.
+     */
+    private def createMicroserviceReference(String qualifiedName) {
+        val microservice = SERVICE_FACTORY.createMicroservice
+        microservice.name = qualifiedName
+        return microservice
+    }
+
+    private def createInterfaceReference(String qualifiedName) {
+        val interfaze = SERVICE_FACTORY.createInterface
+        interfaze.name = qualifiedName
+        return interfaze
+    }
+
+    private def createOperationReference(String qualifiedName) {
+        val operation = SERVICE_FACTORY.createOperation
+        operation.name = qualifiedName
+        return operation
     }
 
     private def generateMicroserviceFrom(Microservice reconstructedMicroservice) {

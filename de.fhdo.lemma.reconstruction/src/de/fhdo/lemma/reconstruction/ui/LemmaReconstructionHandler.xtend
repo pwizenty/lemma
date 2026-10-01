@@ -176,10 +176,13 @@ class LemmaReconstructionHandler extends AbstractHandler {
 	 * Generate the models based on the previous selection
 	 */
     private def generateModels() {
-    	if (!selectedContexts.nullOrEmpty)
-        	generateDomainModels
-        	generateServiceModels
-        	generateOperationModels
+        // No guard on the contexts: the condition used to be written without
+        // braces, so it only ever guarded the first of the three calls, and each
+        // generator already does nothing when its own selection is empty. What
+        // is selected is generated, independently of the rest.
+        generateDomainModels
+        generateServiceModels
+        generateOperationModels
     }
 
 	/**
@@ -199,9 +202,11 @@ class LemmaReconstructionHandler extends AbstractHandler {
         selectedMicroservices.forEach[
             // A generator collects its microservices in one service model, so
             // every microservice needs its own generator to end up in its own
-            // model and therefore in its own file.
+            // model and therefore in its own file. All of them are handed over
+            // all the same: what a service requires of another is resolved
+            // against the callee's interfaces and operations.
             val model = new LemmaServiceGenerator().generateModelFrom(it,
-                technologyFolder)
+                technologyFolder, selectedMicroservices)
             serviceModels.add(model)
         ]
     }

@@ -134,11 +134,17 @@ class ReconstructionRegressionTest {
             ReconstructionModelWriter.writeDataModel(model, target)
         ]
 
+        val microservices = newArrayList
         documents.get("microservice")?.forEach[
-            val microservice = MAPPER.treeToValue(it, Microservice)
+            microservices.add(MAPPER.treeToValue(it, Microservice))
+        ]
+        microservices.forEach[
             // One generator per microservice: a generator collects all of its
-            // microservices in a single service model.
-            val model = new LemmaServiceGenerator().generateModelFrom(microservice)
+            // microservices in a single service model. Every microservice is
+            // handed over all the same, because what one requires of another is
+            // resolved against the callee's interfaces and operations.
+            val model = new LemmaServiceGenerator().generateModelFrom(it,
+                TECHNOLOGY_FOLDER, microservices)
             ReconstructionModelWriter.writeServiceModel(model, target)
         ]
     }

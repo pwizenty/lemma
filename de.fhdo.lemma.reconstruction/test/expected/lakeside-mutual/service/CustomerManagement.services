@@ -1,9 +1,16 @@
 import technology from "../technology/spring.technology" as javaWithSpring
 import datatypes from "../domain/CustomerManagement.data" as CustomerManagement
+import microservices from "CustomerCore.services" as CustomerCore
 
 @technology(javaWithSpring)
 @javaWithSpring::_aspects.ServiceCommunicationTransport(transport = "plaintext")
 public functional microservice com.lakesidemutual.customermanagement.CustomerManagement {
+    required operations {
+        CustomerCore::com.lakesidemutual.customercore.CustomerCore.CustomerInformationHolder.getCustomer,
+        CustomerCore::com.lakesidemutual.customercore.CustomerCore.CustomerInformationHolder.getCustomers,
+        CustomerCore::com.lakesidemutual.customercore.CustomerCore.CustomerInformationHolder.updateCustomer
+    }
+
     @endpoints(javaWithSpring::_protocols.rest:"/notifications";)
     interface NotificationInformationHolder {
         @javaWithSpring::_aspects.GetMapping

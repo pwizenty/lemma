@@ -3552,7 +3552,8 @@
             "artifactType": "SOURCE",
             "snippet": "@Value(\"${customercore.baseURL}\")",
             "property": "customercore.baseURL",
-            "resolvedUrl": "http://localhost:8110"
+            "resolvedUrl": "http://localhost:8110",
+            "targetQualifiedName": "com.lakesidemutual.customercore.CustomerCore"
           }
         },
         {
@@ -4375,7 +4376,8 @@
             "artifactType": "SOURCE",
             "snippet": "@Value(\"${customercore.baseURL}\")",
             "property": "customercore.baseURL",
-            "resolvedUrl": "http://localhost:8110"
+            "resolvedUrl": "http://localhost:8110",
+            "targetQualifiedName": "com.lakesidemutual.customercore.CustomerCore"
           }
         },
         {
@@ -5222,7 +5224,53 @@
             "artifactType": "SOURCE",
             "snippet": "@FeignClient(name=\"customercore\", url=\"${customercore.baseURL}\", configuration=CustomerCoreClientConfiguration.class)",
             "property": "customercore.baseURL",
-            "resolvedUrl": "http://localhost:8110"
+            "resolvedUrl": "http://localhost:8110",
+            "targetQualifiedName": "com.lakesidemutual.customercore.CustomerCore"
+          }
+        },
+        {
+          "name": "ServiceCallEndpoint",
+          "values": {
+            "target": "CustomerCore",
+            "targetQualifiedName": "com.lakesidemutual.customercore.CustomerCore",
+            "verb": "GetMapping",
+            "path": "/customers",
+            "method": "getCustomers",
+            "technology": "Feign",
+            "file": "customer-management-backend/src/main/java/com/lakesidemutual/customermanagement/infrastructure/CustomerCoreClient.java",
+            "line": "22",
+            "artifactType": "SOURCE",
+            "snippet": "@GetMapping(value = \"/customers\")"
+          }
+        },
+        {
+          "name": "ServiceCallEndpoint",
+          "values": {
+            "target": "CustomerCore",
+            "targetQualifiedName": "com.lakesidemutual.customercore.CustomerCore",
+            "verb": "PutMapping",
+            "path": "/customers/{customerId}",
+            "method": "updateCustomer",
+            "technology": "Feign",
+            "file": "customer-management-backend/src/main/java/com/lakesidemutual/customermanagement/infrastructure/CustomerCoreClient.java",
+            "line": "32",
+            "artifactType": "SOURCE",
+            "snippet": "@PutMapping(value = \"/customers/{customerId}\")"
+          }
+        },
+        {
+          "name": "ServiceCallEndpoint",
+          "values": {
+            "target": "CustomerCore",
+            "targetQualifiedName": "com.lakesidemutual.customercore.CustomerCore",
+            "verb": "GetMapping",
+            "path": "/customers/{ids}",
+            "method": "getCustomer",
+            "technology": "Feign",
+            "file": "customer-management-backend/src/main/java/com/lakesidemutual/customermanagement/infrastructure/CustomerCoreClient.java",
+            "line": "28",
+            "artifactType": "SOURCE",
+            "snippet": "@GetMapping(value = \"/customers/{ids}\")"
           }
         },
         {
