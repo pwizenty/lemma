@@ -1,4 +1,16 @@
 context CustomerCore {
+    structure CustomerProfileEntity<entity> {
+        long serialVersionUID,
+        long id<identifier>,
+        string firstname,
+        string lastname,
+        date birthday,
+        string email,
+        string phoneNumber,
+        Address currentAddress,
+        MoveHistory moveHistory
+    }
+    
     structure Address<entity> {
         long id<identifier>,
         string streetAddress,
@@ -14,22 +26,6 @@ context CustomerCore {
     structure CustomerAggregateRoot<entity> {
         CustomerId id<identifier>,
         CustomerProfileEntity customerProfile
-    }
-    
-    structure CustomerProfileEntity<entity> {
-        long serialVersionUID,
-        long id<identifier>,
-        string firstname,
-        string lastname,
-        date birthday,
-        string email,
-        string phoneNumber,
-        Address currentAddress,
-        MoveHistory moveHistory
-    }
-    
-    structure CitiesResponseDto {
-        string CitiesList
     }
     
     structure CustomerResponseDto {
@@ -74,9 +70,13 @@ context CustomerCore {
         string city
     }
     
-    collection CitiesList { unspecified }
+    structure CitiesResponseDto {
+        string CitiesList
+    }
     
     collection CustomersList { unspecified }
+    
+    collection CitiesList { unspecified }
     
     structure MoveHistory {
         unspecified moveHistory

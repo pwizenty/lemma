@@ -9,13 +9,20 @@ import de.fhdo.lemma.reconstruction.util.Util
 import de.fhdo.lemma.service.MicroserviceType
 import de.fhdo.lemma.reconstruction.domain.ComplexType
 import java.io.File
+import java.math.BigDecimal
 import de.fhdo.lemma.service.ImportType
 import de.fhdo.lemma.data.DataFactory
 import de.fhdo.lemma.data.PrimitiveUnspecified
 import de.fhdo.lemma.reconstruction.domain.ClassType
 import de.fhdo.lemma.service.ImportedType
 import de.fhdo.lemma.technology.TechnologyFactory
+import de.fhdo.lemma.reconstruction.util.TechnologyAspects
 import de.fhdo.lemma.reconstruction.util.TechnologyTypes
+import de.fhdo.lemma.reconstruction.domain.MetaData
+import de.fhdo.lemma.service.Endpoint
+import de.fhdo.lemma.service.ImportedServiceAspect
+import de.fhdo.lemma.technology.Technology
+import java.util.List
 
 class LemmaServiceGenerator {
     static val SERVICE_FACTORY = ServiceFactory.eINSTANCE
@@ -39,9 +46,46 @@ class LemmaServiceGenerator {
     static val TECHNOLOGY_ALIAS = "javaWithSpring"
     static val TECHNOLOGY_MODEL = "spring.technology"
 
+    /**
+     * Protocol the endpoints of a reconstructed interface are declared for. The
+     * reconstruction reads the REST interfaces of a system, so every address it
+     * finds is a REST address.
+     */
+    static val PROTOCOL = "rest"
+
+    /**
+     * Meta-data name under which the reconstruction reports an endpoint, and
+     * the key its address is held under.
+     *
+     * An endpoint is no annotation, so it is reported under a name of its own.
+     * Its address is relative to the element above it, in the reconstruction as
+     * in LEMMA, so it is carried over unchanged.
+     */
+    static val ENDPOINT = "Endpoint"
+    static val ENDPOINT_ADDRESS = "address"
+
+    /**
+     * Join points of the Technology DSL, under which a technology model
+     * declares which of its service aspects may be assigned where.
+     */
+    static val INTERFACES = "interfaces"
+    static val OPERATIONS = "operations"
+    static val PARAMETERS = "parameters"
+
     val model = SERVICE_FACTORY.createServiceModel
 
     var de.fhdo.lemma.service.Import technologyImport
+
+    /**
+     * The technology the generated references belong to.
+     *
+     * A reference to a protocol or to an aspect is extracted with the name of
+     * its technology in front of it, so the technology has to exist even though
+     * the generated model refers to it through the import. Both names are the
+     * same string here, because the import is created under the name of the
+     * technology it imports.
+     */
+    var Technology technology
 
     def ServiceModel generateModelFrom(Microservice reconstructedMicroservice) {
         generateModelFrom(reconstructedMicroservice, "technology")
@@ -100,12 +144,21 @@ class LemmaServiceGenerator {
         }
     }
 
-    private def generateInterfaceFrom(Interface generatedInterface) {
+    private def generateInterfaceFrom(Interface reconstructedInterface) {
         val interfaze = SERVICE_FACTORY.createInterface
-        interfaze.name = generatedInterface.name.split("\\W").lastOrNull
-        interfaze.version = generatedInterface.version
-        interfaze.visibility = deriveLemmaVisibility(generatedInterface.visibility)
-        generatedInterface.operations.forall[
+        interfaze.name = reconstructedInterface.name.split("\\W").lastOrNull
+        interfaze.version = reconstructedInterface.version
+        interfaze.visibility = deriveLemmaVisibility(reconstructedInterface.visibility)
+
+        // The path of the controller the interface was reconstructed from. The
+        // addresses of its operations are read below it.
+        assignEndpoint(interfaze.endpoints, reconstructedInterface.metaData)
+        assignAspects(interfaze.aspects, reconstructedInterface.metaData, INTERFACES)
+
+        // forEach rather than forall: the latter is a predicate that stops at
+        // the first element it is false for, and it only worked here because
+        // adding to a list happens to return true.
+        reconstructedInterface.operations.forEach[
             interfaze.operations.add(generateOperationFrom(it))
         ]
         return interfaze
@@ -159,6 +212,9 @@ class LemmaServiceGenerator {
             operation.notImplemented = true
         }
 
+        assignEndpoint(operation.endpoints, reconstructedOperation.metaData)
+        assignAspects(operation.aspects, reconstructedOperation.metaData, OPERATIONS)
+
         return operation
     }
 
@@ -190,7 +246,142 @@ class LemmaServiceGenerator {
             parameter.importedType = deriveImportedType(reconstructedParameter.complexType) as ImportedType
         }
 
+        assignAspects(parameter.aspects, reconstructedParameter.metaData, PARAMETERS)
+
         return parameter
+    }
+
+    /**
+     * Assign the endpoint the reconstruction reported for an element.
+     *
+     * Spring writes the path of a controller or of a method into its mapping
+     * annotation, and LEMMA writes it as the address of an endpoint. Both read
+     * an address relative to the element above it, so the address is carried
+     * over unchanged: "/customers" on the interface and "/{customerId}" on the
+     * operation together address "/customers/{customerId}".
+     */
+    private def assignEndpoint(List<Endpoint> endpoints, List<MetaData> metaData) {
+        if (technologyImport === null || metaData.nullOrEmpty) {
+            return
+        }
+        val reconstructedEndpoint = metaData.findFirst[name == ENDPOINT]
+        if (reconstructedEndpoint === null || reconstructedEndpoint.values === null) {
+            return
+        }
+        val address = reconstructedEndpoint.values.get(ENDPOINT_ADDRESS)
+        if (address.nullOrEmpty) {
+            return
+        }
+
+        val protocol = TECHNOLOGY_FACTORY.createProtocol
+        protocol.name = PROTOCOL
+        protocol.technology = getOrCreateTechnology
+
+        val importedProtocol = SERVICE_FACTORY.createImportedProtocolAndDataFormat
+        importedProtocol.^import = technologyImport
+        importedProtocol.importedProtocol = protocol
+
+        val endpoint = SERVICE_FACTORY.createEndpoint
+        endpoint.protocols.add(importedProtocol)
+        endpoint.addresses.add(address)
+        endpoints.add(endpoint)
+    }
+
+    /**
+     * Assign the service aspects the reconstruction reported for an element.
+     *
+     * The reconstruction reports the annotations it found under their own
+     * names, and the technology model is the vocabulary that decides which of
+     * them can be expressed: an annotation it declares no aspect for, such as
+     * the OpenAPI annotations of Lakeside Mutual's controllers, is left out,
+     * and so is one it declares for another join point. A reference the model
+     * cannot resolve would be worse than a visible gap.
+     */
+    private def assignAspects(List<ImportedServiceAspect> aspects, List<MetaData> metaData,
+        String joinPoint) {
+        if (technologyImport === null || metaData.nullOrEmpty) {
+            return
+        }
+
+        metaData.forEach[ reconstructedAspect |
+            val declared = TechnologyAspects.declaredAspect(TECHNOLOGY_MODEL,
+                reconstructedAspect.name, joinPoint)
+            if (declared !== null) {
+                aspects.add(createAspect(reconstructedAspect, declared))
+            }
+        ]
+    }
+
+    /**
+     * Create the reference to a declared service aspect, with the values the
+     * aspect declares a property for.
+     */
+    private def createAspect(MetaData reconstructedAspect, TechnologyAspects.Aspect declared) {
+        val aspect = TECHNOLOGY_FACTORY.createServiceAspect
+        aspect.name = reconstructedAspect.name
+        aspect.technology = getOrCreateTechnology
+
+        val importedAspect = SERVICE_FACTORY.createImportedServiceAspect
+        importedAspect.^import = technologyImport
+        importedAspect.importedAspect = aspect
+
+        TechnologyAspects.assignableProperties(declared, reconstructedAspect.values).forEach[
+            propertyName |
+            val property = TECHNOLOGY_FACTORY.createTechnologySpecificProperty
+            property.name = propertyName
+            val assignment = TECHNOLOGY_FACTORY.createTechnologySpecificPropertyValueAssignment
+            assignment.property = property
+            assignment.value = createValue(reconstructedAspect.values.get(propertyName),
+                declared, propertyName)
+            importedAspect.values.add(assignment)
+        ]
+
+        return importedAspect
+    }
+
+    /**
+     * Create the value of an aspect property, in the shape its declared type
+     * asks for.
+     *
+     * The reconstruction reads the element of an annotation as text, and the
+     * technology model declares what that text means: a value assigned to an
+     * int is written as a number and one assigned to a boolean as itself, or
+     * the generated model states a value of the wrong type. Every property the
+     * REST annotations of Spring fill is declared as a string today, so this
+     * follows the model rather than that observation.
+     */
+    private def createValue(String value, TechnologyAspects.Aspect declared,
+        String propertyName) {
+        val primitiveValue = DATA_FACTORY.createPrimitiveValue
+        if (TechnologyAspects.isNumeric(declared, propertyName)) {
+            try {
+                primitiveValue.numericValue = new BigDecimal(value)
+                return primitiveValue
+            } catch (NumberFormatException e) {
+                // The source does not state a number where the model expects
+                // one. Writing the text keeps what was found, and the editor
+                // names the mismatch.
+            }
+        } else if (TechnologyAspects.isBoolean(declared, propertyName)
+            && #{"true", "false"}.contains(value)) {
+            // Boolean.valueOf would turn anything else into false and hide that
+            // the source does not state a boolean where the model expects one.
+            primitiveValue.booleanValue = Boolean.valueOf(value)
+            return primitiveValue
+        }
+        primitiveValue.stringValue = value
+        return primitiveValue
+    }
+
+    /**
+     * The technology the generated references belong to, created on first use.
+     */
+    private def getOrCreateTechnology() {
+        if (technology === null) {
+            technology = TECHNOLOGY_FACTORY.createTechnology
+            technology.name = TECHNOLOGY_ALIAS
+        }
+        return technology
     }
 
     /**

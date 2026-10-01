@@ -2,6 +2,7 @@ package de.fhdo.lemma.servicedsl.extractor
 
 import de.fhdo.lemma.data.ComplexType
 import de.fhdo.lemma.data.PrimitiveType
+import de.fhdo.lemma.data.PrimitiveValue
 import de.fhdo.lemma.service.Endpoint
 import de.fhdo.lemma.service.Import
 import de.fhdo.lemma.service.ImportType
@@ -126,8 +127,21 @@ class ServiceDslExtractor {
      * Extract Interface
      */
     private def generate(Interface iface) {
+        var endpoints = ""
+        if (!iface.endpoints.nullOrEmpty) {
+            endpoints = '''
+            @endpoints(«FOR e: iface.endpoints»«e.generate»«ENDFOR»)
+            '''
+        }
+
+        val aspects = '''
+        «FOR a: iface.aspects»
+            «a.generate»
+        «ENDFOR»
         '''
-        «IF iface.notImplemented»noimpl «ENDIF»interface «iface.name» {
+
+        '''
+        «endpoints»«aspects»«IF iface.notImplemented»noimpl «ENDIF»interface «iface.name» {
             «FOR o: iface.operations»
                 «o.generate»
             «ENDFOR»
@@ -175,7 +189,9 @@ class ServiceDslExtractor {
         }
 
         val aspects = '''
-        «FOR a: operation.aspects»«a.generate»«ENDFOR»
+        «FOR a: operation.aspects»
+            «a.generate»
+        «ENDFOR»
         '''
 
         val parameters = String.join(", ", operation.parameters.map[generate])
@@ -230,7 +246,38 @@ class ServiceDslExtractor {
      */
     private def generate(ImportedServiceAspect aspect) {
         '''@«aspect.importedAspect.technology.name»::«FOR s : aspect.importedAspect.
-            getQualifiedNameParts(false, true) SEPARATOR '.'»«s»«ENDFOR»'''
+            getQualifiedNameParts(false, true) SEPARATOR '.'»«s»«ENDFOR»«aspect.generateValues»'''
+    }
+
+    /**
+     * Extract the values assigned to the properties of an ImportedServiceAspect
+     *
+     * An aspect with a single value states it without naming the property, and
+     * one with several names each of them. An aspect without values is written
+     * without parentheses, which is what a property-less aspect such as Spring's
+     * GetMapping needs.
+     */
+    private def generateValues(ImportedServiceAspect aspect) {
+        if (aspect.singlePropertyValue !== null)
+            return '''(«aspect.singlePropertyValue.generate»)'''
+        if (aspect.values.nullOrEmpty)
+            return ""
+        return '''(«FOR v : aspect.values SEPARATOR ', '»«v.property.name» = «
+            v.value.generate»«ENDFOR»)'''
+    }
+
+    /**
+     * Extract PrimitiveValue
+     */
+    private def generate(PrimitiveValue value) {
+        if (value.stringValue !== null)
+            '''"«value.stringValue»"'''
+        else if (value.booleanValue !== null)
+            '''«value.booleanValue»'''
+        else if (value.numericValue !== null)
+            '''«value.numericValue»'''
+        else
+            '''""'''
     }
 
     /**
