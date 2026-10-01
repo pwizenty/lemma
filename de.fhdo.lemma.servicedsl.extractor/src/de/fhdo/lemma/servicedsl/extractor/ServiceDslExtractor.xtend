@@ -48,7 +48,19 @@ class ServiceDslExtractor {
 
         val microservices = String.join("\n\n", serviceModel.microservices.map[generate])
 
-        '''«importStatements»«microservices»'''
+        return '''«importStatements»«microservices»'''.toString.withoutTrailingSpace
+    }
+
+    /**
+     * Remove the space at the end of a line.
+     *
+     * A line separating two elements is emitted at the indentation of the
+     * element, so it would otherwise consist of nothing but that indentation.
+     * No line of a service model ends inside a string literal, so a space
+     * before a line break is never part of the content.
+     */
+    private def withoutTrailingSpace(String model) {
+        return model.replaceAll("(?m)[ \\t]+$", "")
     }
 
     /**
@@ -80,7 +92,7 @@ class ServiceDslExtractor {
         «service.generateTechAnnotation»
         «preamble» microservice «service.lemmaName» {
             «IF service.interfaces.exists[!operations.empty]»
-                «FOR iface : service.interfaces»
+                «FOR iface : service.interfaces SEPARATOR '\n'»
                     «iface.generate»
                 «ENDFOR»
             «ELSE»
@@ -142,7 +154,7 @@ class ServiceDslExtractor {
 
         '''
         «endpoints»«aspects»«IF iface.notImplemented»noimpl «ENDIF»interface «iface.name» {
-            «FOR o: iface.operations»
+            «FOR o: iface.operations SEPARATOR '\n'»
                 «o.generate»
             «ENDFOR»
         }'''
@@ -194,11 +206,20 @@ class ServiceDslExtractor {
         «ENDFOR»
         '''
 
-        val parameters = String.join(", ", operation.parameters.map[generate])
-
         val notImplemented = if (operation.notImplemented) "noimpl " else ""
 
-        '''«comment»«endpoints»«aspects»«notImplemented»«operation.name»(«parameters»);'''
+        // One parameter per line. An operation of a reconstructed REST
+        // interface carries an aspect on most of its parameters, which on one
+        // line runs to several hundred characters.
+        if (operation.parameters.empty)
+            return '''«comment»«endpoints»«aspects»«notImplemented»«operation.name»();'''
+
+        '''
+        «comment»«endpoints»«aspects»«notImplemented»«operation.name»(
+            «FOR p : operation.parameters SEPARATOR ','»
+                «p.generate»
+            «ENDFOR»
+        );'''
     }
 
     /**
@@ -212,10 +233,16 @@ class ServiceDslExtractor {
      * Extract Parameter
      */
     private def generate(Parameter parameter) {
-        '''«FOR a : parameter.aspects SEPARATOR ' '»«a.generate»«ENDFOR
-        » «parameter.communicationType.generate» «parameter.exchangePattern.generate» «
-        parameter.name» : «parameter.generateType
-        »'''
+        // The separator belongs behind an aspect rather than in front of the
+        // communication type, which gave a parameter without one a leading
+        // space and read as ",  sync out" in the extracted model.
+        val aspects = if (parameter.aspects.empty)
+                ""
+            else
+                String.join(" ", parameter.aspects.map[generate.toString]) + " "
+
+        '''«aspects»«parameter.communicationType.generate» «
+        parameter.exchangePattern.generate» «parameter.name» : «parameter.generateType»'''
     }
 
     /**
