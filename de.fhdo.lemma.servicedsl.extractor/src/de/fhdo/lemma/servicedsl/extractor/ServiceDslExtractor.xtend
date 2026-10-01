@@ -98,13 +98,53 @@ class ServiceDslExtractor {
         '''
         «service.generateTechAnnotation»
         «aspects»«preamble» microservice «service.lemmaName» {
-            «IF service.interfaces.exists[!operations.empty]»
+            «service.generateRequired»«IF service.interfaces.exists[!operations.empty]»
                 «FOR iface : service.interfaces SEPARATOR '\n'»
                     «iface.generate»
                 «ENDFOR»
             «ELSE»
                 [DEFINE_OPERATIONS]
             «ENDIF»
+        }'''
+    }
+
+    /**
+     * Extract what a microservice requires of others
+     *
+     * The three levels are written in the order the grammar expects them, and
+     * only those that hold something: a microservice, an interface and an
+     * operation are alternatives for one dependency, so in practice a model uses
+     * one of them per callee.
+     */
+    private def generateRequired(Microservice service) {
+        val microservices = service.requiredMicroservices.map[
+            '''«^import?.name»::«microservice?.name»'''.toString]
+        val interfaces = service.requiredInterfaces.map[
+            '''«^import?.name»::«^interface?.name»'''.toString]
+        val operations = service.requiredOperations.map[
+            '''«^import?.name»::«operation?.name»'''.toString]
+
+        if (microservices.empty && interfaces.empty && operations.empty) {
+            return ""
+        }
+
+        '''
+        «IF !microservices.empty»«required("microservices", microservices)»«ENDIF»
+        «IF !interfaces.empty»«required("interfaces", interfaces)»«ENDIF»
+        «IF !operations.empty»«required("operations", operations)»«ENDIF»
+
+        '''
+    }
+
+    /**
+     * Extract one required block, one reference per line
+     */
+    private def required(String kind, Iterable<String> references) {
+        '''
+        required «kind» {
+            «FOR reference : references SEPARATOR ','»
+                «reference»
+            «ENDFOR»
         }'''
     }
 

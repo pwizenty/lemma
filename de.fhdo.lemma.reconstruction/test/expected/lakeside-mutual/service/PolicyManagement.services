@@ -1,9 +1,14 @@
 import technology from "../technology/spring.technology" as javaWithSpring
 import datatypes from "../domain/PolicyManagement.data" as PolicyManagement
+import microservices from "CustomerCore.services" as CustomerCore
 
 @technology(javaWithSpring)
 @javaWithSpring::_aspects.ServiceCommunicationTransport(transport = "plaintext")
 public functional microservice com.lakesidemutual.policymanagement.PolicyManagement {
+    required microservices {
+        CustomerCore::com.lakesidemutual.customercore.CustomerCore
+    }
+
     @endpoints(javaWithSpring::_protocols.rest:"/insurance-quote-requests";)
     interface InsuranceQuoteRequestProcessingResource {
         @javaWithSpring::_aspects.GetMapping

@@ -93,6 +93,20 @@ call `customer-core` each carry
 and `CustomerCore`, which calls no other service, carries none. That pair is what
 the fixture guards: the aspect appears where a call was found and nowhere else.
 
+It guards the dependency levels in the same way. Each service states what it
+requires of `customer-core` at the finest level its own sources allow:
+
+| Service | Level | Why |
+|---|---|---|
+| `CustomerManagement` | `required operations` | its Feign client declares the three endpoints it addresses, and each matches one operation of the callee |
+| `CustomerSelfService` | `required microservices` | it calls through `RestTemplate`, which assembles its path in the call expression, so no endpoint is stated |
+| `PolicyManagement` | `required microservices` | the same |
+| `CustomerCore` | none | it calls no other service |
+
+So one fixture covers both outcomes of the resolution, and a change that pushed
+the Feign caller down to the service level - or the others up without the sources
+saying so - shows up here.
+
 ### customer-core
 
 The `customer-core` service of Lakeside Mutual

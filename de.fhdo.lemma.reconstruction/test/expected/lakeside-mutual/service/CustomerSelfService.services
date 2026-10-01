@@ -1,9 +1,14 @@
 import technology from "../technology/spring.technology" as javaWithSpring
 import datatypes from "../domain/CustomerSelfService.data" as CustomerSelfService
+import microservices from "CustomerCore.services" as CustomerCore
 
 @technology(javaWithSpring)
 @javaWithSpring::_aspects.ServiceCommunicationTransport(transport = "plaintext")
 public functional microservice com.lakesidemutual.customerselfservice.CustomerSelfService {
+    required microservices {
+        CustomerCore::com.lakesidemutual.customercore.CustomerCore
+    }
+
     @endpoints(javaWithSpring::_protocols.rest:"/user";)
     interface UserInformationHolder {
         @javaWithSpring::_aspects.PreAuthorize(value = "isAuthenticated()")
