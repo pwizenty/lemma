@@ -8,7 +8,7 @@ LEMMA concepts to LEMMA (ADR-0008 of the reconstruction framework).
 | Model | Technology | Used by |
 |---|---|---|
 | `technology/deployment_base.technology` | `DeploymentBase` | operation models |
-| `technology/deployment_base_relaxed.technology` | `DeploymentBaseRelaxed` | operation models, while containers carry no service values |
+| `technology/deployment_base_relaxed.technology` | `DeploymentBaseRelaxed` | kept for models written by hand without service values |
 | `technology/spring.technology` | `javaWithSpring` | service models, once they are enhanced with technology |
 
 ## What a technology model decides
@@ -41,9 +41,21 @@ deploys a microservice is therefore an error until the reconstruction reads
 those values from the `application.properties` of its service.
 
 `DeploymentBaseRelaxed` drops the two `<mandatory>` markers and changes nothing
-else, so a reconstruction that emits containers alone produces a model that
-validates. Both declare the deployment technology as `Kubernetes`, so moving
-from one to the other changes the import, not the references into it.
+else. Both declare the deployment technology as `Kubernetes`, so moving from one
+to the other changes the import, not the references into it.
+
+**The generated models reference `DeploymentBase`.** The reconstruction reads
+`spring.application.name` and `server.port` from the `application.properties` of
+a container's service and assigns them as its default values, so the mandatory
+properties have values and the strict model is the one that applies. The relaxed
+model is kept for a model written by hand, and for a system whose services
+carry no such configuration - a container without the two values is an error
+against the strict model, which is the point of marking them mandatory.
+
+The values are not carried over to an infrastructure node. Its service
+properties are declared by its infrastructure technology, which names them
+differently: `SpringBootAdmin` declares `applicationName` and `port` where a
+deployment technology declares `springApplicationName` and `serverPort`.
 
 An infrastructure node is unaffected either way: it deploys nothing, so the
 check reads `0 < 0`.
