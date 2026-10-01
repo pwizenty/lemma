@@ -176,10 +176,13 @@ class LemmaReconstructionHandler extends AbstractHandler {
 	 * Generate the models based on the previous selection
 	 */
     private def generateModels() {
-    	if (!selectedContexts.nullOrEmpty)
-        	generateDomainModels
-        	generateServiceModels
-        	generateOperationModels
+        // No guard on the contexts: the condition used to be written without
+        // braces, so it only ever guarded the first of the three calls, and each
+        // generator already does nothing when its own selection is empty. What
+        // is selected is generated, independently of the rest.
+        generateDomainModels
+        generateServiceModels
+        generateOperationModels
     }
 
 	/**
