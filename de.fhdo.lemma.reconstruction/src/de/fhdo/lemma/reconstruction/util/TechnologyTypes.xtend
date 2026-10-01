@@ -71,14 +71,23 @@ class TechnologyTypes {
 
     /**
      * Read a technology model of this bundle, or null when it is not there.
+     *
+     * Visible to the package because [[TechnologyAspects]] scans the same
+     * models for their service aspects and reads them the same way.
      */
-    private def static String readModel(String modelFileName) {
+    package def static String readModel(String modelFileName) {
+        val relativePath = '''«TECHNOLOGY_MODEL_FOLDER»/«modelFileName»'''.toString
         val bundle = FrameworkUtil.getBundle(TechnologyTypes)
         if (bundle === null) {
-            return null
+            // There is no bundle outside a running Eclipse, which is how the
+            // regression test runs the generators. Reading the model from the
+            // working directory keeps the test on the same vocabulary the
+            // wizard uses; without it the test would accept models in which
+            // every declared type and aspect is missing.
+            return readFile(new File(relativePath))
         }
 
-        val entry = bundle.getEntry('''«TECHNOLOGY_MODEL_FOLDER»/«modelFileName»'''.toString)
+        val entry = bundle.getEntry(relativePath)
         if (entry !== null) {
             val stream = entry.openStream
             try {
@@ -90,8 +99,13 @@ class TechnologyTypes {
 
         // A launched workbench does not necessarily expose a plain folder of a
         // bundle as an entry, so its file system is read as well.
-        val file = new File(FileLocator.getBundleFile(bundle),
-            '''«TECHNOLOGY_MODEL_FOLDER»/«modelFileName»'''.toString)
+        return readFile(new File(FileLocator.getBundleFile(bundle), relativePath))
+    }
+
+    /**
+     * Read a file, or null when it is not there.
+     */
+    private def static String readFile(File file) {
         if (file.file) {
             return new String(Files.readAllBytes(file.toPath))
         }

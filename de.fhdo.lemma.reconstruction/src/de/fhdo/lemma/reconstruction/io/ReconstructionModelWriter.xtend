@@ -122,13 +122,18 @@ class ReconstructionModelWriter {
      */
     def static List<String> copyTechnologyModels(String targetFolder, String subFolder) {
         val copied = <String>newLinkedList
-        val bundle = FrameworkUtil.getBundle(ReconstructionModelWriter)
-        if (bundle === null) {
-            return copied
-        }
-
         val folder = Paths.get('''«targetFolder»«File.separator»«subFolder»'''.toString)
         Files.createDirectories(folder)
+
+        val bundle = FrameworkUtil.getBundle(ReconstructionModelWriter)
+        if (bundle === null) {
+            // There is no bundle outside a running Eclipse, which is how the
+            // regression test writes its models. Copying from the working
+            // directory lets the imports of those models resolve, so the test
+            // sees what the wizard produces rather than a folder in which every
+            // import is dangling.
+            return copyFrom(new File(TECHNOLOGY_MODEL_FOLDER), folder, copied)
+        }
 
         // The models are a plain folder of the bundle rather than a source
         // folder. A launched workbench does not necessarily expose such a
@@ -152,21 +157,30 @@ class ReconstructionModelWriter {
         }
 
         if (copied.empty) {
-            val bundleRoot = FileLocator.getBundleFile(bundle)
-            val modelFolder = new File(bundleRoot, TECHNOLOGY_MODEL_FOLDER)
-            lastLookupLocation = modelFolder.absolutePath
-            val models = modelFolder.listFiles
-            if (models !== null) {
-                models.filter[name.endsWith(TECHNOLOGY_MODEL_SUFFIX)].forEach[
-                    Files.copy(toPath, folder.resolve(name),
-                        StandardCopyOption.REPLACE_EXISTING)
-                    copied.add(name)
-                ]
-            } else {
-                lastLookupLocation = '''«modelFolder.absolutePath» (does not exist)'''.toString
-            }
+            copyFrom(new File(FileLocator.getBundleFile(bundle), TECHNOLOGY_MODEL_FOLDER),
+                folder, copied)
         }
 
+        return copied
+    }
+
+    /**
+     * Copy the technology models of a folder of the file system, and report
+     * where they were looked for.
+     */
+    private def static List<String> copyFrom(File modelFolder, Path targetFolder,
+        List<String> copied) {
+        lastLookupLocation = modelFolder.absolutePath
+        val models = modelFolder.listFiles
+        if (models === null) {
+            lastLookupLocation = '''«modelFolder.absolutePath» (does not exist)'''.toString
+            return copied
+        }
+
+        models.filter[name.endsWith(TECHNOLOGY_MODEL_SUFFIX)].forEach[
+            Files.copy(toPath, targetFolder.resolve(name), StandardCopyOption.REPLACE_EXISTING)
+            copied.add(name)
+        ]
         return copied
     }
 
