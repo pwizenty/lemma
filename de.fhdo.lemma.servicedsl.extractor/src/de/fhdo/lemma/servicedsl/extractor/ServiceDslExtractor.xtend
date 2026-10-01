@@ -88,9 +88,16 @@ class ServiceDslExtractor {
      */
     private def generate(Microservice service) {
         val preamble = '''«service.visibility.generate» «service.type.generate»'''
+
+        val aspects = '''
+        «FOR a: service.aspects»
+            «a.generate»
+        «ENDFOR»
+        '''
+
         '''
         «service.generateTechAnnotation»
-        «preamble» microservice «service.lemmaName» {
+        «aspects»«preamble» microservice «service.lemmaName» {
             «IF service.interfaces.exists[!operations.empty]»
                 «FOR iface : service.interfaces SEPARATOR '\n'»
                     «iface.generate»

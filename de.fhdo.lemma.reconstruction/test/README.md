@@ -69,6 +69,30 @@ MRF filled. Its expected models are the ones the reconstruction wizard produced
 from those very documents, so this system also guards the test itself: if the
 test and the wizard ever disagree, this is where it shows.
 
+### lakeside-mutual
+
+All four services of Lakeside Mutual, reconstructed together with
+
+```
+uv run mrf -p Java Spring Communication -t <LakesideMutual>
+```
+
+and the paths in the documents made relative to the system root so the fixture
+is machine independent.
+
+The whole system rather than one service, because a fact about the communication
+between services only arises when both ends are in scope: run against
+`customer-management-backend` alone, its call to `customer-core` has no known
+callee and is classified as leaving the application. Here the three backends that
+call `customer-core` each carry
+
+```
+@javaWithSpring::_aspects.ServiceCommunicationTransport(transport = "plaintext")
+```
+
+and `CustomerCore`, which calls no other service, carries none. That pair is what
+the fixture guards: the aspect appears where a call was found and nowhere else.
+
 ### customer-core
 
 The `customer-core` service of Lakeside Mutual

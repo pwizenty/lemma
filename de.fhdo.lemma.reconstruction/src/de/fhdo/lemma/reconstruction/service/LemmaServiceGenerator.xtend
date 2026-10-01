@@ -68,6 +68,7 @@ class LemmaServiceGenerator {
      * Join points of the Technology DSL, under which a technology model
      * declares which of its service aspects may be assigned where.
      */
+    static val MICROSERVICES = "microservices"
     static val INTERFACES = "interfaces"
     static val OPERATIONS = "operations"
     static val PARAMETERS = "parameters"
@@ -123,6 +124,9 @@ class LemmaServiceGenerator {
                 ?: reconstructedMicroservice.metaData.findFirst[
                     MICROSERVICE_TYPE_NAMES.contains(name.toLowerCase)
                 ]?.name)
+
+        assignAspects(microservice.aspects, reconstructedMicroservice.metaData,
+            MICROSERVICES)
 
         reconstructedMicroservice.interfaces.forEach[
             microservice.interfaces.add(generateInterfaceFrom(it))

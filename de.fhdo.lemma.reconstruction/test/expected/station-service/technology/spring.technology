@@ -176,6 +176,14 @@ technology javaWithSpring {
         aspect SendTo<singleval> for operations {
             string value <mandatory>;
         }
+        // Transport a service uses to call the other services of the system, as
+        // the reconstruction observed it: plaintext, tls, mixed or unresolved.
+        // A fact about the channel, not a finding about it - deciding the smell
+        // Non-Secured Service-to-Service Communications additionally needs what
+        // the callee accepts and whether a service mesh protects the channel.
+        aspect ServiceCommunicationTransport<singleval> for microservices {
+            string transport <mandatory>;
+        }
 
         aspect Table<singleval> for types {
             string name;
