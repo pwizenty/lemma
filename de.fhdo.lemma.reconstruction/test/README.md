@@ -107,6 +107,46 @@ So one fixture covers both outcomes of the resolution, and a change that pushed
 the Feign caller down to the service level - or the others up without the sources
 saying so - shows up here.
 
+### risk-management
+
+`risk-management-server` of Lakeside Mutual, reconstructed from its
+`riskmanagement.proto` with
+
+```
+uv run mrf -p Protobuf -t <LakesideMutual>
+```
+
+The one component of that system written in Node rather than Java, and the only
+fixture whose models come from a gRPC contract instead of from annotated Java.
+It guards what no fixture did before: that a reconstruction from a proto file
+produces models whose references resolve.
+
+```
+import datatypes from "../domain/RiskManagement.data" as RiskManagement
+…
+    Trigger(
+        sync in triggerRequest : RiskManagement::RiskManagement.TriggerRequest,
+        sync out triggerReply : RiskManagement::RiskManagement.TriggerReply
+    );
+```
+
+Two things about it are deliberate and worth knowing before a difference here is
+read as a regression.
+
+**The interface carries no `@endpoints`.** A gRPC service is addressed by its
+qualified name, and the reconstruction reports that address under a name of its
+own rather than as an `Endpoint` - because an endpoint is generated under the
+only protocol the service generator knows, `rest`, and `spring.technology`
+declares no `grpc`. An earlier version did report it as an endpoint, and the
+generated model then said a gRPC service is reached over REST.
+
+**`sync out triggerReply` although the rpc returns a `stream`.** The
+reconstruction reports the parameter as asynchronous;
+`LemmaServiceGenerator.deriveCommunicationType` maps `asynchronous` onto
+`CommunicationType.SYNCHRONOUS`, so it arrives as `sync`. That is a defect of
+the generator rather than of this fixture, and this is the first model to show
+it - no Spring service of the other fixtures has an asynchronous parameter.
+
 ### customer-core
 
 The `customer-core` service of Lakeside Mutual
