@@ -1,0 +1,12 @@
+import technology from "../technology/spring.technology" as javaWithSpring
+import datatypes from "../domain/RiskManagement.data" as RiskManagement
+
+@technology(javaWithSpring)
+public functional microservice riskmanagement.RiskManagement {
+    interface RiskManagement {
+        Trigger(
+            sync in triggerRequest : RiskManagement::RiskManagement.TriggerRequest,
+            sync out triggerReply : RiskManagement::RiskManagement.TriggerReply
+        );
+    }
+}
