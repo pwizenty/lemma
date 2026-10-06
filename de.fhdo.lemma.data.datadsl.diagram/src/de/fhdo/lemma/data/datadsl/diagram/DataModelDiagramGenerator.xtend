@@ -9,6 +9,7 @@ import de.fhdo.lemma.data.DataFieldFeature
 import de.fhdo.lemma.data.DataModel
 import de.fhdo.lemma.data.DataStructure
 import de.fhdo.lemma.data.Enumeration
+import de.fhdo.lemma.data.Version
 import java.util.LinkedHashSet
 import java.util.List
 import org.eclipse.emf.ecore.EObject
@@ -80,12 +81,22 @@ class DataModelDiagramGenerator {
      * model may also declare types outside any context, which are drawn beside
      * the packages.
      *
+     * A model declares versions, or contexts, or types - the grammar offers the
+     * three alternatively - and a version in turn holds contexts or types. All
+     * three are drawn, because a model that uses versions is otherwise drawn
+     * empty.
+     *
      * @param model the data model to diagram
      * @return the PlantUML source of the diagram
      */
     def String generate(DataModel model) {
         val associations = <String>newLinkedList
 
+        val versions = '''
+            «FOR version : model.versions»
+                «generateVersion(version, associations)»
+            «ENDFOR»
+        '''
         val contexts = '''
             «FOR context : model.contexts»
                 «generateContext(context, associations)»
@@ -105,12 +116,31 @@ class DataModelDiagramGenerator {
             skinparam shadowing false
             skinparam classAttributeIconSize 0
 
-            «contexts»«loose»
+            «versions»«contexts»«loose»
             «FOR association : associations.filter[!empty].toSet.sort»
                 «association»
             «ENDFOR»
             @enduml
         '''.toString
+    }
+
+    /**
+     * Generate a version as a package of what it holds.
+     *
+     * Marked as a version, because a package is otherwise a context and a
+     * reader could not tell which of the two a box is.
+     */
+    private def generateVersion(Version version, List<String> associations) {
+        '''
+        package «quote(version.name)» <<version>> {
+            «FOR context : version.contexts»
+                «generateContext(context, associations)»
+            «ENDFOR»
+            «FOR type : version.complexTypes»
+                «generateType(type, associations)»
+            «ENDFOR»
+        }
+        '''
     }
 
     /**
@@ -151,7 +181,7 @@ class DataModelDiagramGenerator {
         ]
 
         '''
-        class «quote(structure.name)»«structureStereotypes(structure)» {
+        class «quote(structure.name)» as «aliasOf(structure)»«structureStereotypes(structure)» {
             «FOR field : structure.dataFields.filter[attribute]»
                 «fieldLine(field)»
             «ENDFOR»
@@ -179,7 +209,7 @@ class DataModelDiagramGenerator {
         val entry = collection.primitiveType
 
         '''
-        class «quote(collection.name)» <<collection>> {
+        class «quote(collection.name)» as «aliasOf(collection)» <<collection>> {
             «IF entry !== null»
                 of «entry.typeName»
             «ENDIF»
@@ -195,7 +225,7 @@ class DataModelDiagramGenerator {
      */
     private def generateEnumeration(Enumeration enumeration) {
         '''
-        enum «quote(enumeration.name)» {
+        enum «quote(enumeration.name)» as «aliasOf(enumeration)» {
             «FOR field : enumeration.fields»
                 «field.name»
             «ENDFOR»
@@ -212,13 +242,42 @@ class DataModelDiagramGenerator {
 
     /**
      * One association, labelled with the name of the field that holds it.
+     *
+     * Drawn between the aliases rather than the names: PlantUML identifies a
+     * class by the name it is declared with, so an association by name would
+     * attach to whichever class of that name it met first.
      */
     private def String association(ComplexType source, DataField field) {
-        val target = referredName(field)
-        if (target.nullOrEmpty) {
+        val target = field.complexType
+        if (target === null) {
             return ""
         }
-        return '''«quote(source.name)» --> «quote(target)» : «field.name»'''.toString
+        return '''«aliasOf(source)» --> «aliasOf(target)» : «field.name»'''.toString
+    }
+
+    /**
+     * The name a type is referred to by inside the diagram.
+     *
+     * Its own name qualified with the versions and contexts that hold it. Two
+     * contexts of a model may declare a type of the same name - and in
+     * ``examples/food-to-go`` two of them do - which PlantUML would otherwise
+     * draw as one class holding the fields of both.
+     */
+    private def String aliasOf(ComplexType type) {
+        val parts = <String>newLinkedList
+        parts.add(type.name)
+
+        var EObject container = type.eContainer
+        while (container !== null) {
+            switch (container) {
+                Context: parts.addFirst(container.name)
+                Version: parts.addFirst(container.name)
+            }
+            container = container.eContainer
+        }
+        // An alias is an identifier, so what a LEMMA name may hold and an
+        // alias may not - a caret, a dot - becomes an underscore.
+        return parts.join("_").replaceAll("[^A-Za-z0-9_]", "_")
     }
 
     /**
@@ -231,13 +290,6 @@ class DataModelDiagramGenerator {
      */
     private def boolean isAttribute(DataField field) {
         return field.complexType === null
-    }
-
-    /**
-     * The name of the type of this model that a field refers to, or null.
-     */
-    private def String referredName(DataField field) {
-        return field.complexType?.name
     }
 
     /**

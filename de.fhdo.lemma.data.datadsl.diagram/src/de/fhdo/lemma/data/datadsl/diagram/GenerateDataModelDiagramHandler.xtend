@@ -5,6 +5,7 @@ import de.fhdo.lemma.data.DataModel
 import de.fhdo.lemma.data.DataPackage
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 import org.eclipse.core.commands.AbstractHandler
 import org.eclipse.core.commands.ExecutionEvent
@@ -15,16 +16,24 @@ import org.eclipse.core.runtime.NullProgressMonitor
 import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.EPackage
 import org.eclipse.jface.dialogs.MessageDialog
+import org.eclipse.swt.widgets.Shell
+import org.eclipse.ui.PlatformUI
 import org.eclipse.ui.handlers.HandlerUtil
+import org.eclipse.ui.ide.IDE
 import org.eclipse.xtext.resource.XtextResourceSet
 
 /**
- * Generate the diagram of the selected data models.
+ * Generate the diagram of the selected data models, and show it.
  *
  * A thin shell around [[DataModelDiagramGenerator]]: it finds the selected
- * files, loads each as a data model, and writes the generated PlantUML beside
- * it. Everything that decides what the diagram looks like is in the generator,
- * which needs no Eclipse and can therefore be checked without one.
+ * files, loads each as a data model, writes the generated PlantUML beside it,
+ * renders it into an image and opens the image. Everything that decides what
+ * the diagram looks like is in the generator, which needs no Eclipse and can
+ * therefore be checked without one.
+ *
+ * The PlantUML is kept beside the image rather than written to a temporary
+ * file: it is the diffable source of the diagram, it renders in GitHub as it
+ * is, and it is what a reader can correct by hand.
  *
  * @author <a href="mailto:philip.wizenty@fh-dortmund.de">Philip Wizenty</a>
  */
@@ -47,13 +56,19 @@ class GenerateDataModelDiagramHandler extends AbstractHandler {
         }
 
         val generator = new DataModelDiagramGenerator
+        val renderer = new PlantUmlRenderer
         val resourceSet = createResourceSet
         val written = <String>newLinkedList
+        val images = <IFile>newLinkedList
         val failed = <String>newLinkedList
 
         for (file : files) {
             try {
-                written.add(generate(file, generator, resourceSet))
+                val diagram = generate(file, generator, resourceSet)
+                written.add(diagram.name)
+                if (renderer.available) {
+                    images.add(render(diagram, renderer))
+                }
             } catch (Exception exception) {
                 // One unreadable model must not stop the others, and what went
                 // wrong is more useful than that something did.
@@ -61,14 +76,18 @@ class GenerateDataModelDiagramHandler extends AbstractHandler {
             }
         }
 
-        report(shell, written, failed)
+        // The diagram is the point of the command, so it is opened rather than
+        // only announced. The first of them: opening twenty editors at once
+        // would bury the result instead of showing it.
+        images.head?.open
+        report(shell, written, images, failed, renderer)
         return null
     }
 
     /**
      * Generate the diagram of one file and write it beside the model.
      */
-    private def String generate(IFile file, DataModelDiagramGenerator generator,
+    private def IFile generate(IFile file, DataModelDiagramGenerator generator,
         XtextResourceSet resourceSet) {
         val location = file.location.toFile
         val resource = resourceSet.createResource(
@@ -87,11 +106,47 @@ class GenerateDataModelDiagramHandler extends AbstractHandler {
         val target = Paths.get(
             location.parent, '''«baseName(file.name)».«DIAGRAM_EXTENSION»'''.toString)
         Files.write(target, diagram.getBytes(StandardCharsets.UTF_8))
+        return refresh(file, target)
+    }
 
-        // The file is written outside the workspace's knowledge, so the folder
-        // is refreshed for it to appear.
-        file.parent.refreshLocal(IResource.DEPTH_ONE, new NullProgressMonitor)
-        return target.fileName.toString
+    /**
+     * Render a written diagram into an image beside it.
+     */
+    private def IFile render(IFile diagram, PlantUmlRenderer renderer) {
+        val image = renderer.render(Paths.get(diagram.location.toFile.absolutePath))
+        return refresh(diagram, image)
+    }
+
+    /**
+     * Make a file written outside the workspace visible in it.
+     *
+     * Both the PlantUML and the image are written through java.nio, which the
+     * workspace knows nothing about, so the folder is refreshed and the new
+     * file is looked up in it.
+     */
+    private def IFile refresh(IFile sibling, Path target) {
+        val folder = sibling.parent
+        folder.refreshLocal(IResource.DEPTH_ONE, new NullProgressMonitor)
+        return folder.getFile(
+            new org.eclipse.core.runtime.Path(target.fileName.toString))
+    }
+
+    /**
+     * Open an image in an editor, so the command ends in a diagram.
+     *
+     * Failing to open it is not failing to generate it, so it is not reported
+     * as such: the file is there either way and the message names it.
+     */
+    private def void open(IFile image) {
+        try {
+            val page = PlatformUI.workbench?.activeWorkbenchWindow?.activePage
+            if (page !== null) {
+                IDE.openEditor(page, image)
+            }
+        } catch (Exception exception) {
+            // No editor is registered for the format, or the workbench is going
+            // down: the file is written either way and the message names it.
+        }
     }
 
     /**
@@ -112,25 +167,33 @@ class GenerateDataModelDiagramHandler extends AbstractHandler {
     }
 
     /**
-     * Say what was written and what was not.
+     * Say what was written, what was rendered and what was not.
      */
-    private def report(org.eclipse.swt.widgets.Shell shell, Iterable<String> written,
-        Iterable<String> failed) {
+    private def report(Shell shell, Iterable<String> written, Iterable<IFile> images,
+        Iterable<String> failed, PlantUmlRenderer renderer) {
+        val summary = '''
+            Generated «written.size» diagram(s)«IF !written.empty»:
+
+            «written.join("\n")»«ENDIF»
+        '''
+        val rendering = if (renderer.available)
+                '''Rendered «images.size» image(s).'''
+            else
+                renderer.installationHint
+
         if (failed.empty) {
             MessageDialog.openInformation(shell, TITLE,
                 '''
-                Generated «written.size» diagram(s):
-
-                «written.join("\n")»
+                «summary»
+                «rendering»
                 '''.toString)
             return
         }
 
         MessageDialog.openWarning(shell, TITLE,
             '''
-            Generated «written.size» diagram(s)«IF !written.empty»:
-
-            «written.join("\n")»«ENDIF»
+            «summary»
+            «rendering»
 
             «failed.size» could not be read:
 
