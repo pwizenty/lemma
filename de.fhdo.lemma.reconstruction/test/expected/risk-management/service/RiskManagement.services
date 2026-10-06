@@ -6,7 +6,7 @@ public functional microservice riskmanagement.RiskManagement {
     interface RiskManagement {
         Trigger(
             sync in triggerRequest : RiskManagement::RiskManagement.TriggerRequest,
-            sync out triggerReply : RiskManagement::RiskManagement.TriggerReply
+            async out triggerReply : RiskManagement::RiskManagement.TriggerReply
         );
     }
 }
