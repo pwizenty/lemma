@@ -140,12 +140,12 @@ only protocol the service generator knows, `rest`, and `spring.technology`
 declares no `grpc`. An earlier version did report it as an endpoint, and the
 generated model then said a gRPC service is reached over REST.
 
-**`sync out triggerReply` although the rpc returns a `stream`.** The
-reconstruction reports the parameter as asynchronous;
-`LemmaServiceGenerator.deriveCommunicationType` maps `asynchronous` onto
-`CommunicationType.SYNCHRONOUS`, so it arrives as `sync`. That is a defect of
-the generator rather than of this fixture, and this is the first model to show
-it - no Spring service of the other fixtures has an asynchronous parameter.
+**`async out triggerReply`, because the rpc returns a `stream`.** This is the
+only model with an asynchronous parameter: the Spring plugin reports every
+parameter as synchronous, so a streaming rpc is the first one. It is also what
+showed that `deriveCommunicationType` mapped `asynchronous` onto
+`CommunicationType.SYNCHRONOUS` and the model stated the opposite of the
+sources; the fixture guards the fix.
 
 ### customer-core
 

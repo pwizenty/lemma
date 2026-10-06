@@ -528,19 +528,39 @@ class LemmaServiceGenerator {
         return importedType
     }
 
+    /**
+     * Derive the exchange pattern of a parameter.
+     *
+     * An unknown pattern falls back to IN rather than to null, which the
+     * extractor would fail on with "Type null is not supported".
+     */
     private def deriveExchangePattern(String pattern) {
         return switch (pattern.toLowerCase) {
             case "in": ExchangePattern.IN
             case "out": ExchangePattern.OUT
             case "inout": ExchangePattern.INOUT
+            default: ExchangePattern.IN
         }
     }
 
 
+    /**
+     * Derive the communication type of a parameter.
+     *
+     * Asynchronous used to map onto SYNCHRONOUS, so a parameter the
+     * reconstruction reported as asynchronous arrived as synchronous and the
+     * model stated the opposite of the sources. No model showed it until a gRPC
+     * contract was reconstructed: the Spring plugin reports every parameter as
+     * synchronous, and a streaming rpc is the first asynchronous one.
+     *
+     * An unknown type falls back to SYNCHRONOUS rather than to null, which the
+     * extractor would fail on with "Type null is not supported".
+     */
     private def deriveCommunicationType(String type) {
         return switch (type.toLowerCase) {
             case "synchronous": CommunicationType.SYNCHRONOUS
-            case "asynchronous": CommunicationType.SYNCHRONOUS
+            case "asynchronous": CommunicationType.ASYNCHRONOUS
+            default: CommunicationType.SYNCHRONOUS
         }
     }
 

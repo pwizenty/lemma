@@ -23,6 +23,7 @@ stay free of files describing themselves.
 | `feat-communication-aspect.md` | `feat/communication-aspect` | `dev` |
 | `feat-service-dependencies.md` | `feat/service-dependencies` | `dev` |
 | `feat-protobuf-fixture.md` | `feat/protobuf-fixture` | `dev` |
+| `fix-asynchronous-communication.md` | `fix/asynchronous-communication` | `dev` |
 
 Merge order matters for the last one: it contains the commits of
 `feat/rest-technology-information`, so that branch goes first. Each also needs
