@@ -48,3 +48,20 @@ shell that finds the selected files, loads them and writes the result. Everythin
 that decides what a diagram looks like is therefore testable without an Eclipse,
 and was checked against all 83 data models of this repository - 538 classes, 24
 enums, 338 associations, no failures.
+
+## Checking the dependencies this bundle declares
+
+```sh
+python3 tools/check-bundle-requires.py .
+```
+
+Resolves every package the sources import against the `Export-Package` of the
+bundles the manifest requires, following `visibility:=reexport` as Eclipse does,
+and fails on one that nothing exports.
+
+This is here because the headless build cannot catch a missing `Require-Bundle`
+entry. It compiles against a flat classpath of every jar of the Eclipse
+installation, which ignores OSGi boundaries, so a bundle can compile headlessly
+and still fail to resolve inside Eclipse - which is how
+`org.eclipse.core.runtime` came to be missing from this manifest. The check
+takes any bundle directory, not just this one.
