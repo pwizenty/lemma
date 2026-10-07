@@ -1,8 +1,31 @@
 # Service model diagrams
 
-Reads LEMMA service models, resolves what they require of each other, and draws
-both the interfaces they offer and the dependencies between them. Steps 1 to 3
-of `docs/service-diagram-plan.md`. The Eclipse command follows.
+Draws LEMMA service models. Select one or more `.services` files in the Project
+Explorer, **Generate PlantUML diagrams** from the context menu, and you get the
+interfaces of each selected model plus the dependencies of the whole selection,
+as `.puml` and `.svg` beside the models. The first image is opened, so the
+command ends in a diagram rather than in a file.
+
+```
+select CustomerSelfService.services, CustomerManagement.services, PolicyManagement.services
+
+  CustomerSelfService-interfaces.puml / .svg        one per selected model
+  CustomerManagement-interfaces.puml / .svg
+  PolicyManagement-interfaces.puml  / .svg
+  CustomerSelfService-dependencies.puml / .svg        once, for the selection
+  CustomerSelfService-dependencies-detail.puml / .svg
+```
+
+The dependency diagrams are written beside the **first** selected model, because
+they belong to no single one of them.
+
+Rendering needs PlantUML, and reuses `PlantUmlRenderer` from
+`de.fhdo.lemma.data.datadsl.diagram`, which this bundle requires. Without
+PlantUML the `.puml` files are still written and the dialog says what to install:
+
+```sh
+brew install plantuml graphviz
+```
 
 ## What it does
 
@@ -241,7 +264,17 @@ bundles the manifest requires. It is here because a headless compile cannot see 
 missing `Require-Bundle` entry: it uses a flat classpath of every jar of the
 Eclipse installation, which ignores OSGi boundaries.
 
-## Not yet here
+## What only Eclipse can confirm
 
-The context-menu command — step 4 of the plan. Until then nothing in this bundle
-is reachable from the user interface.
+`ServiceGraphTest` and the sweeps cover the reader and both generators, which is
+everything that decides what a diagram contains. They cannot cover the context
+menu: whether the entry appears on a `.services` selection, and whether the
+handler resolves inside a running workbench, is what an Eclipse build shows and
+a headless one cannot. The pipeline the handler runs - the same reads, the same
+generators, the same file names, the same renderer - was exercised headlessly
+and produced the five diagrams above with no problems reported.
+
+`PlantUmlRenderer` and `tools/check-bundle-requires.py` are shared with
+`de.fhdo.lemma.data.datadsl.diagram` by requiring that bundle rather than by a
+bundle of their own. Two consumers do not justify a third bundle; a third
+consumer would.

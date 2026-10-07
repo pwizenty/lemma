@@ -37,6 +37,7 @@ class ServiceGraphTest {
         anUndeclaredAliasIsReported
         aCycleOfImportsTerminates
         lakesideMutualResolvesAcrossModels
+        oneReaderServesSeveralReads
         theVerbComesFromTheAspectThatSaysSo
         anOperationShowsItsOwnPath
         aResultIsNotConfusedWithAParameter
@@ -553,6 +554,34 @@ class ServiceGraphTest {
         val overview = overviewOf(#[FIXTURES + "/abbreviated/versions.services"])
         check("the overview counts it as an interface",
             overview.contains(" : 1 interface"), true)
+    }
+
+    /**
+     * One reader serves several reads.
+     *
+     * Catches a reader that creates a resource for a model it already holds: a
+     * resource set refuses that, and the Eclipse command reads each selected
+     * model for its interfaces and then all of them together for their
+     * dependencies, over overlapping imports.
+     */
+    private def static void oneReaderServesSeveralReads() {
+        val reader = new ServiceModelReader
+        val first = reader.read(Paths.get(LAKESIDE + "/CustomerSelfService.services"))
+        val second = reader.read(Paths.get(LAKESIDE + "/CustomerManagement.services"))
+        val both = reader.read(#[
+            Paths.get(LAKESIDE + "/CustomerSelfService.services") as Path,
+            Paths.get(LAKESIDE + "/CustomerManagement.services") as Path
+        ])
+
+        check("the first read works", first.problems.empty, true)
+        check("the second works too, over the same import",
+            second.problems.empty, true)
+        check("and so does reading both", both.problems.empty, true)
+        check("the second read resolves its dependencies",
+            second.dependencies.forall[resolved], true)
+        check("each read sees only what it was asked for",
+            first.entryFiles.size, 1)
+        check("and both together see both", both.entryFiles.size, 2)
     }
 
     private def static String draw(String file) {

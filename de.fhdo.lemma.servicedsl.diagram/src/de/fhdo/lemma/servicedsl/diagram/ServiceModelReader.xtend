@@ -128,8 +128,16 @@ class ServiceModelReader {
             throw new IllegalStateException("no such file")
         }
 
-        val resource = resourceSet.createResource(URI.createFileURI(file))
-        resource.load(resourceSet.loadOptions)
+        // A resource set refuses to create a resource for a URI it already
+        // holds, so an already-loaded model is reused. One reader therefore
+        // serves several reads, which the Eclipse command needs: it draws the
+        // interfaces of each selected model and the dependencies of all of
+        // them, over overlapping imports.
+        val uri = URI.createFileURI(file)
+        val resource = resourceSet.getResource(uri, false) ?: resourceSet.createResource(uri)
+        if (!resource.isLoaded) {
+            resource.load(resourceSet.loadOptions)
+        }
         if (resource.contents.empty) {
             throw new IllegalStateException("the file holds no service model")
         }
