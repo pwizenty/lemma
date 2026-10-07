@@ -161,6 +161,17 @@ class InterfaceNode {
     @Accessors
     String name
 
+    /**
+     * The name a dependency refers to it by: its microservice's qualified name,
+     * its own version if it has one, and its name.
+     *
+     * Built from the metamodel's own ``qualifiedNameParts`` rather than by
+     * joining names here, because a version prefixes a name in a reference and
+     * nothing else says so.
+     */
+    @Accessors
+    String qualifiedName
+
     @Accessors
     boolean notImplemented
 

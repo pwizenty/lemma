@@ -1,9 +1,8 @@
 # Service model diagrams
 
 Reads LEMMA service models, resolves what they require of each other, and draws
-the interfaces they offer. Steps 1 and 2 of `docs/service-diagram-plan.md`: the
-reader, the graph and the interface diagram. The dependency diagrams and the
-Eclipse command follow.
+both the interfaces they offer and the dependencies between them. Steps 1 to 3
+of `docs/service-diagram-plan.md`. The Eclipse command follows.
 
 ## What it does
 
@@ -79,6 +78,78 @@ fault runs past 240 characters. The widest reconstructed interface came out
 microservices in one file is still wide — `examples/parking-spaces` draws five
 packages side by side at 2745x188 — because that is what the model holds.
 
+## The dependency diagrams
+
+Two, because the levels LEMMA offers answer two questions, and they are
+alternatives rather than layers: Lakeside Mutual declares `required operations`
+for `CustomerManagement` and `required microservices` for the others.
+
+**The overview** aggregates every dependency to one arrow and answers who calls
+whom, labelled with what backs it where the model is more specific than the
+arrow:
+
+```
+[CustomerSelfService] --> [CustomerCore]
+[CustomerManagement]  --> [CustomerCore] : 3 ops
+[PolicyManagement]    --> [CustomerCore]
+```
+
+**The detail diagram** answers through what, drawing each required interface or
+operation inside the package of the service that offers it:
+
+```
+[CustomerSelfService] --> [CustomerCore]
+package "CustomerCore" {
+    [CustomerCore]
+    [CustomerInformationHolder.getCustomer]
+    [CustomerInformationHolder.getCustomers]
+    [CustomerInformationHolder.updateCustomer]
+}
+[CustomerManagement] --> [CustomerInformationHolder.getCustomer]
+```
+
+A whole-service dependency is drawn here too, rather than left out: a reader
+would otherwise take `CustomerSelfService` to require nothing. A service nothing
+is required *of* by name is a plain component, not a package holding one
+component of its own name.
+
+Unlike the interface diagram, both draw everything the reader reached. A
+dependency crosses model files, so a diagram of one file could never show the
+system.
+
+A dependency that cannot be followed is drawn dashed, marked `<<unresolved>>`,
+labelled with the whole name the model wrote, and the detail diagram carries the
+reason as a note. The whole name and not its last part: where the microservice
+name ends is exactly what could not be worked out, and `find` would read as an
+operation.
+
+## How a required name is resolved
+
+```
+CustomerCore :: com.lakesidemutual.customercore.CustomerCore . CustomerInformationHolder . getCustomer
+└─ alias ──┘    └──────────── microservice ───────────────┘   └──── interface ───────┘   └── op ──┘
+```
+
+Everything is matched against what was read, never counted off by position.
+Three things the models forced:
+
+- **A version prefixes the name.** `microservice de.fhdo.APIGateways version v01`
+  is referred to as `v01.de.fhdo.APIGateways`. The rule is the metamodel's own
+  `qualifiedNameParts`, not something a reader can assemble from the name.
+  Counting name parts instead made every dependency of the three versioned
+  `e-vehicle-charging` models unresolvable.
+- **A reference may abbreviate.** Inside one model
+  `required microservices { DiscoveryService }` names
+  `v01.de.fhdo.DiscoveryService`. Every dot-boundary suffix of a qualified name
+  is a form it may be named by, and the longest matching form wins.
+- **An ambiguous abbreviation resolves to neither.** Two microservices whose
+  names end the same way, named by that ending, name neither: a guess drawn as
+  an arrow is worse than an arrow drawn as unresolved.
+
+Resolution across the repository went from 24 of 44 dependencies to 45 of 49 as
+these came out. The four that remain are the deliberately unresolvable ones in
+`test/fixtures`.
+
 ## Why the parse tree is read
 
 A cross-reference of a service model does not resolve outside a running Xtext.
@@ -103,26 +174,11 @@ node model is the parse tree of the file, so what the model wrote is still there
 | parameter name, `sync`/`async`, `in`/`out` | |
 | a parameter's primitive type | |
 
-## Resolving a required name
-
-```
-CustomerCore :: com.lakesidemutual.customercore.CustomerCore . CustomerInformationHolder . getCustomer
-└─ alias ──┘    └──────────── microservice ───────────────┘   └──── interface ───────┘   └── op ──┘
-```
-
-The alias is looked up in the imports **of the model it was written in**. The
-qualified name is then matched as the longest prefix against the microservices
-actually found in that file, the match ending on a dot, and the remainder read as
-interface and operation.
-
-Matching rather than splitting, because matching detects a name that nothing
-declares. Splitting `com.example.orders.Nonexistent.Queries.find` from the end
-yields the plausible triple (`Nonexistent`, `Queries`, `find`) and reports a
-dependency on a microservice that does not exist.
-
-A dependency that cannot be followed keeps what the model wrote, gets a reason,
-and is given an unresolved stub as its target — a dependency the diagram cannot
-follow is a fact about the model, not nothing.
+The alias is looked up in the imports **of the model it was written in**, and
+matching rather than splitting is what detects a name nothing declares:
+splitting `com.example.orders.Nonexistent.Queries.find` from the end yields the
+plausible triple (`Nonexistent`, `Queries`, `find`) and reports a dependency on
+a microservice that does not exist.
 
 ## Checking it
 
@@ -134,12 +190,18 @@ python3 tools/check-bundle-requires.py .
 ```
 
 `ServiceGraphTest` needs no database and no running Eclipse, which is the point
-of keeping the reader and the generator free of both. 50 checks over the fixtures
+of keeping the reader and the generator free of both. 90 checks over the fixtures
 in `test/` and the reconstructed Lakeside Mutual models.
 
-A sweep over every service model of the repository backs them up: 31 models, 91
-interfaces, 225 operations, nothing silently empty, no two interfaces sharing an
-alias, every diagram rendered to valid SVG.
+Sweeps over every service model of the repository back them up:
+
+```
+interface diagrams   33 models | 100 interfaces | 234 operations
+                     nothing silently empty | no alias collisions
+dependency diagrams  33 models | 49 dependencies | 45 resolved
+                     every arrow end declared | every dependency drawn
+                     nothing blank | 66 diagrams, all valid SVG
+```
 
 **Every decision it defends was mutation-tested** — a check that cannot fail
 proves nothing, and two of these did not fail until the fixture was rewritten to
@@ -156,6 +218,23 @@ isolate them:
 | a fault is not the result | counted as outgoing | 1 |
 | every outgoing value is shown | only the first | 1 |
 | an outgoing parameter is not a call parameter | listed as one | 7 |
+| a version prefixes the qualified name | the name as written | 5 |
+| an abbreviated reference resolves | only the full name matches | 2 |
+| an ambiguous abbreviation resolves to neither | to the first candidate | 2 |
+| an interface is matched by name | the first interface | 3 |
+| every arrow end is declared | only coarse targets | 2 |
+| an aggregated edge says what backs it | no label | 2 |
+| the interface count is kept | dropped | 1 |
+| the detail diagram keeps coarse dependencies | drops them | 2 |
+| only named requirements make a package | every target does | 2 |
+| an unresolved arrow is dashed | drawn solid | 1 |
+| a stub keeps the whole written name | its last part | 2 |
+
+Two of these were added because a mutation went **uncaught**: no model of this
+repository uses `required interfaces`, so the whole interface level of the
+resolution was unexercised until a fixture declared one, and the check that
+every arrow end is declared was only ever applied to a system where the bug
+could not show.
 
 `tools/check-bundle-requires.py` resolves every imported package against the
 bundles the manifest requires. It is here because a headless compile cannot see a
@@ -164,5 +243,5 @@ Eclipse installation, which ignores OSGi boundaries.
 
 ## Not yet here
 
-The dependency diagrams and the context-menu command — steps 3 and 4 of the
-plan. Until then nothing in this bundle is reachable from the user interface.
+The context-menu command — step 4 of the plan. Until then nothing in this bundle
+is reachable from the user interface.

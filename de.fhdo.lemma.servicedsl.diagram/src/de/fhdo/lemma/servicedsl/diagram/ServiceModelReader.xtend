@@ -184,7 +184,11 @@ class ServiceModelReader {
      * Read a microservice, its interfaces and what it requires.
      */
     private def ServiceNode readMicroservice(Microservice microservice, String file) {
-        val node = new ServiceNode(microservice.name)
+        // Not microservice.name: a version prefixes the name in a reference,
+        // so "microservice de.fhdo.APIGateways version v01" is referred to as
+        // "v01.de.fhdo.APIGateways". qualifiedNameParts is the rule for that.
+        val node = new ServiceNode(microservice.qualifiedNameParts.join("."))
+        node.name = ServiceNode.simpleNameOf(microservice.name)
         node.modelFile = file
         node.visibility = microservice.visibility?.toString
         node.type = microservice.type?.toString
@@ -213,6 +217,7 @@ class ServiceModelReader {
 
     private def InterfaceNode readInterface(Interface anInterface) {
         val node = new InterfaceNode(anInterface.name)
+        node.qualifiedName = anInterface.qualifiedNameParts.join(".")
         node.notImplemented = anInterface.notImplemented
         node.aspects.addAll(anInterface.aspects.map[aspectReference])
         for (endpoint : anInterface.endpoints) {
@@ -370,107 +375,148 @@ class ServiceModelReader {
                 '''«targetFile» declares no microservice''')
         }
 
-        val service = longestPrefix(qualifiedName, candidates)
-        if (service === null) {
+        val match = matchService(qualifiedName, candidates)
+        if (match === null) {
             return unresolved(dependency,
-                '''no microservice of «targetFile» is named in it''')
+                '''no microservice of «targetFile» is named in it, or more than one is''')
         }
+        val service = match.service
         dependency.target = service
 
-        val remainder = remainderAfter(qualifiedName, service.qualifiedName)
+        // A reference may name the microservice by a suffix of its qualified
+        // name, so what follows that suffix is read against the full name.
+        val normalised = service.qualifiedName + qualifiedName.substring(match.form.length)
+
         return switch (entry.level) {
             case MICROSERVICE:
-                if (remainder.empty)
+                if (normalised == service.qualifiedName)
                     dependency
                 else
                     unresolved(dependency,
-                        '''a microservice is required but «remainder.join(".")» follows its name''')
+                        "a microservice is required but the name does not end with one")
             case INTERFACE:
-                resolveInterface(dependency, service, remainder)
+                resolveInterface(dependency, service, normalised)
             case OPERATION:
-                resolveOperation(dependency, service, remainder)
+                resolveOperation(dependency, service, normalised)
         }
     }
 
+    /**
+     * Resolve a required interface by matching the name against the interfaces
+     * the microservice declares.
+     *
+     * Matched rather than counted. An interface may carry a version, which
+     * prefixes its name in a reference, so the number of names between the
+     * microservice and the interface is not fixed - and counting them made
+     * every dependency of the versioned e-vehicle-charging models unresolvable.
+     */
     private def Dependency resolveInterface(Dependency dependency, ServiceNode service,
-        List<String> remainder) {
-        if (remainder.size !== 1) {
+        String qualifiedName) {
+        val match = service.interfaces.findFirst[it.qualifiedName == qualifiedName]
+        if (match === null) {
             return unresolved(dependency,
-                '''an interface is required but «remainder.size» name(s) follow the microservice''')
+                '''«service.name» declares no interface of that name''')
         }
-        dependency.targetInterface = remainder.head
-        if (service.interfaceOf(remainder.head) === null) {
-            return unresolved(dependency,
-                '''«service.name» declares no interface «remainder.head»''')
-        }
-        return dependency
-    }
-
-    private def Dependency resolveOperation(Dependency dependency, ServiceNode service,
-        List<String> remainder) {
-        if (remainder.size !== 2) {
-            return unresolved(dependency,
-                '''an operation is required but «remainder.size» name(s) follow the microservice''')
-        }
-        dependency.targetInterface = remainder.get(0)
-        dependency.targetOperation = remainder.get(1)
-
-        val anInterface = service.interfaceOf(remainder.get(0))
-        if (anInterface === null) {
-            return unresolved(dependency,
-                '''«service.name» declares no interface «remainder.get(0)»''')
-        }
-        if (anInterface.operationOf(remainder.get(1)) === null) {
-            return unresolved(dependency,
-                '''«remainder.get(0)» declares no operation «remainder.get(1)»''')
-        }
+        dependency.targetInterface = match.name
         return dependency
     }
 
     /**
-     * The microservice whose qualified name is the longest prefix of a name.
+     * Resolve a required operation by matching the interface, then the
+     * operation it declares.
      *
-     * A microservice name is itself qualified and the number of parts it has is
-     * not fixed, so a required operation cannot be split positionally:
-     *
-     *     com.lakesidemutual.customercore.CustomerCore . CustomerInformationHolder . getCustomer
-     *     └──────────── microservice ───────────────┘   └──── interface ───────┘   └── op ──┘
-     *
-     * The name is matched against the microservices that were actually found,
-     * longest first, and only what is left over is read as interface and
-     * operation. The match ends on a dot, so a microservice whose name is a
-     * prefix of another's does not swallow it.
+     * The longest interface name that the required name begins with, for the
+     * same reason a microservice is matched that way.
      */
-    private def ServiceNode longestPrefix(String qualifiedName, List<ServiceNode> candidates) {
-        var ServiceNode match = null
-        for (candidate : candidates) {
-            val name = candidate.qualifiedName
-            if (name !== null
-                && (qualifiedName == name || qualifiedName.startsWith(name + "."))
-                && (match === null || name.length > match.qualifiedName.length)) {
+    private def Dependency resolveOperation(Dependency dependency, ServiceNode service,
+        String qualifiedName) {
+        var InterfaceNode match = null
+        for (candidate : service.interfaces) {
+            val prefix = candidate.qualifiedName
+            if (prefix !== null && qualifiedName.startsWith(prefix + ".")
+                && (match === null || prefix.length > match.qualifiedName.length)) {
                 match = candidate
             }
         }
-        return match
+        if (match === null) {
+            return unresolved(dependency,
+                '''«service.name» declares no interface of that name''')
+        }
+
+        val operationName = qualifiedName.substring(match.qualifiedName.length + 1)
+        dependency.targetInterface = match.name
+        dependency.targetOperation = operationName
+        if (match.operationOf(operationName) === null) {
+            return unresolved(dependency,
+                '''«match.name» declares no operation «operationName»''')
+        }
+        return dependency
     }
 
     /**
-     * The parts of a qualified name that follow a microservice's name.
+     * The microservice a required name names, and the form it named it by.
+     *
+     * A reference may abbreviate: inside one model
+     * ``required microservices { DiscoveryService }`` names the microservice
+     * ``de.fhdo.DiscoveryService version v01``, whose qualified name is
+     * ``v01.de.fhdo.DiscoveryService``. So every dot-boundary suffix of a
+     * candidate's qualified name is a form it may be named by, and the longest
+     * form that matches wins - for the same reason the longest candidate does.
+     *
+     * Two candidates matching by the same form is ambiguous and resolves to
+     * neither: naming one of them would be a guess, and a guess drawn as an
+     * arrow is worse than an arrow drawn as unresolved.
      */
-    private def List<String> remainderAfter(String qualifiedName, String serviceName) {
-        if (qualifiedName.length <= serviceName.length) {
-            return emptyList
+    private def ServiceMatch matchService(String qualifiedName, List<ServiceNode> candidates) {
+        var ServiceMatch best = null
+        var boolean ambiguous = false
+
+        for (candidate : candidates) {
+            val form = longestMatchingForm(qualifiedName, candidate)
+            if (form !== null) {
+                if (best === null || form.length > best.form.length) {
+                    best = new ServiceMatch(candidate, form)
+                    ambiguous = false
+                } else if (form.length == best.form.length && best.service !== candidate) {
+                    ambiguous = true
+                }
+            }
         }
-        val rest = qualifiedName.substring(serviceName.length + 1)
-        return rest.split("\\.").filter[!empty].toList
+        return if (ambiguous) null else best
+    }
+
+    /**
+     * The longest form of a candidate's name that a required name begins with.
+     *
+     * The match ends on a dot, so a microservice whose name is a prefix of
+     * another's does not swallow it.
+     */
+    private def String longestMatchingForm(String qualifiedName, ServiceNode candidate) {
+        val name = candidate.qualifiedName
+        if (name === null) {
+            return null
+        }
+        val parts = name.split("\\.")
+        for (var int start = 0; start < parts.length; start++) {
+            val form = parts.drop(start).join(".")
+            if (qualifiedName == form || qualifiedName.startsWith(form + ".")) {
+                return form
+            }
+        }
+        return null
     }
 
     private def Dependency unresolved(Dependency dependency, String reason) {
         dependency.resolved = false
         dependency.reason = reason
         if (dependency.target === null) {
-            // A stub, so the diagram can still draw the edge to something.
-            val stub = new ServiceNode(stubName(dependency.written))
+            // A stub, so the diagram can still draw the edge to something. Its
+            // label is the whole name the model wrote, not the last part of it:
+            // where the microservice name ends is exactly what could not be
+            // worked out, and "find" would read as an operation.
+            val name = stubName(dependency.written)
+            val stub = new ServiceNode(name)
+            stub.name = name
             stub.resolved = false
             dependency.target = stub
         }
@@ -516,6 +562,19 @@ class ServiceModelReader {
 
     private def String canonical(Path path) {
         return path.toAbsolutePath.normalize.toString
+    }
+}
+
+/**
+ * A microservice a required name matched, and the form it matched by.
+ */
+class ServiceMatch {
+    public val ServiceNode service
+    public val String form
+
+    new(ServiceNode service, String form) {
+        this.service = service
+        this.form = form
     }
 }
 
