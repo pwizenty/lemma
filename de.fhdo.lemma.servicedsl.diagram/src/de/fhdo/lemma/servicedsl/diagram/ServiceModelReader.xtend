@@ -6,6 +6,7 @@ import de.fhdo.lemma.data.DataPackage
 import de.fhdo.lemma.service.Import
 import de.fhdo.lemma.service.ImportType
 import de.fhdo.lemma.service.ImportedServiceAspect
+import de.fhdo.lemma.service.Endpoint
 import de.fhdo.lemma.service.Interface
 import de.fhdo.lemma.service.Microservice
 import de.fhdo.lemma.service.Operation
@@ -97,7 +98,9 @@ class ServiceModelReader {
         val visited = <String>newLinkedHashSet
 
         for (entry : entries) {
-            queue.add(canonical(entry))
+            val file = canonical(entry)
+            queue.add(file)
+            graph.addEntryFile(file)
         }
 
         while (!queue.empty) {
@@ -213,7 +216,7 @@ class ServiceModelReader {
         node.notImplemented = anInterface.notImplemented
         node.aspects.addAll(anInterface.aspects.map[aspectReference])
         for (endpoint : anInterface.endpoints) {
-            node.endpoints.addAll(endpoint.addresses)
+            node.endpoints.add(endpointReference(endpoint))
         }
         for (operation : anInterface.operations) {
             node.operations.add(readOperation(operation))
@@ -226,7 +229,7 @@ class ServiceModelReader {
         node.notImplemented = operation.notImplemented
         node.aspects.addAll(operation.aspects.map[aspectReference])
         for (endpoint : operation.endpoints) {
-            node.endpoints.addAll(endpoint.addresses)
+            node.endpoints.add(endpointReference(endpoint))
         }
         for (parameter : operation.parameters) {
             node.parameters.add(readParameter(parameter))
@@ -239,6 +242,7 @@ class ServiceModelReader {
         node.communicationType = parameter.communicationType?.toString
         node.exchangePattern = parameter.exchangePattern?.toString
         node.optional = parameter.optional
+        node.fault = parameter.communicatesFault
         node.aspects.addAll(parameter.aspects.map[aspectReference])
 
         val primitiveType = parameter.primitiveType
@@ -251,6 +255,43 @@ class ServiceModelReader {
         // there is - and it wrote the alias and the qualified name.
         node.typeName = written(parameter.importedType)
         return node
+    }
+
+    /**
+     * An endpoint as its protocol and its addresses.
+     *
+     * The protocol is a cross-reference, so its name is read from what the
+     * model wrote: ``javaWithSpring::_protocols.rest`` is ``rest``.
+     */
+    private def EndpointReference endpointReference(Endpoint endpoint) {
+        val protocol = endpoint.protocols.map[protocolName(written(it))]
+            .filterNull.join(", ")
+        val reference = new EndpointReference(
+            if (protocol.empty) null else protocol)
+        reference.addresses.addAll(endpoint.addresses)
+        return reference
+    }
+
+    /**
+     * The name of a protocol, read from what the model wrote.
+     *
+     * ``javaWithSpring::_protocols.rest`` is a ``rest``; a data format in
+     * parentheses behind it is not part of the name.
+     */
+    static def String protocolName(String written) {
+        if (written.nullOrEmpty) {
+            return null
+        }
+        var text = written
+        val parenthesis = text.indexOf("(")
+        if (parenthesis >= 0) {
+            text = text.substring(0, parenthesis)
+        }
+        val separator = text.lastIndexOf(".")
+        if (separator >= 0) {
+            text = text.substring(separator + 1)
+        }
+        return text.trim
     }
 
     /**

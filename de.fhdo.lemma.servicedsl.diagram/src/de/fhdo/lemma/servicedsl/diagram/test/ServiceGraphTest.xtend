@@ -2,6 +2,7 @@ package de.fhdo.lemma.servicedsl.diagram.test
 
 import de.fhdo.lemma.servicedsl.diagram.Dependency
 import de.fhdo.lemma.servicedsl.diagram.DependencyLevel
+import de.fhdo.lemma.servicedsl.diagram.InterfaceDiagramGenerator
 import de.fhdo.lemma.servicedsl.diagram.ServiceGraph
 import de.fhdo.lemma.servicedsl.diagram.ServiceModelReader
 import java.nio.file.Path
@@ -34,6 +35,11 @@ class ServiceGraphTest {
         anUndeclaredAliasIsReported
         aCycleOfImportsTerminates
         lakesideMutualResolvesAcrossModels
+        theVerbComesFromTheAspectThatSaysSo
+        anOperationShowsItsOwnPath
+        aResultIsNotConfusedWithAParameter
+        anInterfaceNameIsScopedToItsMicroservice
+        anInterfaceDiagramShowsTheSelectionOnly
 
         println('''
         ---
@@ -189,6 +195,120 @@ class ServiceGraphTest {
             "getCustomer,getCustomers,updateCustomer")
         check("the levels are mixed, not normalised",
             whole.dependencies.filter[level === DependencyLevel.MICROSERVICE].size, 2)
+    }
+
+    /**
+     * The verb is read from the aspect, and only where the aspect says it.
+     *
+     * Catches a verb guessed from the operation's name, and catches
+     * ``RequestMapping`` being read as a ``GET``: it carries its verb in a
+     * property rather than in its name, so claiming one would state something
+     * the model does not say.
+     */
+    private def static void theVerbComesFromTheAspectThatSaysSo() {
+        val diagram = draw(FIXTURES + "/interface-shapes/shapes.services")
+
+        check("GetMapping is a GET",
+            diagram.contains("GET read(id : string) : string"), true)
+        check("RequestMapping claims no verb",
+            diagram.contains("any(id : string) : string"), true)
+        check("and is not read as a GET", diagram.contains("GET any"), false)
+        check("an operation with no aspect claims no verb",
+            diagram.contains("plain(id : string) : string"), true)
+    }
+
+    /**
+     * An operation's own path is shown beside its verb.
+     *
+     * Catches a diagram that shows only the interface's path, which would say
+     * that every operation of it answers under the same address.
+     */
+    private def static void anOperationShowsItsOwnPath() {
+        val diagram = draw(LAKESIDE + "/CustomerCore.services")
+
+        check("the interface's path is shown once",
+            diagram.contains("/customers"), true)
+        check("an operation's own path is shown with its verb",
+            diagram.contains("GET /{ids} getCustomer("), true)
+        check("an operation without one shows none",
+            diagram.contains("POST createCustomer("), true)
+    }
+
+    /**
+     * What an operation returns, and what it does not.
+     *
+     * Catches an outgoing parameter drawn as a parameter of the call, a fault
+     * drawn as the result - which would state that a failure is what the
+     * operation returns - and a second outgoing value dropped, which LEMMA
+     * allows and a diagram showing only the first would hide.
+     */
+    private def static void aResultIsNotConfusedWithAParameter() {
+        val diagram = draw(FIXTURES + "/interface-shapes/shapes.services")
+
+        check("an operation with nothing outgoing returns void",
+            diagram.contains("notify(message : string) : void"), true)
+        check("several outgoing values are all shown",
+            diagram.contains("split(id : string) : (first : string, second : int)"), true)
+        check("a fault is not the result",
+            diagram.contains("risky(id : string) : string {fault string}"), true)
+        check("an asynchronous operation is marked",
+            diagram.contains("stream(id : string) : string {async}"), true)
+        check("an optional parameter is marked",
+            diagram.contains("search(filter? : string)"), true)
+    }
+
+    /**
+     * Two microservices of one system offer an interface of the same name.
+     *
+     * Catches an alias that is only the interface name: PlantUML identifies a
+     * type by the name it is declared with whatever package it sits in, so one
+     * interface would be drawn holding the operations of both. This is the
+     * defect the data model diagram was corrected for.
+     */
+    private def static void anInterfaceNameIsScopedToItsMicroservice() {
+        val diagram = draw(FIXTURES + "/interface-shapes/shapes.services")
+        val aliases = diagram.split("\n")
+            .filter[contains("interface ") && contains(" as ")]
+            .map[substring(indexOf(" as ") + 4).split(" ").head.trim]
+            .toList
+
+        check("both Shared interfaces are drawn",
+            diagram.split("interface .Shared.").size - 1, 2)
+        check("under aliases of their own", aliases.size, aliases.toSet.size)
+        check("scoped to the microservice",
+            aliases.exists[endsWith("Shapes_Shared")]
+                && aliases.exists[endsWith("Helper_Shared")], true)
+        check("a microservice that is neither public nor functional says so",
+            diagram.contains("package \"Helper\" <<internal, utility>>"), true)
+        check("a noimpl interface is marked",
+            diagram.contains("<<noimpl>>"), true)
+    }
+
+    /**
+     * An interface diagram shows the model that was opened, not its imports.
+     *
+     * The reader follows imports because a dependency diagram needs them, so
+     * the graph of CustomerSelfService holds CustomerCore as well. Catches an
+     * interface diagram that draws it too: a reader who opens one service model
+     * is asking what that service offers, and drawing everything reachable made
+     * this diagram two packages wide where it should be one.
+     */
+    private def static void anInterfaceDiagramShowsTheSelectionOnly() {
+        val graph = read(LAKESIDE + "/CustomerSelfService.services")
+        val diagram = new InterfaceDiagramGenerator().generate(graph)
+
+        check("the graph still reaches CustomerCore, for the dependencies",
+            graph.services.exists[name == "CustomerCore"], true)
+        check("the diagram draws the selected service",
+            diagram.contains("package \"CustomerSelfService\""), true)
+        check("and not the one it imports",
+            diagram.contains("package \"CustomerCore\""), false)
+        check("exactly one package is drawn",
+            diagram.split("package \"").size - 1, 1)
+    }
+
+    private def static String draw(String file) {
+        return new InterfaceDiagramGenerator().generate(read(file))
     }
 
     private def static ServiceGraph read(String file) {

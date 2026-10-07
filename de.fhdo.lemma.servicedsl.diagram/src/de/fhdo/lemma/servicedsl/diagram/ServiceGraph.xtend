@@ -30,6 +30,18 @@ class ServiceGraph {
     @Accessors(PUBLIC_GETTER)
     val List<String> problems = newLinkedList
 
+    /**
+     * The models that were asked for, as opposed to those reached through their
+     * imports.
+     *
+     * A dependency diagram wants everything reachable; an interface diagram
+     * wants what was selected, because a reader who opens one model is asking
+     * about that one. Both read the same graph, so the graph has to keep the
+     * difference.
+     */
+    @Accessors(PUBLIC_GETTER)
+    val List<String> entryFiles = newLinkedList
+
     def void add(ServiceNode service) {
         services.add(service)
     }
@@ -40,6 +52,24 @@ class ServiceGraph {
 
     def void addProblem(String problem) {
         problems.add(problem)
+    }
+
+    def void addEntryFile(String file) {
+        entryFiles.add(file)
+    }
+
+    /**
+     * Whether a model is one of those that were asked for.
+     */
+    def boolean isEntry(String modelFile) {
+        return entryFiles.contains(modelFile)
+    }
+
+    /**
+     * The microservices the asked-for models declare.
+     */
+    def List<ServiceNode> entryServices() {
+        return services.filter[resolved && isEntry(modelFile)].toList
     }
 
     /**
@@ -135,10 +165,10 @@ class InterfaceNode {
     boolean notImplemented
 
     /**
-     * The addresses its endpoints answer under, as the model wrote them.
+     * Its endpoints: the protocol each answers, and under which addresses.
      */
     @Accessors
-    val List<String> endpoints = newLinkedList
+    val List<EndpointReference> endpoints = newLinkedList
 
     @Accessors
     val List<AspectReference> aspects = newLinkedList
@@ -166,10 +196,10 @@ class OperationNode {
     boolean notImplemented
 
     /**
-     * Its own endpoint addresses, which extend its interface's.
+     * Its own endpoints, whose addresses extend its interface's.
      */
     @Accessors
-    val List<String> endpoints = newLinkedList
+    val List<EndpointReference> endpoints = newLinkedList
 
     @Accessors
     val List<AspectReference> aspects = newLinkedList
@@ -214,11 +244,49 @@ class ParameterNode {
     @Accessors
     boolean optional
 
+    /**
+     * Whether it communicates a fault rather than a result.
+     */
+    @Accessors
+    boolean fault
+
     @Accessors
     val List<AspectReference> aspects = newLinkedList
 
     new(String name) {
         this.name = name
+    }
+
+    def boolean isIncoming() {
+        return "IN" == exchangePattern
+    }
+
+    def boolean isOutgoing() {
+        return "OUT" == exchangePattern
+    }
+
+    def boolean isAsynchronous() {
+        return "ASYNCHRONOUS" == communicationType
+    }
+}
+
+/**
+ * An endpoint: the protocol it answers and the addresses it answers under.
+ *
+ * The protocol is a cross-reference, so it is read from the parse tree and kept
+ * by name - ``rest`` of ``javaWithSpring::_protocols.rest``. A diagram says
+ * which protocol an interface speaks, and the technology it came from is not
+ * what distinguishes one interface from another.
+ */
+class EndpointReference {
+    @Accessors
+    String protocol
+
+    @Accessors
+    val List<String> addresses = newLinkedList
+
+    new(String protocol) {
+        this.protocol = protocol
     }
 }
 

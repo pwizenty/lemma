@@ -1,8 +1,8 @@
 # Service model diagrams
 
-Reads LEMMA service models and resolves what they require of each other, so that
-a diagram can be drawn from the result. Step 1 of
-`docs/service-diagram-plan.md`: the reader and the graph. The generators and the
+Reads LEMMA service models, resolves what they require of each other, and draws
+the interfaces they offer. Steps 1 and 2 of `docs/service-diagram-plan.md`: the
+reader, the graph and the interface diagram. The dependency diagrams and the
 Eclipse command follow.
 
 ## What it does
@@ -24,6 +24,60 @@ ServiceModelReader.read(Paths.get("CustomerSelfService.services"))
 dependency across model files is the hard part of drawing a service model; it
 happens once, it is testable on its own, and a further diagram needs no further
 reading.
+
+## The interface diagram
+
+```
+package "CustomerCore" {
+    interface "CustomerInformationHolder" as com_…_CustomerCore_CustomerInformationHolder <<rest>> {
+        /customers
+        ..
+        GET getCustomers(filter : string, limit : int) : PaginatedCustomerResponseDto
+        GET /{ids} getCustomer(ids : string) : CustomersResponseDto
+        PUT /{customerId} updateCustomer(customerId : CustomerId, …) : CustomerResponseDto
+        POST createCustomer(requestDto : CustomerProfileUpdateRequestDto) : CustomerResponseDto
+    }
+}
+```
+
+An interface is an interface, an operation a method, its incoming parameters the
+method's parameters and its outgoing one the result. What makes it a REST
+interface rather than an abstract one is the verb and the path, so those are on
+every operation that has them.
+
+| In the model | In the diagram |
+|---|---|
+| `microservice` | a package, labelled with its simple name |
+| `interface` | an interface, stereotyped with the protocol of its endpoints |
+| `@endpoints(…rest:"/customers";)` | the path, on the interface or the operation |
+| `@…_aspects.GetMapping` | `GET` in front of the operation |
+| `sync in` parameter | a parameter of the method |
+| `sync out` parameter | the result; several become a named tuple |
+| `fault` parameter | `{fault T}`, never the result |
+| `async` parameter | `{async}` |
+| `?` | `name? : T` |
+| `noimpl` | `<<noimpl>>` |
+| a microservice that is not `public functional` | `<<internal, utility>>` on the package |
+
+Three things it deliberately does not do:
+
+- **`RequestMapping` gets no verb.** It carries the verb in a property rather
+  than in its name, so claiming `GET` would state something the model does not.
+- **It draws the model that was opened, not the models it imports.** The reader
+  follows imports because the dependency diagram needs them, so the graph of
+  `CustomerSelfService` holds `CustomerCore` too. A reader who opens one service
+  model is asking what *that* service offers; drawing everything reachable made
+  this diagram two packages at four times as wide as high.
+- **A parameter's type is shown by its simple name.** In a service model every
+  complex type is imported, so the alias and the context would be on every
+  parameter and say nothing about the interface.
+
+`skinparam wrapWidth 500` is emitted because PlantUML does not wrap a class
+member by itself, and an operation with several parameters, several results and a
+fault runs past 240 characters. The widest reconstructed interface came out
+4786x1010 without it and 2638x1504 with it. A model that declares several
+microservices in one file is still wide — `examples/parking-spaces` draws five
+packages side by side at 2745x188 — because that is what the model holds.
 
 ## Why the parse tree is read
 
@@ -80,8 +134,12 @@ python3 tools/check-bundle-requires.py .
 ```
 
 `ServiceGraphTest` needs no database and no running Eclipse, which is the point
-of keeping the reader free of both. 29 checks over the fixtures in `test/` and
-the reconstructed Lakeside Mutual models.
+of keeping the reader and the generator free of both. 50 checks over the fixtures
+in `test/` and the reconstructed Lakeside Mutual models.
+
+A sweep over every service model of the repository backs them up: 31 models, 91
+interfaces, 225 operations, nothing silently empty, no two interfaces sharing an
+alias, every diagram rendered to valid SVG.
 
 **Every decision it defends was mutation-tested** — a check that cannot fail
 proves nothing, and two of these did not fail until the fixture was rewritten to
@@ -93,6 +151,11 @@ isolate them:
 | the longest match wins | the first match wins | 4 |
 | match what was read | split from the end of the name | 1 |
 | a visited set when following imports | follow unconditionally | 1 |
+| an interface alias is scoped to its service | the interface name alone | 2 |
+| `RequestMapping` claims no verb | mapped to `GET` | 1 |
+| a fault is not the result | counted as outgoing | 1 |
+| every outgoing value is shown | only the first | 1 |
+| an outgoing parameter is not a call parameter | listed as one | 7 |
 
 `tools/check-bundle-requires.py` resolves every imported package against the
 bundles the manifest requires. It is here because a headless compile cannot see a
@@ -101,5 +164,5 @@ Eclipse installation, which ignores OSGi boundaries.
 
 ## Not yet here
 
-The generators and the context-menu command — steps 2 to 4 of the plan. Until
-then nothing in this bundle is reachable from the user interface.
+The dependency diagrams and the context-menu command — steps 3 and 4 of the
+plan. Until then nothing in this bundle is reachable from the user interface.
