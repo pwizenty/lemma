@@ -85,7 +85,7 @@ So: read local features from EMF, read cross-references from the node model via
 resolves dependencies itself, by matching an alias against the imports and the
 qualified name against the microservices of the imported file.
 
-## 4. The correctness trap
+## 4. Resolving a required name
 
 A microservice name is itself qualified, so a required operation reads
 
@@ -94,17 +94,37 @@ CustomerCore :: com.lakesidemutual.customercore.CustomerCore . CustomerInformati
 └─ alias ──┘    └──────────── microservice ───────────────┘   └──── interface ───────┘   └── op ──┘
 ```
 
-Splitting that positionally is wrong, because the number of dots in a
-microservice name is not fixed. The name has to be matched as the **longest
-prefix** against the microservice names actually found in the imported file, and
-only the remainder read as interface and operation. This is the same shape as
-the MRF rule that a data structure must be qualified `<Context>.<Type>`, which
-cost a round of rework there, so it gets a test of its own asserting the trap
-directly rather than a diagram that happens to look right.
+The name is matched as the **longest prefix** against the microservice names
+actually found in the imported file, the match ending on a dot, and only the
+remainder read as interface and operation.
 
-An alias that no import declares, or a qualified name no imported model holds,
-is drawn as an unresolved stub rather than dropped: a dependency the diagram
-cannot follow is a fact about the model, not nothing.
+**A correction to an earlier draft of this plan.** It claimed that splitting the
+name positionally is wrong "because the number of dots in a microservice name is
+not fixed". That is not true of splitting from the *end*: given the level, the
+interface and operation are the last one or two segments, so dropping them yields
+the microservice name deterministically. The argument only holds against
+splitting from the front, which nobody would write.
+
+The real reason to match against what was read is that it **detects a name
+nothing declares**. Splitting from the end of
+`com.example.orders.Nonexistent.Queries.find` yields the plausible triple
+(`Nonexistent`, `Queries`, `find`) and reports a dependency on a microservice
+that does not exist. Matching cannot: there is nothing to match. Measured by
+mutating the reader to do exactly that, which turns one check red.
+
+Three decisions, each defended by a check that fails when the decision is
+reversed:
+
+| Decision | Reversed | Checks that go red |
+|---|---|---|
+| Match ends on a dot | `startsWith(name)` | 2 |
+| Longest match wins | first match wins | 4 |
+| Match what was read | split from the end | 1 |
+| Visited set when following imports | follow unconditionally | 1 |
+
+An alias that no import declares, or a qualified name no imported model holds, is
+drawn as an unresolved stub rather than dropped: a dependency the diagram cannot
+follow is a fact about the model, not nothing.
 
 ## 5. Structure
 
