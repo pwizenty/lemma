@@ -1,5 +1,6 @@
 package de.fhdo.lemma.data.datadsl.diagram
 
+import de.fhdo.lemma.diagram.common.PlantUmlRenderer
 import de.fhdo.lemma.data.DataDslStandaloneSetup
 import de.fhdo.lemma.data.DataModel
 import de.fhdo.lemma.data.DataPackage

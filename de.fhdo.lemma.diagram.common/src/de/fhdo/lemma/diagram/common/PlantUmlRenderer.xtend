@@ -1,4 +1,4 @@
-package de.fhdo.lemma.data.datadsl.diagram
+package de.fhdo.lemma.diagram.common
 
 import java.io.File
 import java.nio.charset.StandardCharsets

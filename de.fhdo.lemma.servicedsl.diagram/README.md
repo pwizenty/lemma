@@ -209,7 +209,7 @@ a microservice that does not exist.
 # in this bundle, "Run As -> Java Application" on ServiceGraphTest, or:
 java de.fhdo.lemma.servicedsl.diagram.test.ServiceGraphTest
 
-python3 tools/check-bundle-requires.py .
+python3 ../de.fhdo.lemma.diagram.common/tools/check-bundle-requires.py .
 ```
 
 `ServiceGraphTest` needs no database and no running Eclipse, which is the point
@@ -274,7 +274,7 @@ a headless one cannot. The pipeline the handler runs - the same reads, the same
 generators, the same file names, the same renderer - was exercised headlessly
 and produced the five diagrams above with no problems reported.
 
-`PlantUmlRenderer` and `tools/check-bundle-requires.py` are shared with
-`de.fhdo.lemma.data.datadsl.diagram` by requiring that bundle rather than by a
-bundle of their own. Two consumers do not justify a third bundle; a third
-consumer would.
+`PlantUmlRenderer` and `tools/check-bundle-requires.py` come from
+`de.fhdo.lemma.diagram.common`, which this bundle requires. They moved there when
+the operation model diagrams became their third consumer, which is the trigger
+condition this file used to name.

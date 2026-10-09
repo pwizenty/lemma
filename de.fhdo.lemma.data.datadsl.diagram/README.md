@@ -99,7 +99,7 @@ and on two classes sharing an alias.
 ## Checking the dependencies this bundle declares
 
 ```sh
-python3 tools/check-bundle-requires.py .
+python3 ../de.fhdo.lemma.diagram.common/tools/check-bundle-requires.py .
 ```
 
 Resolves every package the sources import against the `Export-Package` of the
