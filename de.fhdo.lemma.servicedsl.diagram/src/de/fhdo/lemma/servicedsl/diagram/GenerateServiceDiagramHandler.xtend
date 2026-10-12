@@ -1,6 +1,6 @@
 package de.fhdo.lemma.servicedsl.diagram
 
-import de.fhdo.lemma.data.datadsl.diagram.PlantUmlRenderer
+import de.fhdo.lemma.diagram.common.PlantUmlRenderer
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.util.List
