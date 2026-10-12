@@ -185,6 +185,29 @@ technology javaWithSpring {
             string transport <mandatory>;
         }
 
+        // One port the service itself answers on, and whether that port uses
+        // TLS. The other half of Non-Secured Service-to-Service Communications:
+        // a plaintext call matters because the callee accepts plaintext.
+        //
+        // Deliberately not <singleval>, so that it may be applied once per
+        // connector: Spring configures a main connector and, where
+        // management.server.port is set, a second one, and the two may differ
+        // in whether they use TLS. checkUniqueAspects of the Service DSL
+        // forbids repeating a single-valued aspect, which would make the second
+        // connector unrepresentable.
+        //
+        // No property is <mandatory>. A database written by an older
+        // reconstruction then yields a model with fewer values rather than a
+        // generation that fails, and the value that matters - tlsEnabled - is
+        // reported whenever it was reconstructed.
+        aspect ServerEndpoint for microservices {
+            string connector;
+            string port;
+            string protocol;
+            boolean tlsEnabled;
+            string clientAuth;
+        }
+
         aspect Table<singleval> for types {
             string name;
         }

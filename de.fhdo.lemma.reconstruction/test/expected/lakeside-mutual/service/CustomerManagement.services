@@ -4,6 +4,7 @@ import microservices from "CustomerCore.services" as CustomerCore
 
 @technology(javaWithSpring)
 @javaWithSpring::_aspects.ServiceCommunicationTransport(transport = "plaintext")
+@javaWithSpring::_aspects.ServerEndpoint(connector = "server", port = "8100", protocol = "http", tlsEnabled = false)
 public functional microservice com.lakesidemutual.customermanagement.CustomerManagement {
     required operations {
         CustomerCore::com.lakesidemutual.customercore.CustomerCore.CustomerInformationHolder.getCustomer,

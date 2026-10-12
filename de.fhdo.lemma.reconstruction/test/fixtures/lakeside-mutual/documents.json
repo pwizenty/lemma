@@ -3561,6 +3561,16 @@
           "values": {
             "transport": "plaintext"
           }
+        },
+        {
+          "name": "ServerEndpoint",
+          "values": {
+            "connector": "server",
+            "port": "8080",
+            "protocol": "http",
+            "tlsEnabled": "false",
+            "valueSource": "customer-self-service-backend/src/main/resources/application.properties"
+          }
         }
       ],
       "interfaces": [
@@ -4384,6 +4394,16 @@
           "name": "ServiceCommunicationTransport",
           "values": {
             "transport": "plaintext"
+          }
+        },
+        {
+          "name": "ServerEndpoint",
+          "values": {
+            "connector": "server",
+            "port": "8090",
+            "protocol": "http",
+            "tlsEnabled": "false",
+            "valueSource": "policy-management-backend/src/main/resources/application.properties"
           }
         }
       ],
@@ -5278,6 +5298,16 @@
           "values": {
             "transport": "plaintext"
           }
+        },
+        {
+          "name": "ServerEndpoint",
+          "values": {
+            "connector": "server",
+            "port": "8100",
+            "protocol": "http",
+            "tlsEnabled": "false",
+            "valueSource": "customer-management-backend/src/main/resources/application.properties"
+          }
         }
       ],
       "interfaces": [
@@ -5695,6 +5725,16 @@
         {
           "name": "functional",
           "values": {}
+        },
+        {
+          "name": "ServerEndpoint",
+          "values": {
+            "connector": "server",
+            "port": "8110",
+            "protocol": "http",
+            "tlsEnabled": "false",
+            "valueSource": "customer-core/src/main/resources/application.properties"
+          }
         }
       ],
       "interfaces": [
