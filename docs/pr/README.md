@@ -9,12 +9,14 @@ name the exact commands and their output - which matters here, because this
 repository has no headless build and the verification was done by compiling the
 Xtend with the batch compiler and running `ReconstructionRegressionTest` by hand.
 
-At the repository root rather than inside a bundle: each of these changes spans
-`de.fhdo.lemma.reconstruction` and `de.fhdo.lemma.servicedsl.extractor`.
+At the repository root rather than inside a bundle: these changes span several
+of them - `de.fhdo.lemma.reconstruction` and `de.fhdo.lemma.servicedsl.extractor`
+for the reconstruction work, the `*.diagram` bundles for the visualisations, and
+`de.fhdo.lemma.servicedsl.smells*` for the smell detection.
 
-All three arrived with the branch `feat/communication-aspect`, which contains the
-commits of the other two; the earlier branches are left alone so their own diffs
-stay free of files describing themselves.
+The first three arrived together on the branch `feat/communication-aspect`, which
+contains the commits of the other two; the earlier branches are left alone so
+their own diffs stay free of files describing themselves.
 
 | File | Branch | Into |
 |---|---|---|
@@ -24,8 +26,14 @@ stay free of files describing themselves.
 | `feat-service-dependencies.md` | `feat/service-dependencies` | `dev` |
 | `feat-protobuf-fixture.md` | `feat/protobuf-fixture` | `dev` |
 | `fix-asynchronous-communication.md` | `fix/asynchronous-communication` | `dev` |
+| `feat-data-model-diagram.md` | `feat/data-model-diagram` | `dev` |
+| `feat-service-model-diagram.md` | `feat/service-model-diagram` | `dev` |
+| `feat-operation-model-diagram.md` | `feat/operation-model-diagram` | `dev` |
+| `feat-server-endpoint-aspect.md` | `feat/server-endpoint-aspect` | `dev` |
+| `feat-security-smell-detection.md` | `feat/security-smell-detection` | `dev` |
 
-Merge order matters for the last one: it contains the commits of
-`feat/rest-technology-information`, so that branch goes first. Each also needs
-its counterpart in the MRF repository - neither side produces visible output
-alone.
+Merge order matters for `feat/communication-aspect`: it contains the commits of
+`feat/rest-technology-information`, so that branch goes first. Most also need
+their counterpart in the MRF repository - neither side produces visible output
+alone. The `*.diagram` branches are the exception: they read models that already
+exist and depend on nothing in MRF.
