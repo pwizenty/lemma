@@ -109,7 +109,7 @@ class NodeDetailDiagramGenerator {
 
         // A separator was added before each group whether or not the group
         // turned out to have anything in it, so one may be left at the end.
-        while (!lines.empty && ".." == lines.last) {
+        while (!lines.empty && ".." == lines.get(lines.size - 1)) {
             lines.remove(lines.size - 1)
         }
 
@@ -161,7 +161,10 @@ class NodeDetailDiagramGenerator {
      * them - a diagram should not show a rule above nothing.
      */
     private def void separate(List<String> lines) {
-        if (!lines.empty && ".." != lines.last) {
+        // Indexed rather than the "last" extension: on a List that reads as
+        // List.getLast(), which Java added in 21, while this bundle declares
+        // JavaSE-11. A compile on a newer JDK accepts it and Eclipse does not.
+        if (!lines.empty && ".." != lines.get(lines.size - 1)) {
             lines.add("..")
         }
     }
