@@ -1,0 +1,118 @@
+# Security smells in service models
+
+Detects **Non-Secured Service-to-Service Communications** — §3.7 of Ponce et
+al. (2022) — in LEMMA service models. Select one or more `.services` files,
+**Detect security smells** from the context menu, and a Markdown report lands
+beside the first of them and opens.
+
+```
+Findings                            9
+Channels judged protected           0
+Channels that could not be judged   0
+
+### CustomerManagement → CustomerCore
+- Channel: call to CustomerCore
+- Why: the call uses http, which does not protect the channel
+- Refactoring: Use Mutual TLS
+- Evidence, as the models state it:
+  - @javaWithSpring::_aspects.ServiceCall(target = "CustomerCore", …, scheme = "http", …)
+  - @javaWithSpring::_aspects.ServerEndpoint(connector = "server", port = "8110", …, tlsEnabled = false)
+```
+
+A report rather than editor markers: a finding is about a **pair** of
+microservices declared in two different files, so there is no single line to
+mark — and the evidence is worth more than a squiggle.
+
+## Where the decision belongs
+
+ADR-0009 of the reconstruction framework puts the split: **MRF collects facts,
+LEMMA decides the smell.** So nothing MRF writes is named `insecure` and nothing
+carries a severity; this bundle reads the facts a model carries and judges them.
+
+A finding carries no severity either. The literature does not rank these smells,
+and inventing a ranking would put a judgement in the tool that belongs to
+whoever reads it.
+
+## What the rule decides
+
+For every interaction between two microservices **of the application**:
+
+| Channel | Judged from |
+|---|---|
+| A synchronous call | the scheme the caller uses, **and** whether the callee's connector accepts plaintext |
+| A channel through a queue | the transport of the broker |
+
+Four things it deliberately does:
+
+- **A call to a third party is not this smell.** The paper's smell is about two
+  microservices of the application, so an external target is neither a finding
+  nor something this rule can clear.
+- **A TLS call to a callee that also accepts plaintext is still a finding.** The
+  smell is about the channel: a callee with a plaintext management connector can
+  be reached over plaintext however this caller calls it.
+- **A queue is judged once, from the producer's end.** Both ends carry the fact
+  — it is one interaction, and judging both would double every asynchronous
+  finding.
+- **What cannot be decided is reported as undecided, never as secure.** A system
+  that does not smell and a system whose facts were never reconstructed must not
+  look alike. That is the difference between a rule and a guess.
+
+Where TLS is in place but `clientAuth` is not `need`, the finding says so: the
+paper's refactoring is *mutual* TLS because it also authenticates the peers,
+which is what additionally mitigates §3.8 Unauthenticated traffic.
+
+## What it found in Lakeside Mutual
+
+```
+3 synchronous calls   CustomerManagement, CustomerSelfService, PolicyManagement → CustomerCore
+6 queue channels      CustomerSelfService ↔ PolicyManagement (5), PolicyManagement → RiskManagement
+                      ─────
+                      9 findings, 0 protected, 0 undecided
+```
+
+Every one plaintext. The last is cross-technology: a Java producer and a Node
+consumer, paired by queue name.
+
+## Checking it
+
+```sh
+# in this bundle, "Run As -> Java Application" on SmellDetectionTest, or:
+java de.fhdo.lemma.servicedsl.smells.test.SmellDetectionTest
+
+python3 ../de.fhdo.lemma.diagram.common/tools/check-bundle-requires.py .
+```
+
+28 checks, no database and no running Eclipse. The fixtures under `test/` carry
+what no sample system has — TLS anywhere, a TLS broker, a callee with both kinds
+of connector — because **neither Lakeside Mutual nor park-and-charge configures
+TLS at all**. So the rule's *negative* case is fixture-only.
+
+Every decision is defended by a mutation that turns it red:
+
+| Decision | Reversed to | Checks that go red |
+|---|---|---|
+| a protected channel is cleared | report every call | 2 |
+| the callee's connectors count | judge the caller's scheme alone | 2 |
+| undecided is not secure | assume secure | 1 |
+| a queue is judged once | judge both ends | 1 |
+| a third party is not this smell | report it too | 1 |
+
+## Structure
+
+`NonSecuredCommunicationDetector` is a function of a `ServiceGraph` and nothing
+else: no file system, no workspace, no Eclipse. `SmellReport` is a function of
+the result. `DetectSmellsHandler` is the shell that finds the selection, writes
+the report and opens it.
+
+The `ServiceGraph` and its reader come from `de.fhdo.lemma.servicedsl.diagram`,
+which this bundle requires. That makes a diagram bundle the host of the service
+model reader, which is the shape of coupling `PlantUmlRenderer` had before it
+moved to `de.fhdo.lemma.diagram.common` — two consumers do not justify
+extracting it, a third would.
+
+## What only Eclipse can confirm
+
+Whether the menu entry appears on a `.services` selection and whether the
+handler resolves in a running workbench. The detector and the report were
+exercised headlessly against the models generated from the real database, and
+produced the nine findings above.
