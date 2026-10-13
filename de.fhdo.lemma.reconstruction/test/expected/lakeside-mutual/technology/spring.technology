@@ -200,10 +200,12 @@ technology javaWithSpring {
         // reconstruction then yields a model with fewer values rather than a
         // generation that fails, and the value that matters - tlsEnabled - is
         // reported whenever it was reconstructed.
+        // ^protocol and, below, ^technology: both are keywords of the DSLs, so
+        // the declaration needs the caret as the generated application does.
         aspect ServerEndpoint for microservices {
             string connector;
             string port;
-            string protocol;
+            string ^protocol;
             boolean tlsEnabled;
             string clientAuth;
         }
@@ -230,7 +232,7 @@ technology javaWithSpring {
             string target;
             string targetKind;
             string scheme;
-            string technology;
+            string ^technology;
         }
 
         // One endpoint of another service that a client declares it addresses.

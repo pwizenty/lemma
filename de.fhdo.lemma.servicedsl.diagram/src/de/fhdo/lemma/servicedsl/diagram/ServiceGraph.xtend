@@ -364,7 +364,10 @@ class AspectReference {
         for (assignment : split(written.substring(open + 1, close))) {
             val separator = assignment.indexOf("=")
             if (separator > 0) {
-                val name = assignment.substring(0, separator).trim
+                // A property named after a keyword is written with a caret -
+                // ^protocol, ^technology - and the caret is syntax, not part of
+                // the name a reader asks for.
+                val name = assignment.substring(0, separator).trim.replaceFirst("^\\^", "")
                 val value = assignment.substring(separator + 1).trim
                 values.put(name, unquote(value))
             }

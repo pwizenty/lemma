@@ -3,9 +3,9 @@ import datatypes from "../domain/PolicyManagement.data" as PolicyManagement
 import microservices from "CustomerCore.services" as CustomerCore
 
 @technology(javaWithSpring)
-@javaWithSpring::_aspects.ServiceCall(target = "CustomerCore", targetKind = "SERVICE", scheme = "http", technology = "RestTemplate")
+@javaWithSpring::_aspects.ServiceCall(target = "CustomerCore", targetKind = "SERVICE", scheme = "http", ^technology = "RestTemplate")
 @javaWithSpring::_aspects.ServiceCommunicationTransport(transport = "plaintext")
-@javaWithSpring::_aspects.ServerEndpoint(connector = "server", port = "8090", protocol = "http", tlsEnabled = false)
+@javaWithSpring::_aspects.ServerEndpoint(connector = "server", port = "8090", ^protocol = "http", tlsEnabled = false)
 @javaWithSpring::_aspects.MessageChannel(role = "producer", queue = "newpolicies", target = "RiskManagement", broker = "activemq", scheme = "tcp", transport = "plaintext")
 @javaWithSpring::_aspects.MessageChannel(role = "producer", queue = "insurance-quote-response-event-queue", target = "CustomerSelfService", broker = "activemq", scheme = "tcp", transport = "plaintext")
 @javaWithSpring::_aspects.MessageChannel(role = "producer", queue = "insurance-quote-expired-event-queue", target = "CustomerSelfService", broker = "activemq", scheme = "tcp", transport = "plaintext")
