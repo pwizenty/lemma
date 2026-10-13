@@ -3,6 +3,10 @@ import datatypes from "../domain/CustomerManagement.data" as CustomerManagement
 import microservices from "CustomerCore.services" as CustomerCore
 
 @technology(javaWithSpring)
+@javaWithSpring::_aspects.ServiceCall(target = "CustomerCore", targetKind = "SERVICE", scheme = "http", technology = "Feign")
+@javaWithSpring::_aspects.ServiceCallEndpoint(target = "CustomerCore", verb = "GetMapping", path = "/customers", method = "getCustomers")
+@javaWithSpring::_aspects.ServiceCallEndpoint(target = "CustomerCore", verb = "PutMapping", path = "/customers/{customerId}", method = "updateCustomer")
+@javaWithSpring::_aspects.ServiceCallEndpoint(target = "CustomerCore", verb = "GetMapping", path = "/customers/{ids}", method = "getCustomer")
 @javaWithSpring::_aspects.ServiceCommunicationTransport(transport = "plaintext")
 @javaWithSpring::_aspects.ServerEndpoint(connector = "server", port = "8100", protocol = "http", tlsEnabled = false)
 public functional microservice com.lakesidemutual.customermanagement.CustomerManagement {

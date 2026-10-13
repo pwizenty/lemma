@@ -3,8 +3,14 @@ import datatypes from "../domain/CustomerSelfService.data" as CustomerSelfServic
 import microservices from "CustomerCore.services" as CustomerCore
 
 @technology(javaWithSpring)
+@javaWithSpring::_aspects.ServiceCall(target = "CustomerCore", targetKind = "SERVICE", scheme = "http", technology = "RestTemplate")
 @javaWithSpring::_aspects.ServiceCommunicationTransport(transport = "plaintext")
 @javaWithSpring::_aspects.ServerEndpoint(connector = "server", port = "8080", protocol = "http", tlsEnabled = false)
+@javaWithSpring::_aspects.MessageChannel(role = "producer", queue = "insurance-quote-request-event-queue", target = "PolicyManagement", broker = "activemq", scheme = "tcp", transport = "plaintext")
+@javaWithSpring::_aspects.MessageChannel(role = "producer", queue = "customer-decision-event-queue", target = "PolicyManagement", broker = "activemq", scheme = "tcp", transport = "plaintext")
+@javaWithSpring::_aspects.MessageChannel(role = "consumer", queue = "insurance-quote-expired-event-queue", target = "PolicyManagement", broker = "activemq", scheme = "tcp", transport = "plaintext")
+@javaWithSpring::_aspects.MessageChannel(role = "consumer", queue = "policy-created-event-queue", target = "PolicyManagement", broker = "activemq", scheme = "tcp", transport = "plaintext")
+@javaWithSpring::_aspects.MessageChannel(role = "consumer", queue = "insurance-quote-response-event-queue", target = "PolicyManagement", broker = "activemq", scheme = "tcp", transport = "plaintext")
 public functional microservice com.lakesidemutual.customerselfservice.CustomerSelfService {
     required microservices {
         CustomerCore::com.lakesidemutual.customercore.CustomerCore

@@ -208,6 +208,65 @@ technology javaWithSpring {
             string clientAuth;
         }
 
+        // One outgoing call of a service, and the transport it uses.
+        //
+        // ServiceCommunicationTransport above says what a service's calls use
+        // *together* - plaintext, tls, mixed or unresolved - which is enough to
+        // see that a service has a problem and not enough to see which link it
+        // is. A rule for Non-Secured Service-to-Service Communications judges a
+        // pair of services, so it needs the link.
+        //
+        // Not <singleval>, so that it may be applied once per call: a service
+        // that calls three others carries it three times, and
+        // checkUniqueAspects of the Service DSL forbids repeating an aspect
+        // that is single-valued.
+        //
+        // There is no join point for a required dependency - the Technology DSL
+        // offers types, fields, domainOperations, domainParameters,
+        // microservices, interfaces, operations and parameters - so a per-link
+        // fact can only be an aspect on the calling microservice that names its
+        // target. A rule joins target to the required entry itself.
+        aspect ServiceCall for microservices {
+            string target;
+            string targetKind;
+            string scheme;
+            string technology;
+        }
+
+        // One endpoint of another service that a client declares it addresses.
+        aspect ServiceCallEndpoint for microservices {
+            string target;
+            string verb;
+            string path;
+            string method;
+        }
+
+        // One queue a service produces to or consumes from, and whether the
+        // broker protects the channel.
+        //
+        // The asynchronous half of the interaction surface: the smell covers
+        // "each communication channel between any two microservices", and a
+        // queue is such a channel. Lakeside Mutual has eleven of them and three
+        // synchronous calls, so a rule that saw only the calls would miss most
+        // of the system's interactions.
+        //
+        // role says which end this service is. target is the service at the
+        // other end, absent where nothing in the system is at it.
+        //
+        // No file and no line, as ServerEndpoint carries no valueSource. The
+        // reconstruction records the path it was given, which is absolute for a
+        // real run - and a generated model has to be the same on every machine
+        // to be diffable and reproducible. The evidence stays in the database,
+        // where a finding can look it up.
+        aspect MessageChannel for microservices {
+            string role;
+            string queue;
+            string target;
+            string broker;
+            string scheme;
+            string transport;
+        }
+
         aspect Table<singleval> for types {
             string name;
         }

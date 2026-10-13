@@ -3571,6 +3571,71 @@
             "tlsEnabled": "false",
             "valueSource": "customer-self-service-backend/src/main/resources/application.properties"
           }
+        },
+        {
+          "name": "MessageChannel",
+          "values": {
+            "role": "producer",
+            "queue": "insurance-quote-request-event-queue",
+            "target": "PolicyManagement",
+            "broker": "activemq",
+            "scheme": "tcp",
+            "transport": "plaintext",
+            "brokerAddress": "tcp://0.0.0.0:61616",
+            "technology": "JMS"
+          }
+        },
+        {
+          "name": "MessageChannel",
+          "values": {
+            "role": "producer",
+            "queue": "customer-decision-event-queue",
+            "target": "PolicyManagement",
+            "broker": "activemq",
+            "scheme": "tcp",
+            "transport": "plaintext",
+            "brokerAddress": "tcp://0.0.0.0:61616",
+            "technology": "JMS"
+          }
+        },
+        {
+          "name": "MessageChannel",
+          "values": {
+            "role": "consumer",
+            "queue": "insurance-quote-expired-event-queue",
+            "target": "PolicyManagement",
+            "broker": "activemq",
+            "scheme": "tcp",
+            "transport": "plaintext",
+            "brokerAddress": "tcp://0.0.0.0:61616",
+            "technology": "JMS"
+          }
+        },
+        {
+          "name": "MessageChannel",
+          "values": {
+            "role": "consumer",
+            "queue": "policy-created-event-queue",
+            "target": "PolicyManagement",
+            "broker": "activemq",
+            "scheme": "tcp",
+            "transport": "plaintext",
+            "brokerAddress": "tcp://0.0.0.0:61616",
+            "technology": "JMS"
+          }
+        },
+        {
+          "name": "MessageChannel",
+          "values": {
+            "role": "consumer",
+            "queue": "insurance-quote-response-event-queue",
+            "target": "PolicyManagement",
+            "broker": "activemq",
+            "scheme": "tcp",
+            "transport": "plaintext",
+            "brokerAddress": "tcp://0.0.0.0:61616",
+            "technology": "JMS"
+          }
         }
       ],
       "interfaces": [
@@ -4404,6 +4469,84 @@
             "protocol": "http",
             "tlsEnabled": "false",
             "valueSource": "policy-management-backend/src/main/resources/application.properties"
+          }
+        },
+        {
+          "name": "MessageChannel",
+          "values": {
+            "role": "producer",
+            "queue": "newpolicies",
+            "target": "RiskManagement",
+            "broker": "activemq",
+            "scheme": "tcp",
+            "transport": "plaintext",
+            "brokerAddress": "tcp://0.0.0.0:61616",
+            "technology": "JMS"
+          }
+        },
+        {
+          "name": "MessageChannel",
+          "values": {
+            "role": "producer",
+            "queue": "insurance-quote-response-event-queue",
+            "target": "CustomerSelfService",
+            "broker": "activemq",
+            "scheme": "tcp",
+            "transport": "plaintext",
+            "brokerAddress": "tcp://0.0.0.0:61616",
+            "technology": "JMS"
+          }
+        },
+        {
+          "name": "MessageChannel",
+          "values": {
+            "role": "producer",
+            "queue": "insurance-quote-expired-event-queue",
+            "target": "CustomerSelfService",
+            "broker": "activemq",
+            "scheme": "tcp",
+            "transport": "plaintext",
+            "brokerAddress": "tcp://0.0.0.0:61616",
+            "technology": "JMS"
+          }
+        },
+        {
+          "name": "MessageChannel",
+          "values": {
+            "role": "producer",
+            "queue": "policy-created-event-queue",
+            "target": "CustomerSelfService",
+            "broker": "activemq",
+            "scheme": "tcp",
+            "transport": "plaintext",
+            "brokerAddress": "tcp://0.0.0.0:61616",
+            "technology": "JMS"
+          }
+        },
+        {
+          "name": "MessageChannel",
+          "values": {
+            "role": "consumer",
+            "queue": "insurance-quote-request-event-queue",
+            "target": "CustomerSelfService",
+            "broker": "activemq",
+            "scheme": "tcp",
+            "transport": "plaintext",
+            "brokerAddress": "tcp://0.0.0.0:61616",
+            "technology": "JMS"
+          }
+        },
+        {
+          "name": "MessageChannel",
+          "values": {
+            "role": "consumer",
+            "queue": "customer-decision-event-queue",
+            "target": "CustomerSelfService",
+            "broker": "activemq",
+            "scheme": "tcp",
+            "transport": "plaintext",
+            "brokerAddress": "tcp://0.0.0.0:61616",
+            "technology": "JMS"
           }
         }
       ],
