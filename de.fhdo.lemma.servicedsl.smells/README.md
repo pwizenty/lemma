@@ -116,3 +116,46 @@ Whether the menu entry appears on a `.services` selection and whether the
 handler resolves in a running workbench. The detector and the report were
 exercised headlessly against the models generated from the real database, and
 produced the nine findings above.
+
+## The second way: a warning in the model editor
+
+`de.fhdo.lemma.servicedsl.smells.validation` warns in the editor where a
+microservice interacts with another over an unprotected channel:
+
+```
+Non-Secured Service-to-Service Communications (Ponce et al. (2022) §3.7):
+the call to CustomerCore is not secured - the call uses http, which does not
+protect the channel. Suggested refactoring: Use Mutual TLS.
+```
+
+It is composed into the Service DSL's own validator, which is the **one line**
+it needs of that bundle:
+
+```xtend
+@ComposedChecks(validators = #[NonSecuredCommunicationValidator])
+class ServiceDslValidator extends AbstractServiceDslValidator {
+```
+
+The validation bundle requires only the metamodels, so nothing cycles — had the
+rule lived here instead, the Service DSL would have had to require this bundle,
+which requires it.
+
+### Why the two ways cannot drift apart
+
+Both decide with `ChannelVerdict`, a function of plain values with no model, no
+EMF and no Xtext in it. The editor arrives there with facts read from resolved
+cross-references; the command line arrives with facts read from parse trees. The
+verdict is the same code.
+
+### Why the editor judges better, not merely sooner
+
+Inside a running Xtext a cross-reference resolves. So the validator follows
+`required microservices` to the callee itself and reads its `ServerEndpoint`
+aspects, where the command line has to match the target by name against what
+the models wrote.
+
+### Why a warning and not an error
+
+The model is not wrong; the architecture has a risk. Ponce et al. do not rank
+their smells, so the severity is a presentation choice rather than a finding —
+which is also why a `Finding` from the command line carries none.

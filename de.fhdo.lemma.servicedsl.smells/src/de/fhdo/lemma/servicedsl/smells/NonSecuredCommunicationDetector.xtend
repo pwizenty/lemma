@@ -3,6 +3,8 @@ package de.fhdo.lemma.servicedsl.smells
 import de.fhdo.lemma.servicedsl.diagram.AspectReference
 import de.fhdo.lemma.servicedsl.diagram.ServiceGraph
 import de.fhdo.lemma.servicedsl.diagram.ServiceNode
+import de.fhdo.lemma.servicedsl.smells.validation.ChannelVerdict
+import de.fhdo.lemma.servicedsl.smells.validation.Outcome
 
 /**
  * Detector of **Non-Secured Service-to-Service Communications**, §3.7 of
@@ -34,15 +36,9 @@ import de.fhdo.lemma.servicedsl.diagram.ServiceNode
  * @author <a href="mailto:philip.wizenty@fh-dortmund.de">Philip Wizenty</a>
  */
 class NonSecuredCommunicationDetector {
-    public static val SMELL = "Non-Secured Service-to-Service Communications"
-    public static val REFERENCE = "Ponce et al. (2022) §3.7"
-
-    /**
-     * What the paper suggests, and why it is mutual rather than plain TLS: it
-     * also authenticates the peers, which is what additionally mitigates
-     * §3.8 Unauthenticated traffic.
-     */
-    public static val REFACTORING = "Use Mutual TLS"
+    public static val SMELL = ChannelVerdict.SMELL
+    public static val REFERENCE = ChannelVerdict.REFERENCE
+    public static val REFACTORING = ChannelVerdict.REFACTORING
 
     static val SERVICE_CALL = "ServiceCall"
     static val MESSAGE_CHANNEL = "MessageChannel"
@@ -111,36 +107,34 @@ class NonSecuredCommunicationDetector {
         }
 
         val channel = '''call to «target»'''.toString
-        val scheme = aspect.valueOf(SCHEME)
-        if (scheme === null || UNRESOLVED.equalsIgnoreCase(scheme)) {
-            result.undecided.add(
-                '''«caller.name» -> «target» («channel»): the model does not say which scheme the call uses''')
-            return
-        }
-
         val callee = graph.services.findFirst[name == target && resolved]
-        val accepting = calleeAcceptsPlaintext(callee)
+        val verdict = ChannelVerdict.ofCall(aspect.valueOf(SCHEME), kind,
+            calleeAcceptsPlaintext(callee))
 
-        if ("https" == scheme.toLowerCase && accepting !== Boolean.TRUE) {
-            result.secured.add(
-                '''«caller.name» -> «target»: «scheme»«IF accepting === Boolean.FALSE», and the callee accepts only TLS«ENDIF»''')
-            return
+        switch (verdict.outcome) {
+            case NOT_APPLICABLE: return
+            case UNDECIDED: {
+                result.undecided.add(
+                    '''«caller.name» -> «target» («channel»): «verdict.reason»''')
+                return
+            }
+            case PROTECTED: {
+                result.secured.add('''«caller.name» -> «target»: «verdict.reason»''')
+                return
+            }
+            case SMELL: {
+                val finding = newFinding(caller.name, target, channel)
+                finding.reason = verdict.reason
+                finding.evidence.add(aspect.written)
+                if (callee !== null) {
+                    callee.aspects.filter[name == SERVER_ENDPOINT].forEach[
+                        finding.evidence.add(written)
+                    ]
+                }
+                addMutualTlsNote(finding, callee)
+                result.add(finding)
+            }
         }
-
-        val finding = newFinding(caller.name, target, channel)
-        if ("https" == scheme.toLowerCase) {
-            finding.reason = "the caller uses TLS, but the callee also answers on a plaintext connector"
-        } else {
-            finding.reason = '''the call uses «scheme», which does not protect the channel'''
-        }
-        finding.evidence.add(aspect.written)
-        if (callee !== null) {
-            callee.aspects.filter[name == SERVER_ENDPOINT].forEach[
-                finding.evidence.add(written)
-            ]
-        }
-        addMutualTlsNote(finding, callee)
-        result.add(finding)
     }
 
     /**
@@ -168,22 +162,24 @@ class NonSecuredCommunicationDetector {
         }
 
         val channel = '''queue «queue»'''.toString
-        val transport = aspect.valueOf(TRANSPORT)
-        if (transport === null || UNRESOLVED.equalsIgnoreCase(transport)) {
-            result.undecided.add(
-                '''«service.name» -> «target» («channel»): the model does not say how the broker is reached''')
-            return
-        }
-        if (!PLAINTEXT.equalsIgnoreCase(transport)) {
-            result.secured.add('''«service.name» -> «target» («channel»): «transport»''')
-            return
-        }
+        val verdict = ChannelVerdict.ofQueue(role, aspect.valueOf(TRANSPORT),
+            aspect.valueOf(SCHEME), target !== null)
 
-        val finding = newFinding(service.name, target, channel)
-        finding.reason =
-            '''the broker is reached over «aspect.valueOf(SCHEME) ?: transport», which does not protect the channel'''
-        finding.evidence.add(aspect.written)
-        result.add(finding)
+        switch (verdict.outcome) {
+            case NOT_APPLICABLE: return
+            case UNDECIDED:
+                result.undecided.add(
+                    '''«service.name» uses «queue»: «verdict.reason»''')
+            case PROTECTED:
+                result.secured.add(
+                    '''«service.name» -> «target» («channel»): «verdict.reason»''')
+            case SMELL: {
+                val finding = newFinding(service.name, target, channel)
+                finding.reason = verdict.reason
+                finding.evidence.add(aspect.written)
+                result.add(finding)
+            }
+        }
     }
 
     /**
