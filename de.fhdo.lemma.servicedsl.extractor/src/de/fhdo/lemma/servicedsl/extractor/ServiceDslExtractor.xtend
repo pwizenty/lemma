@@ -336,8 +336,56 @@ class ServiceDslExtractor {
             return '''(«aspect.singlePropertyValue.generate»)'''
         if (aspect.values.nullOrEmpty)
             return ""
-        return '''(«FOR v : aspect.values SEPARATOR ', '»«v.property.name» = «
+        return '''(«FOR v : aspect.values SEPARATOR ', '»«v.property.name.escaped» = «
             v.value.generate»«ENDFOR»)'''
+    }
+
+
+    /**
+     * Keywords of the Service DSL, which an identifier has to be escaped
+     * against.
+     *
+     * A technology model may name an aspect property after one of these -
+     * ``protocol`` and ``technology`` are both keywords and both natural names
+     * for a property - and writing the name unescaped produces a model that
+     * does not parse: "no viable alternative at input 'protocol'".
+     *
+     * Taken from the keyword literals of ServiceDsl.xtext. Single-letter
+     * literals are left out: they belong to the number and string terminals
+     * rather than to the syntax, and no identifier is one character that
+     * collides.
+     */
+    static val KEYWORDS = #{
+        "aggregate", "applicationService", "architecture", "as", "aspect", "aspects",
+        "async", "based", "boolean", "byte", "char", "closure",
+        "collection", "communication_type", "compatibility", "containers", "context", "data",
+        "data_format", "datatypes", "date", "default", "deployment", "domainEvent",
+        "domainService", "double", "endpoints", "entity", "enum", "environments",
+        "exchange_pattern", "extends", "factory", "fault", "fields", "float",
+        "for", "format", "formats", "from", "function", "functional",
+        "hide", "identifier", "immutable", "import", "in", "infrastructure",
+        "infrastructureService", "inout", "int", "interface", "interfaces", "internal",
+        "long", "mandatory", "matrix", "microservice", "microservices", "neverEmpty",
+        "noimpl", "on", "operation", "operations", "out", "param",
+        "parameters", "part", "primitive", "procedure", "properties", "protocol",
+        "protocols", "public", "refers", "repository", "required", "requires",
+        "returned", "returns", "selector", "service", "short", "sideEffectFree",
+        "singleval", "specification", "string", "structure", "sync", "technologies",
+        "technology", "type", "typedef", "types", "utility", "validator",
+        "valueObject", "version", "with"
+    }
+
+    /**
+     * An identifier, escaped with a caret where it is a keyword.
+     *
+     * The same escape the DSL uses for a parameter named ``fields``, which the
+     * reconstructed Lakeside Mutual models already carry as ``^fields``.
+     */
+    private def String escaped(String identifier) {
+        if (identifier === null) {
+            return identifier
+        }
+        return if (KEYWORDS.contains(identifier)) "^" + identifier else identifier
     }
 
     /**

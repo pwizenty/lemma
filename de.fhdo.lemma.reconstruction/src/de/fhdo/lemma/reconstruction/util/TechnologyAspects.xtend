@@ -69,10 +69,15 @@ class TechnologyAspects {
      * A property of an aspect. The type is one of the primitive types of the
      * Data DSL, which is what makes this different from the other declarations
      * a body holds, such as a selector.
+     *
+     * A property named after a keyword is declared with a caret - ``string
+     * ^protocol`` - and the caret is syntax rather than part of the name. Read
+     * with it, the name matched no reconstructed fact and the value was
+     * silently dropped from the generated model.
      */
     static val PROPERTY = Pattern.compile(
         "\\b(boolean|byte|char|date|double|float|int|long|short|string|unspecified)" +
-        "\\s+(\\w+)")
+        "\\s+\\^?(\\w+)")
 
     /**
      * The primitive types of the Data DSL that a value is written as a number

@@ -1,0 +1,84 @@
+package de.fhdo.lemma.servicedsl.smells
+
+import de.fhdo.lemma.servicedsl.diagram.ServiceGraph
+
+/**
+ * The report a detection run writes.
+ *
+ * Markdown, for the same reasons the diagrams are PlantUML: it is diffable, it
+ * renders where the models are read, and it needs nothing installed. A function
+ * of the result and the graph, so what it says can be checked without an
+ * Eclipse.
+ *
+ * @author <a href="mailto:philip.wizenty@fh-dortmund.de">Philip Wizenty</a>
+ */
+class SmellReport {
+    /**
+     * Write the report of one detection run.
+     *
+     * @param result what was found
+     * @param graph the services it was found in
+     * @return the Markdown of the report
+     */
+    def String write(DetectionResult result, ServiceGraph graph) {
+        return '''
+            # Security smells
+
+            Detected in «graph.services.filter[resolved].size» microservice(s) of the selected service models and the models they import.
+
+            | | |
+            |---|---|
+            | Findings | «result.findings.size» |
+            | Channels judged protected | «result.secured.size» |
+            | Channels that could not be judged | «result.undecided.size» |
+
+            ## «NonSecuredCommunicationDetector.SMELL»
+
+            «NonSecuredCommunicationDetector.REFERENCE». The smell holds whenever two microservices interact without a secure channel, *even if they are within the same network*. Suggested refactoring: **«NonSecuredCommunicationDetector.REFACTORING»** — mutual rather than plain TLS, because it also authenticates the peers.
+
+            «IF result.findings.empty»
+                No finding. «IF !result.undecided.empty»That is not the same as a system without the smell: «result.undecided.size» channel(s) below could not be judged.«ENDIF»
+            «ELSE»
+                «FOR finding : result.findings»
+                    ### «finding.caller» → «finding.callee»
+
+                    - **Channel:** «finding.channel»
+                    - **Why:** «finding.reason»
+                    - **Refactoring:** «finding.refactoring»
+                    «IF !finding.evidence.empty»
+                        - **Evidence, as the models state it:**
+                        «FOR item : finding.evidence»
+                            «"  "»- `«item»`
+                        «ENDFOR»
+                    «ENDIF»
+
+                «ENDFOR»
+            «ENDIF»
+            «IF !result.secured.empty»
+                ## Judged protected
+
+                «FOR entry : result.secured»
+                    - «entry»
+                «ENDFOR»
+
+            «ENDIF»
+            «IF !result.undecided.empty»
+                ## Could not be judged
+
+                The facts in the models do not settle these. Reported rather than counted as protected, so a system that does not smell and a system whose facts were not reconstructed do not look alike.
+
+                «FOR entry : result.undecided»
+                    - «entry»
+                «ENDFOR»
+
+            «ENDIF»
+            «IF !result.problems.empty»
+                ## Problems
+
+                «FOR problem : result.problems»
+                    - «problem»
+                «ENDFOR»
+            «ENDIF»
+        '''.toString
+    }
+}

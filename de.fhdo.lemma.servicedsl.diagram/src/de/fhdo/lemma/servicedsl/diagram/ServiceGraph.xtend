@@ -1,6 +1,7 @@
 package de.fhdo.lemma.servicedsl.diagram
 
 import java.util.List
+import java.util.Map
 import org.eclipse.xtend.lib.annotations.Accessors
 
 /**
@@ -316,9 +317,97 @@ class AspectReference {
     @Accessors
     String written
 
+    /**
+     * The property values the aspect carries, by property name.
+     *
+     * Read from the written form, because an aspect is a cross-reference and
+     * only its text is available outside a running Xtext. A rule over the
+     * model asks for a value - the transport of a channel, the target of a
+     * call - rather than for the text it was written in.
+     */
+    @Accessors
+    val Map<String, String> values = newLinkedHashMap
+
     new(String name, String written) {
         this.name = name
         this.written = written
+        values.putAll(valuesOf(written))
+    }
+
+    /**
+     * Whether the aspect carries this value.
+     */
+    def String valueOf(String property) {
+        return values.get(property)
+    }
+
+    /**
+     * The property values written inside an aspect's parentheses.
+     *
+     * ``@t::_aspects.MessageChannel(role = "producer", queue = "q")`` carries a
+     * role and a queue. A single-valued aspect writes one value with no
+     * property name, which belongs to no property and is therefore not a value
+     * this returns - ``ServiceCommunicationTransport(transport = "plaintext")``
+     * names its property because the aspect declares one.
+     */
+    static def Map<String, String> valuesOf(String written) {
+        val values = newLinkedHashMap
+        if (written === null) {
+            return values
+        }
+        val open = written.indexOf("(")
+        val close = written.lastIndexOf(")")
+        if (open < 0 || close <= open) {
+            return values
+        }
+
+        for (assignment : split(written.substring(open + 1, close))) {
+            val separator = assignment.indexOf("=")
+            if (separator > 0) {
+                // A property named after a keyword is written with a caret -
+                // ^protocol, ^technology - and the caret is syntax, not part of
+                // the name a reader asks for.
+                val name = assignment.substring(0, separator).trim.replaceFirst("^\\^", "")
+                val value = assignment.substring(separator + 1).trim
+                values.put(name, unquote(value))
+            }
+        }
+        return values
+    }
+
+    /**
+     * Split on commas that are not inside a quoted value.
+     */
+    private static def List<String> split(String text) {
+        val parts = <String>newLinkedList
+        var current = new StringBuilder
+        var boolean quoted = false
+        // Compared as strings: Xtend has no character literal, and a value may
+        // hold a comma of its own - a path, a list - which must not split it.
+        for (var int i = 0; i < text.length; i++) {
+            val character = text.substring(i, i + 1)
+            if ('"' == character) {
+                quoted = !quoted
+            }
+            if ("," == character && !quoted) {
+                parts.add(current.toString)
+                current = new StringBuilder
+            } else {
+                current.append(character)
+            }
+        }
+        if (!current.toString.trim.empty) {
+            parts.add(current.toString)
+        }
+        return parts
+    }
+
+    private static def String unquote(String value) {
+        val text = value.trim
+        return if (text.length > 1 && text.startsWith('"') && text.endsWith('"'))
+                text.substring(1, text.length - 1)
+            else
+                text
     }
 }
 

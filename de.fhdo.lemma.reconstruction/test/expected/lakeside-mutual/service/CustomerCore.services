@@ -2,7 +2,7 @@ import technology from "../technology/spring.technology" as javaWithSpring
 import datatypes from "../domain/CustomerCore.data" as CustomerCore
 
 @technology(javaWithSpring)
-@javaWithSpring::_aspects.ServerEndpoint(connector = "server", port = "8110", protocol = "http", tlsEnabled = false)
+@javaWithSpring::_aspects.ServerEndpoint(connector = "server", port = "8110", ^protocol = "http", tlsEnabled = false)
 public functional microservice com.lakesidemutual.customercore.CustomerCore {
     @endpoints(javaWithSpring::_protocols.rest:"/customers";)
     interface CustomerInformationHolder {
