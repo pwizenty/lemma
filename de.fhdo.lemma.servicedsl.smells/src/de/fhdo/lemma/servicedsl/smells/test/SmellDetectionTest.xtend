@@ -4,6 +4,9 @@ import de.fhdo.lemma.servicedsl.diagram.AspectReference
 import de.fhdo.lemma.servicedsl.diagram.ServiceModelReader
 import de.fhdo.lemma.servicedsl.smells.DetectionResult
 import de.fhdo.lemma.servicedsl.smells.NonSecuredCommunicationDetector
+import de.fhdo.lemma.servicedsl.smells.validation.ChannelVerdict
+import de.fhdo.lemma.servicedsl.smells.validation.Outcome
+import de.fhdo.lemma.servicedsl.smells.validation.RootCause
 import java.nio.file.Path
 import java.nio.file.Paths
 
@@ -34,6 +37,8 @@ class SmellDetectionTest {
         aChannelIsJudgedOnceNotTwice
         aFindingCarriesItsEvidenceAndRefactoring
         anAspectsValuesAreRead
+        tlsIsNotTheSameAsMutualTls
+        findingsGroupByTheirCause
 
         println('''
         ---
@@ -220,4 +225,85 @@ class SmellDetectionTest {
             println('''  FAIL  «what»: expected «expected», got «actual»''')
         }
     }
+
+    /**
+     * Mutual TLS is the refactoring §3.7 prescribes, so plain TLS and mutual
+     * TLS must not read alike.
+     *
+     * Catches a rule that treats any TLS as the refactoring applied, which
+     * would let the verifier certify something weaker than the paper cites.
+     * Tested against the rule directly: plain values in, verdict out, no model
+     * needed - which is the property that lets the editor and the command line
+     * share it.
+     */
+    private def static void tlsIsNotTheSameAsMutualTls() {
+        val mutual = ChannelVerdict.ofCall("https", "SERVICE", false, "need")
+        check("a TLS call to a callee requiring a client certificate is protected",
+            mutual.outcome, Outcome.PROTECTED)
+        check("and is not a finding", mutual.smell, false)
+        check("and the reason says it is mutual",
+            mutual.reason.contains("mutual TLS"), true)
+
+        val notMutual = ChannelVerdict.ofCall("https", "SERVICE", false, "none")
+        check("a TLS call to a callee requiring nothing is not mutual",
+            notMutual.outcome, Outcome.PROTECTED_NOT_MUTUAL)
+        check("which is still not a §3.7 finding", notMutual.smell, false)
+        check("but is reported as protected", notMutual.protected, true)
+        check("and flagged as not mutual", notMutual.protectedButNotMutual, true)
+
+        // "want" asks for a certificate and then serves the request without
+        // one, so it authenticates nobody. The trap this exists for.
+        val want = ChannelVerdict.ofCall("https", "SERVICE", false, "want")
+        check("clientAuth=want is not mutual either",
+            want.outcome, Outcome.PROTECTED_NOT_MUTUAL)
+        check("and the reason says why",
+            want.reason.contains("serves the request without one"), true)
+
+        // Absent is Spring's "none", and the reconstruction records absence
+        // rather than defaulting it.
+        check("an absent clientAuth is not mutual",
+            ChannelVerdict.ofCall("https", "SERVICE", false, null).outcome,
+            Outcome.PROTECTED_NOT_MUTUAL)
+
+        // Mutuality must not rescue a callee that also answers on plaintext.
+        check("a plaintext connector still wins over clientAuth=need",
+            ChannelVerdict.ofCall("https", "SERVICE", true, "need").outcome,
+            Outcome.SMELL)
+
+        // A queue carries no client-authentication fact, so it must never be
+        // guessed at in either direction.
+        check("a TLS queue is protected, not judged on mutuality",
+            ChannelVerdict.ofQueue("producer", "tls", "ssl", true).outcome,
+            Outcome.PROTECTED)
+    }
+
+    /**
+     * Findings group by what causes them, because a cause is what gets fixed.
+     *
+     * Catches a grouping keyed by the caller, which would make three services
+     * calling one plaintext connector look like three separate repairs.
+     */
+    private def static void findingsGroupByTheirCause() {
+        val callee = RootCause.ofCall("CustomerCore")
+        check("two callers of one callee share a cause",
+            RootCause.ofCall("CustomerCore").id, callee.id)
+        check("a different callee is a different cause",
+            RootCause.ofCall("PolicyManagement").id == callee.id, false)
+        check("the cause names what has to change",
+            callee.label.contains("connectors of CustomerCore"), true)
+        check("and says which kind it is", callee.kind, RootCause.KIND_ENDPOINT)
+
+        val broker = RootCause.ofQueue("activemq", "tcp")
+        check("two queues of one broker share a cause",
+            RootCause.ofQueue("activemq", "tcp").id, broker.id)
+        check("a broker reached over another scheme is another cause",
+            RootCause.ofQueue("activemq", "ssl").id == broker.id, false)
+        check("a call and a queue never share a cause",
+            broker.id == callee.id, false)
+
+        // Equality is by id, so a cause can key a map.
+        check("a cause equals another with the same id",
+            broker == RootCause.ofQueue("activemq", "tcp"), true)
+    }
+
 }
