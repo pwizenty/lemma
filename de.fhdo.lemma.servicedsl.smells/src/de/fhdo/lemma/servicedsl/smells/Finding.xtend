@@ -1,6 +1,8 @@
 package de.fhdo.lemma.servicedsl.smells
 
+import java.util.LinkedHashMap
 import java.util.List
+import java.util.Map
 import org.eclipse.xtend.lib.annotations.Accessors
 
 /**
@@ -66,6 +68,19 @@ class Finding {
     override String toString() {
         return '''«caller» -> «callee» («channel»): «reason»'''.toString
     }
+    /**
+     * What causes this finding, as [[RootCause]] keys it. Findings sharing a
+     * key share a repair.
+     */
+    @Accessors
+    String rootCauseId
+
+    /**
+     * How that cause reads in a report.
+     */
+    @Accessors
+    String rootCauseLabel
+
 }
 
 /**
@@ -91,6 +106,17 @@ class DetectionResult {
     @Accessors
     val List<String> secured = newLinkedList
 
+    /**
+     * Channels that are encrypted but not mutually authenticated.
+     *
+     * Its own list, not merged into ``secured``: §3.7 is resolved by TLS, so
+     * these are not findings - but the refactoring the paper prescribes for
+     * §3.7 is *mutual* TLS, so they were resolved by a weaker means than the
+     * one cited, and that is where §3.8 Unauthenticated traffic begins.
+     */
+    @Accessors
+    val List<String> notMutual = newLinkedList
+
     @Accessors
     val List<String> problems = newLinkedList
 
@@ -99,6 +125,23 @@ class DetectionResult {
     }
 
     def int channelsJudged() {
-        return findings.size + secured.size
+        return findings.size + secured.size + notMutual.size
+    }
+
+    /**
+     * The findings grouped by what causes them, keyed by the cause's id and
+     * ordered by where each cause is first met.
+     *
+     * Nine findings on Lakeside Mutual reduce to two causes, and a cause is
+     * the unit a refactoring acts on - so this is what a report should lead
+     * with and what a quickfix should offer.
+     */
+    def Map<String, List<Finding>> byRootCause() {
+        val grouped = new LinkedHashMap<String, List<Finding>>
+        for (finding : findings) {
+            val key = finding.rootCauseId ?: "<ungrouped>"
+            grouped.computeIfAbsent(key, [newLinkedList]).add(finding)
+        }
+        return grouped
     }
 }

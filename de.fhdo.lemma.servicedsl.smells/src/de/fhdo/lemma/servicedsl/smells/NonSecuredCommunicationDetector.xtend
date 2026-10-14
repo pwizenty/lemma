@@ -5,6 +5,7 @@ import de.fhdo.lemma.servicedsl.diagram.ServiceGraph
 import de.fhdo.lemma.servicedsl.diagram.ServiceNode
 import de.fhdo.lemma.servicedsl.smells.validation.ChannelVerdict
 import de.fhdo.lemma.servicedsl.smells.validation.Outcome
+import de.fhdo.lemma.servicedsl.smells.validation.RootCause
 
 /**
  * Detector of **Non-Secured Service-to-Service Communications**, §3.7 of
@@ -50,6 +51,7 @@ class NonSecuredCommunicationDetector {
     static val TRANSPORT = "transport"
     static val QUEUE = "queue"
     static val ROLE = "role"
+    static val BROKER = "broker"
     static val TLS_ENABLED = "tlsEnabled"
     static val CONNECTOR = "connector"
     static val PORT = "port"
@@ -109,7 +111,7 @@ class NonSecuredCommunicationDetector {
         val channel = '''call to «target»'''.toString
         val callee = graph.services.findFirst[name == target && resolved]
         val verdict = ChannelVerdict.ofCall(aspect.valueOf(SCHEME), kind,
-            calleeAcceptsPlaintext(callee))
+            calleeAcceptsPlaintext(callee), calleeClientAuth(callee))
 
         switch (verdict.outcome) {
             case NOT_APPLICABLE: return
@@ -122,16 +124,22 @@ class NonSecuredCommunicationDetector {
                 result.secured.add('''«caller.name» -> «target»: «verdict.reason»''')
                 return
             }
+            case PROTECTED_NOT_MUTUAL: {
+                result.notMutual.add('''«caller.name» -> «target»: «verdict.reason»''')
+                return
+            }
             case SMELL: {
+                val cause = RootCause.ofCall(target)
                 val finding = newFinding(caller.name, target, channel)
                 finding.reason = verdict.reason
+                finding.rootCauseId = cause.id
+                finding.rootCauseLabel = cause.label
                 finding.evidence.add(aspect.written)
                 if (callee !== null) {
                     callee.aspects.filter[name == SERVER_ENDPOINT].forEach[
                         finding.evidence.add(written)
                     ]
                 }
-                addMutualTlsNote(finding, callee)
                 result.add(finding)
             }
         }
@@ -173,9 +181,18 @@ class NonSecuredCommunicationDetector {
             case PROTECTED:
                 result.secured.add(
                     '''«service.name» -> «target» («channel»): «verdict.reason»''')
+            // A queue carries no client-authentication fact, so ofQueue never
+            // returns this. The arm exists so that adding the fact later is a
+            // change to the rule and not a silent fall-through here.
+            case PROTECTED_NOT_MUTUAL:
+                result.notMutual.add(
+                    '''«service.name» -> «target» («channel»): «verdict.reason»''')
             case SMELL: {
+                val cause = RootCause.ofQueue(aspect.valueOf(BROKER), aspect.valueOf(SCHEME))
                 val finding = newFinding(service.name, target, channel)
                 finding.reason = verdict.reason
+                finding.rootCauseId = cause.id
+                finding.rootCauseLabel = cause.label
                 finding.evidence.add(aspect.written)
                 result.add(finding)
             }
@@ -202,25 +219,30 @@ class NonSecuredCommunicationDetector {
     }
 
     /**
-     * Say where TLS is in place but not mutual.
+     * What the callee demands of a client, across its connectors.
      *
-     * The paper's refactoring is *mutual* TLS, because it also authenticates
-     * the peers. A connector with TLS and no ``clientAuth = need`` has the
-     * confidentiality half and not the authenticity half.
+     * The weakest value wins, as the least protected connector does: a callee
+     * that requires a certificate on one connector and not on another is
+     * reachable without one. ``null`` where nothing is known, which is not the
+     * same as requiring nothing.
+     *
+     * Whether that makes a channel mutual is [[ChannelVerdict]]'s to decide,
+     * not this detector's - this reads the fact and hands it over, exactly as
+     * the editor's validator does.
      */
-    private def void addMutualTlsNote(Finding finding, ServiceNode callee) {
+    private def String calleeClientAuth(ServiceNode callee) {
         if (callee === null) {
-            return
+            return null
         }
-        val tlsWithoutClientAuth = callee.aspects.filter[name == SERVER_ENDPOINT].exists[
-            "true" == (valueOf(TLS_ENABLED) ?: "false").toLowerCase
-                && CLIENT_AUTH_REQUIRED != valueOf(CLIENT_AUTH)
-        ]
-        if (tlsWithoutClientAuth) {
-            finding.evidence.add(
-                "a TLS connector of the callee does not require a client certificate, "
-                    + "so the channel is not mutually authenticated")
+        val values = callee.aspects.filter[name == SERVER_ENDPOINT]
+            .map[valueOf(CLIENT_AUTH)].toList
+        if (values.empty || values.exists[it === null]) {
+            return null
         }
+        if (values.forall[CLIENT_AUTH_REQUIRED.equalsIgnoreCase(it)]) {
+            return CLIENT_AUTH_REQUIRED
+        }
+        return values.findFirst[!CLIENT_AUTH_REQUIRED.equalsIgnoreCase(it)]
     }
 
     private def Finding newFinding(String caller, String callee, String channel) {
