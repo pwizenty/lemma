@@ -52,8 +52,9 @@ means the models do not say; letting an AI change code there would launder a
 gap in the reconstruction into a source edit.
 
 **A proposal counts only when verified** **[decided]**, and verification
-requires all three of: the finding count dropped, the build green, **and the
-system starts**. The third is load-bearing - see §5.
+requires all four of: the finding count dropped, the build green **on a clean
+checkout of the patch**, the build green in place, **and the system starts**.
+The third and fourth are load-bearing - see §5 and §7.
 
 **The AI sits strictly downstream of deterministic detection** **[decided]**.
 Detection stays reproducible; resolution is explicitly not part of the
@@ -133,6 +134,15 @@ cd <worktree> && claude -p \
 `--dangerously-skip-permissions`. The build is allowed **[decided]** so the AI
 catches its own compile and config errors before the patch is ever reviewed.
 
+Two things step 2 established about this invocation. **`--output-format json`
+buffers everything until the process exits**, so the background Job should use
+`stream-json` instead if the quickfix is to show progress rather than sit
+silent for the ten to twenty-five minutes a proposal takes. And **a hit usage
+limit returns `subtype: "success"` with `is_error: true`** - so the machinery
+must test `is_error`, or it will file an empty patch as a successful proposal.
+The allowlist also has to include `bash` and `chmod`: without them `rc1` could
+not run its own generated script and committed it without the executable bit.
+
 ## 5. The two root causes, and done
 
 Expressed in MRF's recognition rules, so that "the AI believes it is finished"
@@ -206,12 +216,41 @@ repository, or the root cause not resolvable from the model.
    root-cause grouping — then re-run all four suites
 4. The refactoring machinery in `…smells`
 5. The `@Fix` and the source-root preference in `…servicedsl.ui`
-6. The verify script: branch, apply, reconstruct, detect, compose health check
+6. The verify script: branch, apply, reconstruct, detect, compose health check.
+   Four gates, and **"builds in the working tree" and "builds on a clean
+   checkout" are separate ones** - a patch whose tests read generated key
+   material passes the first and fails the second. Measured in step 2: `rc2`
+   satisfied every other criterion and still produced
+   `FileNotFoundException: ../certs/policy-management-backend.p12`,
+   `BUILD FAILURE`, when applied to a fresh worktree. Nothing but a clean-room
+   build found it - not the proposal's own notes, not any constraint check
 7. A TLS-positive fixture, for the case where there is nothing to resolve
 
 **Step 2 is the one that matters first.** If the AI cannot produce a working
 mutual-TLS patch for Lakeside Mutual, that is known before any of steps 3-7 is
 paid for - and it is the question the whole feature rests on.
+
+**Step 2 is done, and the answer is yes.** Both root causes were run against a
+worktree of Lakeside Mutual on 2026-10-13, recorded under `refactorings/` in
+the MRF repository:
+
+| | rc1 CustomerCore | rc2 ActiveMQ broker |
+|---|---|---|
+| Turns / duration / cost | 144 / 25 min / $10.62 | 100 / 13 min / $6.55 |
+| Patch | 17 files, applies clean | 12 files, applies clean |
+| Constraints | none violated | none violated |
+| Mutual, not merely TLS | `client-auth=need` | `needClientAuth=true`, both connectors |
+| Suite in the worktree | 26 pass | 19 pass |
+| Suite on a clean checkout | passes | **fails** - see step 6 |
+
+Three findings worth carrying forward. `rc1` handled **Spring relaxed binding**
+in `docker-compose.yml`, which MRF cannot yet resolve (backlog A3), so the
+patch was more complete than the toolchain could verify. `rc2` converted both
+plaintext connectors rather than supplementing them, which is the pitfall the
+skill was written for and the one most likely to yield a patch that clears
+findings while changing nothing. And the two proposals **disagreed** about
+whether the build may depend on generated key material - the skill now settles
+it.
 
 Step 3 changes code merged on 2026-10-13, so the CLI's report format moves with
 it and the 28 / 96 / 60 checks plus the reconstruction regression all have to be
