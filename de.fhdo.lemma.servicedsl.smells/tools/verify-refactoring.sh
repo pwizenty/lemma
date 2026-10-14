@@ -196,12 +196,45 @@ else
     # --build matters: the compose file names published images as well as build
     # contexts, so without it a stale image would be started and the gate would
     # report on code the patch never touched.
-    if (cd "$WORK" && docker compose up -d --build --wait) > /dev/null 2>&1; then
+    START_LOG="$(mktemp -t lemma-start)"
+    if (cd "$WORK" && docker compose up -d --build --wait) > "$START_LOG" 2>&1; then
         pass "starts: the system comes up with the patch applied"
+        (cd "$WORK" && docker compose down -v) >> "$START_LOG" 2>&1
     else
-        fail "starts" "the system does not come up with the patch applied"
+        # Which services are unhealthy is the whole value of this gate, so it
+        # is captured before the stack is torn down.
+        (cd "$WORK" && docker compose ps -a) >> "$START_LOG" 2>&1
+        (cd "$WORK" && docker compose logs --tail 40) >> "$START_LOG" 2>&1
+        UNHEALTHY="$(grep -oE "(container|service) \"?[a-z0-9_-]+\"? is unhealthy" "$START_LOG" \
+            | head -3 | tr '\n' ' ')"
+        (cd "$WORK" && docker compose down -v) >> "$START_LOG" 2>&1
+
+        # This gate needs a baseline as much as the smell gate does. A sample
+        # system whose base image has been withdrawn from the registry, or whose
+        # build is broken for any other reason of its own, does not come up
+        # patched or unpatched - and blaming the patch for that is a false
+        # finding. The control runs only on failure, because it costs a second
+        # full build.
+        CONTROL="$(mktemp -d -t lemma-control)"; rm -rf "$CONTROL"
+        CONTROL_LOG="$(mktemp -t lemma-control)"
+        CONTROL_STARTS=1
+        if git -C "$SOURCE" worktree add --detach "$CONTROL" HEAD > /dev/null 2>&1; then
+            if ! (cd "$CONTROL" && docker compose up -d --build --wait) \
+                > "$CONTROL_LOG" 2>&1; then
+                CONTROL_STARTS=0
+            fi
+            (cd "$CONTROL" && docker compose down -v) >> "$CONTROL_LOG" 2>&1
+            git -C "$SOURCE" worktree remove --force "$CONTROL" > /dev/null 2>&1
+        fi
+
+        if [[ "$CONTROL_STARTS" == 0 ]]; then
+            WHY="$(grep -oE "[^ ]+: not found|failed to solve: [^ ]+" "$CONTROL_LOG" \
+                | head -1)"
+            skip "starts" "the system does not come up unpatched either${WHY:+ ($WHY)}, so this gate cannot attribute anything to the patch; see $CONTROL_LOG"
+        else
+            fail "starts" "the system does not come up with the patch applied, though it does unpatched: ${UNHEALTHY:+$UNHEALTHY, }see $START_LOG"
+        fi
     fi
-    (cd "$WORK" && docker compose down -v) > /dev/null 2>&1
 fi
 
 git -C "$SOURCE" worktree remove --force "$WORK" > /dev/null 2>&1
