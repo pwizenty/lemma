@@ -49,11 +49,12 @@ throwaway worktree and written to disk for you to review.''',
                 val aspect = if (element instanceof ImportedServiceAspect) element else null
                 val sourceRoot = SmellRefactoringPreferences.sourceRoot
                 if (sourceRoot.nullOrEmpty) {
-                    throw new IllegalStateException(
-                        '''No source root is configured, so there is nothing to patch.
-Set the preference «SmellRefactoringPreferences.NODE»/«
-                        SmellRefactoringPreferences.SOURCE_ROOT» to the checked-out
-system these models were reconstructed from.''')
+                    // Open the page rather than name a preference key. The
+                    // thing that is missing cannot be guessed - a model
+                    // carries no source paths - so the only useful response
+                    // is to put the reader in front of the field.
+                    askForTheSourceRoot
+                    return
                 }
 
                 val request = new RefactoringRequest
@@ -72,6 +73,30 @@ system these models were reconstructed from.''')
                 new ProposeRefactoringJob(request,
                     SmellRefactoringPreferences.recordRoot).schedule
             ])
+    }
+
+    /**
+     * Say what is missing, and offer to go and set it.
+     *
+     * A quickfix that throws here shows the reader a stack trace in an error
+     * log they did not ask for. This explains the one thing the toolchain
+     * genuinely cannot work out for itself and opens the page that fixes it.
+     */
+    private def void askForTheSourceRoot() {
+        val shell = org.eclipse.ui.PlatformUI.workbench?.activeWorkbenchWindow?.shell
+        val open = org.eclipse.jface.dialogs.MessageDialog.openQuestion(shell,
+            "Security Smell Refactoring",
+            '''No source root is configured, so there is nowhere to propose a patch.
+
+A reconstructed model carries no source paths - they are absolute, and a
+generated model has to be identical on every machine - so the toolchain cannot
+tell which checkout these models came from.
+
+Set it now?''')
+        if (open && shell !== null) {
+            org.eclipse.ui.dialogs.PreferencesUtil.createPreferenceDialogOn(shell,
+                SmellRefactoringPreferencePage.ID, null, null).open
+        }
     }
 
     private def String dataAt(Issue issue, int index) {
