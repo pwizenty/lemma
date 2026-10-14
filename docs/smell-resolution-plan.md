@@ -226,6 +226,26 @@ repository, or the root cause not resolvable from the model.
    build found it - not the proposal's own notes, not any constraint check
 7. A TLS-positive fixture, for the case where there is nothing to resolve
 
+**All seven are done.** What the last four established, beyond compiling:
+
+| | |
+|---|---|
+| Step 3 | 9 findings reduce to 2 causes, computed rather than asserted |
+| Step 4 | the AI sits behind one interface; 91 checks cover everything else |
+| Step 5 | the quickfix compiles against the real APIs, but has **not** been exercised in a running Eclipse |
+| Step 6 | **rc1 verifies PARTIAL: findings fell from 9 to 6** |
+| Step 7 | the clean verdict exists at all, which no sample system could show |
+
+The 9-to-6 reduction is the result this plan exists to produce, and it is the
+predicted one: `rc1` resolves the three synchronous findings and leaves the six
+asynchronous ones, which are `rc2`'s cause.
+
+Two limits stand. The *system starts* gate can only skip until Lakeside
+Mutual's Dockerfiles leave `openjdk:21-slim-buster`, withdrawn from Docker Hub
+(MRF backlog E5), so **no refactoring can reach a full VERIFIED verdict here**.
+And the quickfix itself needs launching in Eclipse before anyone should believe
+the `Ctrl+1` entry appears.
+
 **Step 2 is the one that matters first.** If the AI cannot produce a working
 mutual-TLS patch for Lakeside Mutual, that is known before any of steps 3-7 is
 paid for - and it is the question the whole feature rests on.
