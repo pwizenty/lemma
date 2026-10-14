@@ -302,10 +302,14 @@ technology javaWithSpring {
     infrastructure technologies {
         SpringBootAdmin {
             // An environment can only be referenced once it is declared here.
-            // openjdk:21-slim-buster is the base image the reconstruction reads
-            // from the Dockerfile of Lakeside Mutual's monitoring service.
+            // These are the base images the reconstruction reads from the
+            // Dockerfile of Lakeside Mutual's monitoring service. The openjdk
+            // ones remain because a model reconstructed before that image was
+            // withdrawn from Docker Hub is still a valid model.
             operation environments = "spring-boot-admin" default,
                 "openjdk:21-slim-buster",
+                "eclipse-temurin:21-jdk",
+                "eclipse-temurin:21-jre",
                 "openjdk:11-jdk-slim";
 
             service properties {

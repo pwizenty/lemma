@@ -19,8 +19,16 @@ technology models are copied into every system's folder, exactly as the wizard
 copies them into the folder it writes to. Without them the imports of an
 accepted model do not resolve and the folder shows errors although the models
 are right. They are inputs rather than output, so the comparison ignores
-them. The copies are overwritten on every run, so a change to a model under
-`models/technology/` shows up here as well.
+them. **They are refreshed by `--update`, not by a comparing run**: a comparing
+run generates into a temporary folder and copies the technology models beside
+*that*, so a change under `models/technology/` does not reach these copies by
+itself. Keep them in step by hand, or with `--update`, or an expected folder
+opened in Eclipse shows unresolved imports although the models are right.
+
+Note also what is **not** compared here: there are no `operation/` models in any
+expected folder, so nothing in this test exercises `deployment_base.technology`
+or the operation environments it declares. A change there has to be checked by
+generating a system's models and opening them.
 
 The technology models are also what decides which types and service aspects a
 generated model may refer to, which the generators read from the model itself.
