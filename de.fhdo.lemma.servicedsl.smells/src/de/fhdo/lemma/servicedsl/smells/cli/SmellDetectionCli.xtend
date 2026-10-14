@@ -130,6 +130,7 @@ class SmellDetectionCli {
 
         «models» model(s) read.
         «result.findings.size» finding(s), «result.secured.size» channel(s) judged protected, «
+            result.notMutual.size» encrypted but not mutually authenticated, «
             result.undecided.size» not decidable from the models.
         «FOR finding : result.findings»
             «finding.caller» -> «finding.callee» («finding.channel»)

@@ -5,6 +5,7 @@ import de.fhdo.lemma.servicedsl.diagram.ServiceModelReader
 import de.fhdo.lemma.servicedsl.smells.DetectionResult
 import de.fhdo.lemma.servicedsl.smells.Finding
 import de.fhdo.lemma.servicedsl.smells.NonSecuredCommunicationDetector
+import de.fhdo.lemma.servicedsl.smells.SmellReport
 import de.fhdo.lemma.servicedsl.smells.validation.ChannelVerdict
 import de.fhdo.lemma.servicedsl.smells.validation.Outcome
 import de.fhdo.lemma.servicedsl.smells.validation.RootCause
@@ -51,6 +52,7 @@ class SmellDetectionTest {
         thePromptSaysWhatWasLearned
         aPatchIsCheckedNotTrusted
         aProposalIsRecorded
+        aSecuredSystemYieldsNothingToResolve
 
         println('''
         ---
@@ -514,6 +516,59 @@ class SmellDetectionTest {
             .propose(request)
         check("a failed proposal is not a success", failing.success, false)
         check("and says why", failing.failure, "the proposer changed nothing")
+    }
+
+
+    /**
+     * A system with nothing to resolve, which no sample system can show.
+     *
+     * Every system available here is plaintext throughout, so "the detector
+     * found nothing" and "the detector is broken" are indistinguishable
+     * without this. Catches a rule that cannot reach a clean verdict at all,
+     * a report that announces causes it does not have, and a quickfix that
+     * would offer itself where there is nothing to fix.
+     */
+    private def static void aSecuredSystemYieldsNothingToResolve() {
+        val graph = new ServiceModelReader().read(#[
+            Paths.get(FIXTURES + "/secured.services") as Path
+        ])
+        val result = new NonSecuredCommunicationDetector().detect(graph)
+
+        check("a secured system has no findings", result.findings.size, 0)
+        check("and therefore no causes", result.byRootCause.size, 0)
+        check("and nothing is undecided", result.undecided.size, 0)
+        check("every channel was actually judged", result.channelsJudged, 3)
+
+        // The middle channel is the point: §3.7 resolved, §3.8 begun.
+        check("the one-way TLS channel is reported as not mutual",
+            result.notMutual.size, 1)
+        // Guarded rather than dereferenced: when a mutation empties this list
+        // the check has to FAIL, not throw, or every later check is lost with
+        // it and the suite reports a crash instead of a result.
+        check("and names the service it reached",
+            result.notMutual.exists[contains("OneWayTlsService")], true)
+        check("and says a client certificate is not required",
+            result.notMutual.exists[contains("client certificate")], true)
+        check("it is not counted as a finding",
+            result.findings.exists[callee == "OneWayTlsService"], false)
+        check("nor as fully secured",
+            result.secured.exists[contains("OneWayTlsService")], false)
+
+        check("the mutual call is secured", result.secured.exists[
+            contains("MutualTlsService") && contains("mutual TLS")], true)
+        check("the TLS queue is secured too",
+            result.secured.exists[contains("secure-orders")], true)
+
+        // What the quickfix would offer here: nothing.
+        check("no refactoring is proposed for a secured system",
+            RefactoringRequests.of(result, "/tmp/system", "a-skill").size, 0)
+
+        val report = new SmellReport().write(result, graph)
+        check("the report says there is no finding", report.contains("No finding"), true)
+        check("and does not announce causes it has none of",
+            report.contains("What has to change"), false)
+        check("but it does report the channel that is not mutual",
+            report.contains("not mutually authenticated"), true)
     }
 
 }
