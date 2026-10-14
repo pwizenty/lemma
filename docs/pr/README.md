@@ -31,6 +31,7 @@ their own diffs stay free of files describing themselves.
 | `feat-operation-model-diagram.md` | `feat/operation-model-diagram` | `dev` |
 | `feat-server-endpoint-aspect.md` | `feat/server-endpoint-aspect` | `dev` |
 | `feat-security-smell-detection.md` | `feat/security-smell-detection` | `dev` |
+| `feat-smell-verdict-and-grouping.md` | `feat/smell-verdict-and-grouping` | `dev` |
 
 Merge order matters for `feat/communication-aspect`: it contains the commits of
 `feat/rest-technology-information`, so that branch goes first. Most also need
