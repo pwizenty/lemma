@@ -50,16 +50,26 @@ WORKSPACE_BINS="$(find "$WORKSPACE" -maxdepth 2 -type d -name bin | tr '\n' ':')
 FULL_CP="$COMPILER_CP$WORKSPACE_BINS"
 
 if [[ "$BUILD_SOURCES" == 1 ]]; then
-    echo "Compiling the Xtend of the reader and the detector..." >&2
+    echo "Compiling the Xtend of the rule, the reader and the detector..." >&2
     rm -rf "$BUILD"
     mkdir -p "$BUILD/classes"
-    for project in "$WORKSPACE/de.fhdo.lemma.servicedsl.diagram" "$BUNDLE"; do
+    # The rule bundle comes first and is compiled rather than taken from its
+    # bin/: it holds ChannelVerdict and RootCause, which the detector calls, so
+    # relying on a prebuilt bin/ silently judges a system with a stale rule.
+    #
+    # $BUILD/classes also has to precede the workspace bin/ directories on
+    # every classpath below. A bundle that has been built in the IDE has a
+    # bin/ holding an older copy of the same classes, and whichever comes
+    # first wins: with it last, this script compiled the new rule and then
+    # type-checked the detector against the old one.
+    for project in "$WORKSPACE/de.fhdo.lemma.servicedsl.smells.validation" \
+                   "$WORKSPACE/de.fhdo.lemma.servicedsl.diagram" "$BUNDLE"; do
         name="$(basename "$project")"
         generated="$project/.headless-src"
         rm -rf "$generated" && mkdir -p "$generated"
 
         java -cp "$COMPILER_CP" org.eclipse.xtend.core.compiler.batch.Main \
-            -cp "$FULL_CP$BUILD/classes" -d "$generated" "$project/src" \
+            -cp "$BUILD/classes:$FULL_CP" -d "$generated" "$project/src" \
             > "$BUILD/$name.log" 2>&1 || true
         if grep -qE "^ERROR" "$BUILD/$name.log"; then
             grep -A3 "^ERROR" "$BUILD/$name.log" | sort -u >&2

@@ -14,7 +14,7 @@ import org.eclipse.xtend.lib.annotations.Accessors
  * the editor's validator and the command line share one rule rather than agree
  * by accident - the validator reads resolved cross-references inside Eclipse,
  * the command line reads a graph built from parse trees, and both arrive here
- * with the same four facts.
+ * with the same facts.
  *
  * @author <a href="mailto:philip.wizenty@fh-dortmund.de">Philip Wizenty</a>
  */
@@ -35,6 +35,18 @@ class ChannelVerdict {
     static val UNRESOLVED = "unresolved"
     static val HTTPS = "https"
 
+    /**
+     * The value of ``clientAuth`` that means mutual.
+     *
+     * Spring offers ``none``, ``want`` and ``need``. Only ``need`` is mutual:
+     * ``want`` asks for a certificate and then serves the request without one,
+     * so it authenticates nobody. An absent value is ``none`` by Spring's own
+     * default, and the reconstruction records the value as absent rather than
+     * defaulting it, so absent is treated as not mutual.
+     */
+    static val CLIENT_AUTH_NEED = "need"
+    static val CLIENT_AUTH_WANT = "want"
+
     @Accessors
     val Outcome outcome
 
@@ -51,6 +63,27 @@ class ChannelVerdict {
     }
 
     /**
+     * Whether the channel is encrypted but the peers are not mutually
+     * authenticated.
+     *
+     * Not a §3.7 finding: plain TLS does secure the channel, which is what
+     * §3.7 is about. It is reported separately because the refactoring the
+     * paper prescribes for §3.7 is *mutual* TLS, so a channel in this state has
+     * had the smell resolved by a weaker means than the one cited - and it is
+     * where §3.8 Unauthenticated traffic would begin.
+     */
+    def boolean isProtectedButNotMutual() {
+        return outcome === Outcome.PROTECTED_NOT_MUTUAL
+    }
+
+    /**
+     * Whether the channel protects the data, mutually authenticated or not.
+     */
+    def boolean isProtected() {
+        return outcome === Outcome.PROTECTED || outcome === Outcome.PROTECTED_NOT_MUTUAL
+    }
+
+    /**
      * Judge a synchronous call.
      *
      * Both halves decide it: the scheme the caller uses, and whether the callee
@@ -64,10 +97,13 @@ class ChannelVerdict {
      * @param calleeAcceptsPlaintext true, false, or null where the model says
      *     nothing about the callee's connectors - which is not the same as "it
      *     does not"
+     * @param calleeClientAuth what the callee's connectors demand of a client -
+     *     ``need``, ``want``, ``none``, or null where the model does not say.
+     *     Decides whether a TLS channel is mutual.
      * @return the verdict
      */
     static def ChannelVerdict ofCall(String scheme, String targetKind,
-        Boolean calleeAcceptsPlaintext) {
+        Boolean calleeAcceptsPlaintext, String calleeClientAuth) {
         if (targetKind !== null && KIND_SERVICE != targetKind) {
             // A third party. The paper's smell is about two microservices of
             // the application, so this rule has nothing to say about it.
@@ -83,11 +119,22 @@ class ChannelVerdict {
                 return new ChannelVerdict(Outcome.SMELL,
                     "the caller uses TLS, but the callee also answers on a plaintext connector")
             }
-            return new ChannelVerdict(Outcome.PROTECTED,
-                if (calleeAcceptsPlaintext === Boolean.FALSE)
-                    "the call uses TLS and the callee accepts only TLS"
+            val onlyTls = calleeAcceptsPlaintext === Boolean.FALSE
+            if (CLIENT_AUTH_NEED.equalsIgnoreCase(calleeClientAuth)) {
+                return new ChannelVerdict(Outcome.PROTECTED,
+                    if (onlyTls)
+                        "the call uses mutual TLS and the callee accepts only TLS"
+                    else
+                        "the call uses mutual TLS")
+            }
+            // Encrypted, but nobody is authenticated. Not a §3.7 finding, and
+            // not the refactoring §3.7 prescribes either.
+            return new ChannelVerdict(Outcome.PROTECTED_NOT_MUTUAL,
+                if (CLIENT_AUTH_WANT.equalsIgnoreCase(calleeClientAuth))
+                    "the call uses TLS, but the callee only requests a client certificate "
+                        + "and serves the request without one"
                 else
-                    "the call uses TLS")
+                    "the call uses TLS, but the callee does not require a client certificate")
         }
         return new ChannelVerdict(Outcome.SMELL,
             '''the call uses «scheme», which does not protect the channel'''.toString)
@@ -121,6 +168,10 @@ class ChannelVerdict {
                 "the model does not say how the broker is reached")
         }
         if (!PLAINTEXT.equalsIgnoreCase(transport)) {
+            // PROTECTED rather than split in two as a call is: a MessageChannel
+            // carries no client-authentication fact, so whether the broker
+            // demands a client certificate is not reconstructed and must not be
+            // guessed at in either direction.
             return new ChannelVerdict(Outcome.PROTECTED,
                 '''the broker is reached over «transport»'''.toString)
         }
@@ -139,6 +190,7 @@ class ChannelVerdict {
 enum Outcome {
     SMELL,
     PROTECTED,
+    PROTECTED_NOT_MUTUAL,
     UNDECIDED,
     NOT_APPLICABLE
 }

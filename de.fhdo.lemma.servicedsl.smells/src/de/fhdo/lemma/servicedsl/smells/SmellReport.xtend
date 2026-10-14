@@ -29,7 +29,9 @@ class SmellReport {
             | | |
             |---|---|
             | Findings | «result.findings.size» |
+            | Root causes behind them | «result.byRootCause.size» |
             | Channels judged protected | «result.secured.size» |
+            | Channels encrypted but not mutually authenticated | «result.notMutual.size» |
             | Channels that could not be judged | «result.undecided.size» |
 
             ## «NonSecuredCommunicationDetector.SMELL»
@@ -53,6 +55,28 @@ class SmellReport {
                     «ENDIF»
 
                 «ENDFOR»
+            «ENDIF»
+            «IF result.findings.size > result.byRootCause.size»
+                ### What has to change
+
+                «result.findings.size» finding(s) come from «result.byRootCause.size» cause(s). A cause is the unit a refactoring acts on, because mutual TLS has to be applied to both ends of every channel it covers at once.
+
+                «FOR cause : result.byRootCause.entrySet»
+                    - **«cause.value.head.rootCauseLabel ?: cause.key»** — «cause.value.size» finding(s)
+                «ENDFOR»
+
+            «ENDIF»
+            «IF !result.notMutual.empty»
+                ### Encrypted, but not mutually authenticated
+
+                Not findings: §3.7 is resolved by TLS. But the refactoring the paper prescribes
+                for it is *mutual* TLS, so these channels were secured by a weaker means than the
+                one cited, and this is where §3.8 Unauthenticated traffic begins.
+
+                «FOR entry : result.notMutual»
+                    - «entry»
+                «ENDFOR»
+
             «ENDIF»
             «IF !result.secured.empty»
                 ## Judged protected
