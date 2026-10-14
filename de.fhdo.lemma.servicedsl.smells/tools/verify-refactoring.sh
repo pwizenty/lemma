@@ -193,7 +193,10 @@ elif [[ ! -f "$WORK/docker-compose.yml" ]]; then
 elif ! command -v docker > /dev/null 2>&1; then
     skip "starts" "docker is not available"
 else
-    if (cd "$WORK" && docker compose up -d --wait) > /dev/null 2>&1; then
+    # --build matters: the compose file names published images as well as build
+    # contexts, so without it a stale image would be started and the gate would
+    # report on code the patch never touched.
+    if (cd "$WORK" && docker compose up -d --build --wait) > /dev/null 2>&1; then
         pass "starts: the system comes up with the patch applied"
     else
         fail "starts" "the system does not come up with the patch applied"
