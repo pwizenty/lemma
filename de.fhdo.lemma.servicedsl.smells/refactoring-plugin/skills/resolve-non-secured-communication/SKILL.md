@@ -67,6 +67,10 @@ have worked - however correct it is.
 - **no plaintext connector remains** (see pitfalls)
 - every client's broker address uses the TLS scheme
 
+**For either, and not negotiable:**
+- the test suite of every affected service passes on a **clean checkout of the
+  patch**, with no generated key material present
+
 ## Pitfalls
 
 These are specific to this toolchain and this smell. Each one has produced a
@@ -91,6 +95,15 @@ patch that looked right and was not.
   weakening an assertion, or turning off certificate verification to make
   something pass is not - and `TrustAllStrategy`, `NoopHostnameVerifier` or
   `InsecureTrustManagerFactory` would each introduce a different smell.
+- **The test suite must still pass on a clean checkout, with no generated key
+  material present.** This is the pitfall most easily missed, because it cannot
+  be seen in the worktree you are working in: the certificates are already
+  there. A test that reads a key store from disk fails for anybody who applies
+  the patch and runs the build before generating anything, which turns a
+  refactoring into a broken build. Build the TLS material inside the beans that
+  need it, so a test using a mock web environment or a plaintext fixture never
+  touches a store, or make the test skip itself when the material is absent -
+  but never leave the suite depending on a file the repository does not carry.
 
 ## Never
 
