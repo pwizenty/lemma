@@ -3,10 +3,18 @@ package de.fhdo.lemma.servicedsl.smells.test
 import de.fhdo.lemma.servicedsl.diagram.AspectReference
 import de.fhdo.lemma.servicedsl.diagram.ServiceModelReader
 import de.fhdo.lemma.servicedsl.smells.DetectionResult
+import de.fhdo.lemma.servicedsl.smells.Finding
 import de.fhdo.lemma.servicedsl.smells.NonSecuredCommunicationDetector
 import de.fhdo.lemma.servicedsl.smells.validation.ChannelVerdict
 import de.fhdo.lemma.servicedsl.smells.validation.Outcome
 import de.fhdo.lemma.servicedsl.smells.validation.RootCause
+import de.fhdo.lemma.servicedsl.smells.refactoring.PatchGuard
+import de.fhdo.lemma.servicedsl.smells.refactoring.PromptBuilder
+import de.fhdo.lemma.servicedsl.smells.refactoring.ProposalRecord
+import de.fhdo.lemma.servicedsl.smells.refactoring.RecordedProposer
+import de.fhdo.lemma.servicedsl.smells.refactoring.RefactoringRequest
+import de.fhdo.lemma.servicedsl.smells.refactoring.RefactoringRequests
+import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
@@ -39,6 +47,10 @@ class SmellDetectionTest {
         anAspectsValuesAreRead
         tlsIsNotTheSameAsMutualTls
         findingsGroupByTheirCause
+        findingsBecomeOneRequestPerCause
+        thePromptSaysWhatWasLearned
+        aPatchIsCheckedNotTrusted
+        aProposalIsRecorded
 
         println('''
         ---
@@ -304,6 +316,204 @@ class SmellDetectionTest {
         // Equality is by id, so a cause can key a map.
         check("a cause equals another with the same id",
             broker == RootCause.ofQueue("activemq", "tcp"), true)
+    }
+
+
+    /**
+     * Nine findings become two requests, each knowing what it must not touch.
+     *
+     * Catches a machinery that proposes per finding, which would ask for the
+     * same repair three times, and one that forgets the other causes, which
+     * lets a proposal quietly widen into a second one.
+     */
+    private def static void findingsBecomeOneRequestPerCause() {
+        // Built by hand rather than taken from a fixture: every finding in
+        // channels.services shares one cause, so a fixture-based check of what
+        // a request knows about the OTHER causes cannot fail. Two causes here,
+        // asserted to be two, so the checks below bite.
+        val result = new DetectionResult
+        result.add(finding("CustomerManagement", "CustomerCore", "call to CustomerCore",
+            RootCause.ofCall("CustomerCore")))
+        result.add(finding("CustomerSelfService", "CustomerCore", "call to CustomerCore",
+            RootCause.ofCall("CustomerCore")))
+        result.add(finding("PolicyManagement", "RiskManagement", "queue newpolicies",
+            RootCause.ofQueue("activemq", "tcp")))
+
+        check("the fixture for this check really has two causes",
+            result.byRootCause.size, 2)
+
+        val requests = RefactoringRequests.of(result, "/tmp/system", "a-skill")
+        check("a request per cause, not per finding", requests.size, 2)
+        check("every finding lands in a request",
+            requests.map[findings.size].reduce[a, b | a + b], 3)
+        check("the two callers of one callee share a request",
+            requests.findFirst[rootCauseId.contains("CustomerCore")].findings.size, 2)
+        check("a request carries its cause's label",
+            requests.forall[!rootCauseLabel.nullOrEmpty], true)
+        check("and the source root and skill it was built with",
+            requests.forall[sourceRoot == "/tmp/system" && skill == "a-skill"], true)
+        check("a request names the other cause as out of scope",
+            requests.forall[otherCauses.size == 1], true)
+        check("and never names its own cause among them",
+            requests.forall[!otherCauses.contains(rootCauseLabel)], true)
+        check("a request with a finding is valid", requests.forall[valid], true)
+        check("one without is not", new RefactoringRequest().valid, false)
+
+        // The fixture still has to group, which is a different claim.
+        val fromFixture = RefactoringRequests.of(judge("/channels.services"),
+            "/tmp/system", "a-skill")
+        check("a fixture whose findings share one cause yields one request",
+            fromFixture.size, 1)
+        check("with no other cause to avoid", fromFixture.head.otherCauses.empty, true)
+    }
+
+    /**
+     * A finding as the detector would build it, for a check that needs a shape
+     * no fixture provides.
+     */
+    private def static Finding finding(String caller, String callee, String channel,
+        RootCause cause) {
+        val finding = new Finding(ChannelVerdict.SMELL, ChannelVerdict.REFERENCE, caller, callee)
+        finding.channel = channel
+        finding.refactoring = ChannelVerdict.REFACTORING
+        finding.reason = "test"
+        finding.rootCauseId = cause.id
+        finding.rootCauseLabel = cause.label
+        return finding
+    }
+
+    /**
+     * The prompt is deterministic and says the things that must be said.
+     *
+     * Catches a builder that leaves out the scope fence or the clean-checkout
+     * criterion - both of which were learned from a proposal that got them
+     * wrong.
+     */
+    private def static void thePromptSaysWhatWasLearned() {
+        val result = judge("/channels.services")
+        val request = RefactoringRequests.of(result, "/tmp/system",
+            "lemma-smell-refactoring:resolve-non-secured-communication").head
+
+        val prompt = PromptBuilder.request(request)
+        check("the prompt is deterministic", prompt, PromptBuilder.request(request))
+        check("it names the skill to use",
+            prompt.contains("lemma-smell-refactoring:resolve-non-secured-communication"), true)
+        check("it names the smell", prompt.contains(ChannelVerdict.SMELL), true)
+        check("and cites the paper", prompt.contains(ChannelVerdict.REFERENCE), true)
+        check("it carries the cause's label", prompt.contains(request.rootCauseLabel), true)
+        check("it says the models carry no paths",
+            prompt.contains("no file paths"), true)
+        check("it demands the clean-checkout criterion",
+            prompt.contains("clean checkout"), true)
+        check("it carries the evidence from the model",
+            prompt.contains("MessageChannel") || prompt.contains("ServiceCall"), true)
+
+        val constraints = PromptBuilder.constraints
+        check("the constraints forbid editing a model",
+            constraints.contains(".services"), true)
+        check("they forbid a mesh, which cannot be verified",
+            constraints.contains("service mesh"), true)
+        check("they forbid weakening verification",
+            constraints.contains("NoopHostnameVerifier"), true)
+        check("they demand both ends", constraints.contains("BOTH ends"), true)
+        check("and they say the clean-checkout trap is invisible from inside",
+            constraints.contains("already here"), true)
+    }
+
+    /**
+     * A patch is checked, not trusted, because the prompt is only instruction.
+     *
+     * Catches a guard that looks at context lines rather than added ones,
+     * which would reject a patch that *removes* a weakening - the very patch
+     * worth having.
+     */
+    private def static void aPatchIsCheckedNotTrusted() {
+        check("an empty patch is a violation",
+            PatchGuard.violations("").size, 1)
+
+        val clean = '''
+        --- a/customer-core/src/main/resources/application.properties
+        +++ b/customer-core/src/main/resources/application.properties
+        +server.ssl.enabled=true
+        +server.ssl.client-auth=need
+        '''.toString
+        check("a patch that only changes configuration passes",
+            PatchGuard.violations(clean).empty, true)
+        check("and its changed paths are read",
+            PatchGuard.changedPaths(clean).head,
+            "customer-core/src/main/resources/application.properties")
+
+        val editsModel = '''
+        --- a/service/CustomerCore.services
+        +++ b/service/CustomerCore.services
+        +@javaWithSpring::_aspects.ServerEndpoint(tlsEnabled = true)
+        '''.toString
+        check("a patch editing a model is rejected",
+            PatchGuard.violations(editsModel).exists[contains("reconstructed output")], true)
+
+        val weakens = '''
+        --- a/Client.java
+        +++ b/Client.java
+        +    .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
+        '''.toString
+        check("a patch adding NoopHostnameVerifier is rejected",
+            PatchGuard.violations(weakens).exists[contains("NoopHostnameVerifier")], true)
+
+        val weakensJs = '''
+        --- a/index.js
+        +++ b/index.js
+        +  rejectUnauthorized: false,
+        '''.toString
+        check("rejectUnauthorized:false is rejected whatever the spacing",
+            PatchGuard.violations(weakensJs).exists[contains("rejectUnauthorized")], true)
+
+        // The case a naive guard gets backwards.
+        val removesWeakening = '''
+        --- a/Client.java
+        +++ b/Client.java
+        -    .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
+        +    .setSSLHostnameVerifier(defaultVerifier)
+        '''.toString
+        check("a patch that REMOVES a weakening is not rejected",
+            PatchGuard.violations(removesWeakening).empty, true)
+    }
+
+    /**
+     * A proposal is recorded so that what cannot be reproduced can be audited.
+     *
+     * Catches a record that references the skill instead of carrying it, which
+     * would need two repositories at the right revisions to be read.
+     */
+    private def static void aProposalIsRecorded() {
+        val result = judge("/channels.services")
+        val request = RefactoringRequests.of(result, "/tmp/system", "a-skill").head
+        val proposer = new RecordedProposer("--- a/x\n+++ b/x\n+changed\n")
+        val proposal = proposer.propose(request)
+
+        check("the fake proposer hands back its patch", proposal.success, true)
+        check("and keeps what it was asked", proposer.lastRequest, request)
+
+        val root = Files.createTempDirectory("lemma-record-test")
+        val folder = ProposalRecord.write(root, request, proposal, "THE SKILL TEXT")
+        check("the record holds the request", Files.exists(folder.resolve("request.md")), true)
+        check("the constraints", Files.exists(folder.resolve("constraints.md")), true)
+        check("the patch", Files.exists(folder.resolve("patch.diff")), true)
+        check("and the skill verbatim, not by reference",
+            new String(Files.readAllBytes(folder.resolve("skill.md"))), "THE SKILL TEXT")
+        check("the summary names the cause",
+            new String(Files.readAllBytes(folder.resolve("model.txt")))
+                .contains(request.rootCauseId), true)
+        check("and says a patch is not evidence the smell is resolved",
+            new String(Files.readAllBytes(folder.resolve("model.txt")))
+                .contains("not evidence"), true)
+        check("the folder name carries the cause",
+            ProposalRecord.folderName(request).contains("endpoint")
+                || ProposalRecord.folderName(request).contains("broker"), true)
+
+        val failing = new RecordedProposer(null, "the proposer changed nothing")
+            .propose(request)
+        check("a failed proposal is not a success", failing.success, false)
+        check("and says why", failing.failure, "the proposer changed nothing")
     }
 
 }
