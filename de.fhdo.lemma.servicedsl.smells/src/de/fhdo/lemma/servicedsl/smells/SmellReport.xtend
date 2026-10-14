@@ -39,7 +39,8 @@ class SmellReport {
             «NonSecuredCommunicationDetector.REFERENCE». The smell holds whenever two microservices interact without a secure channel, *even if they are within the same network*. Suggested refactoring: **«NonSecuredCommunicationDetector.REFACTORING»** — mutual rather than plain TLS, because it also authenticates the peers.
 
             «IF result.findings.empty»
-                No finding. «IF !result.undecided.empty»That is not the same as a system without the smell: «result.undecided.size» channel(s) below could not be judged.«ENDIF»
+                No finding.«IF !result.undecided.empty» That is not the same as a system without the smell: «result.undecided.size» channel(s) below could not be judged.«ENDIF»
+
             «ELSE»
                 «FOR finding : result.findings»
                     ### «finding.caller» → «finding.callee»

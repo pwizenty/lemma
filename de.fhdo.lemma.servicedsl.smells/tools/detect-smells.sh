@@ -47,6 +47,13 @@ eclipse_classpath() {
 
 COMPILER_CP="$(eclipse_classpath)"
 WORKSPACE_BINS="$(find "$WORKSPACE" -maxdepth 2 -type d -name bin | tr '\n' ':')"
+# A project compiled below must not also reach the classpath through its
+# Eclipse-built bin/: the same class twice makes Xtend resolve the stale copy,
+# which surfaces as "cannot convert from Finding to Finding" or as a method
+# that plainly exists being reported undefined.
+COMPILED_PROJECTS="de.fhdo.lemma.servicedsl.smells.validation|de.fhdo.lemma.servicedsl.diagram|de.fhdo.lemma.servicedsl.smells"
+WORKSPACE_BINS="$(printf '%s' "$WORKSPACE_BINS" | tr ':' '\n' \
+    | grep -vE "/($COMPILED_PROJECTS)/bin/?$" | tr '\n' ':')"
 FULL_CP="$COMPILER_CP$WORKSPACE_BINS"
 
 if [[ "$BUILD_SOURCES" == 1 ]]; then

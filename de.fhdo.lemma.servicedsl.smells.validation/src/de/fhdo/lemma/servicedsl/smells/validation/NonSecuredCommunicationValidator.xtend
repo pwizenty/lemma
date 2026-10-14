@@ -217,42 +217,12 @@ class NonSecuredCommunicationValidator extends AbstractDeclarativeValidator {
         )
     }
 
-    /**
-     * The name of an aspect, which resolves here.
-     */
     private def String aspectName(ImportedServiceAspect aspect) {
-        return aspect.importedAspect?.name
+        return AspectValues.nameOf(aspect)
     }
 
-    /**
-     * The values an aspect carries, by property name.
-     *
-     * A boolean or a number is read as its text, because the rule compares
-     * text - the Mongo seam the facts came through carries only text, and the
-     * two halves of the detection have to compare the same thing.
-     */
     private def Map<String, String> valuesOf(ImportedServiceAspect aspect) {
-        val values = newLinkedHashMap
-        for (assignment : aspect.values) {
-            val name = assignment.property?.name
-            val value = assignment.value
-            if (name !== null && value !== null) {
-                values.put(name, value.asText)
-            }
-        }
-        return values
+        return AspectValues.of(aspect)
     }
 
-    private def String asText(de.fhdo.lemma.data.PrimitiveValue value) {
-        if (value.stringValue !== null) {
-            return value.stringValue
-        }
-        if (value.booleanValue !== null) {
-            return value.booleanValue.toString
-        }
-        if (value.numericValue !== null) {
-            return value.numericValue.toString
-        }
-        return null
-    }
 }
