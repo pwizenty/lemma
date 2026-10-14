@@ -20,8 +20,22 @@
 #
 # Usage:
 #   tools/verify-refactoring.sh --proposal <folder> --source <checkout> \
-#       --models <generated-models> [--mrf <mrf-repo>] [--skip-start]
-#       [--skip-smell] [--certs <command>]
+#       --models <generated-models> [--mrf <mrf-repo>] [--base <ref>]
+#       [--plugins "<list>"] [--build-command "<command>"]
+#       [--skip-start] [--skip-smell] [--certs <command>]
+#
+# Verifying a system other than Lakeside Mutual needs two of these. --plugins
+# is the MRF plugin selection for that system, and getting it wrong is the one
+# mistake this script cannot catch: the smell gate would compare a baseline
+# against a reconstruction of a different fact set and still print a number.
+# --build-command says how to build a system that is not per-service Maven;
+# without it, a system with no Maven wrapper skips the build gates rather than
+# passing them.
+#
+# --base is the commit the patch is measured against, defaulting to HEAD. It
+# matters when a patch depends on a prerequisite: a refactoring of a system
+# whose container images no longer build has to be judged against the commit
+# that fixes them, or the start gate can only ever skip.
 #
 # The proposal folder is one written by ProposalRecord: it must hold patch.diff,
 # and the result is appended to verification.md inside it.
@@ -34,8 +48,15 @@ set -uo pipefail
 BUNDLE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WORKSPACE="$(cd "$BUNDLE/.." && pwd)"
 
-PROPOSAL=""; SOURCE=""; MODELS=""; MRF=""; CERTS=""
+PROPOSAL=""; SOURCE=""; MODELS=""; MRF=""; CERTS=""; BASE="HEAD"
 SKIP_START=0; SKIP_SMELL=0
+# Defaults fit Lakeside Mutual. Both are options because they are the two
+# places this script would otherwise be specific to one system - and getting
+# either wrong is worse than it looks: the smell gate would compare a baseline
+# against a reconstruction of a different fact set, and the build gates would
+# pass without building anything.
+PLUGINS="Java Spring Communication Docker Protobuf Node"
+BUILD_COMMAND=""
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --proposal) PROPOSAL="$2"; shift 2 ;;
@@ -43,6 +64,9 @@ while [[ $# -gt 0 ]]; do
         --models)   MODELS="$2";   shift 2 ;;
         --mrf)      MRF="$2";      shift 2 ;;
         --certs)    CERTS="$2";    shift 2 ;;
+        --base)     BASE="$2";     shift 2 ;;
+        --plugins)  PLUGINS="$2";  shift 2 ;;
+        --build-command) BUILD_COMMAND="$2"; shift 2 ;;
         --skip-start) SKIP_START=1; shift ;;
         --skip-smell) SKIP_SMELL=1; shift ;;
         -h|--help) sed -n '2,32p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
@@ -65,19 +89,46 @@ pass() { PASSED+=("$1"); printf '  PASS  %s\n' "$1"; }
 fail() { FAILED+=("$1: $2"); printf '  FAIL  %s\n        %s\n' "$1" "$2"; }
 skip() { SKIPPED+=("$1: $2"); printf '  SKIP  %s (%s)\n' "$1" "$2"; }
 
-# Every service of these samples carries its own wrapper, so the build is "each
-# Maven project under the root", not one reactor build.
+# Build and test the system in a tree.
+#
+# Returns 0 when everything built, the number of failures when something did
+# not, and BUILD_NOTHING when there was nothing recognisable to build. That
+# third case has to be distinguishable: a silent "no projects found" would
+# otherwise be indistinguishable from success, and a gate that passes without
+# building anything is worse than no gate.
+#
+# --build-command overrides the default for a system this does not fit. It runs
+# once, from the root of the tree, and its exit status decides.
+BUILD_NOTHING=250
+
 build_all() {
     local tree="$1" log="$2"
-    local failures=0
+
+    if [[ -n "$BUILD_COMMAND" ]]; then
+        if (cd "$tree" && bash -c "$BUILD_COMMAND") >> "$log" 2>&1; then
+            return 0
+        fi
+        echo "FAILED: $BUILD_COMMAND" >> "$log"
+        return 1
+    fi
+
+    # The default: each Maven project under the root has its own wrapper, so
+    # this is "every project", not one reactor build.
+    local failures=0 projects=0
     while IFS= read -r wrapper; do
         local project
         project="$(dirname "$wrapper")"
+        projects=$((projects + 1))
         if ! (cd "$project" && ./mvnw -q -DskipTests=false test) >> "$log" 2>&1; then
             echo "FAILED: ${project#$tree/}" >> "$log"
             failures=$((failures + 1))
         fi
     done < <(find "$tree" -maxdepth 2 -name mvnw -not -path "*/.git/*")
+
+    if (( projects == 0 )); then
+        echo "NOTHING TO BUILD: no Maven wrapper found under $tree" >> "$log"
+        return $BUILD_NOTHING
+    fi
     return $failures
 }
 
@@ -103,16 +154,19 @@ fi
 # ---------------------------------------------------------------- gate 1: clean
 CLEAN="$(mktemp -d -t lemma-clean)"
 rm -rf "$CLEAN"
-if git -C "$SOURCE" worktree add --detach "$CLEAN" HEAD > /dev/null 2>&1; then
+if git -C "$SOURCE" worktree add --detach "$CLEAN" "$BASE" > /dev/null 2>&1; then
     if git -C "$CLEAN" apply "$PATCH" > /dev/null 2>&1; then
         CLEAN_LOG="$(mktemp -t lemma-clean-build)"
-        if build_all "$CLEAN" "$CLEAN_LOG"; then
+        build_all "$CLEAN" "$CLEAN_LOG"; CLEAN_STATUS=$?
+        if (( CLEAN_STATUS == 0 )); then
             pass "clean: the patch applies to a clean checkout and the build is green"
+        elif (( CLEAN_STATUS == BUILD_NOTHING )); then
+            skip "clean" "nothing recognisable to build in this system; pass --build-command to say how"
         else
             fail "clean" "the build fails on a clean checkout with no generated key material: $(grep -m2 '^FAILED:' "$CLEAN_LOG" | tr '\n' ' ')see $CLEAN_LOG"
         fi
     else
-        fail "clean" "the patch does not apply to a clean checkout of HEAD"
+        fail "clean" "the patch does not apply to a clean checkout of $BASE"
     fi
     git -C "$SOURCE" worktree remove --force "$CLEAN" > /dev/null 2>&1
 else
@@ -123,7 +177,7 @@ fi
 WORK="$(mktemp -d -t lemma-work)"
 rm -rf "$WORK"
 BRANCH="refactoring/$(basename "$PROPOSAL")"
-if git -C "$SOURCE" worktree add --detach "$WORK" HEAD > /dev/null 2>&1 \
+if git -C "$SOURCE" worktree add --detach "$WORK" "$BASE" > /dev/null 2>&1 \
     && git -C "$WORK" apply "$PATCH" > /dev/null 2>&1; then
     git -C "$WORK" checkout -q -b "$BRANCH" 2>/dev/null || true
 
@@ -147,8 +201,11 @@ if git -C "$SOURCE" worktree add --detach "$WORK" HEAD > /dev/null 2>&1 \
             fail "inplace" "the key-material command failed, so the patch cannot be built at all"
         else
             WORK_LOG="$(mktemp -t lemma-work-build)"
-            if build_all "$WORK" "$WORK_LOG"; then
+            build_all "$WORK" "$WORK_LOG"; WORK_STATUS=$?
+            if (( WORK_STATUS == 0 )); then
                 pass "inplace: the build is green once key material exists"
+            elif (( WORK_STATUS == BUILD_NOTHING )); then
+                skip "inplace" "nothing recognisable to build in this system; pass --build-command to say how"
             else
                 fail "inplace" "the build fails even with key material: $(grep -m2 '^FAILED:' "$WORK_LOG" | tr '\n' ' ')see $WORK_LOG"
             fi
@@ -165,8 +222,8 @@ elif [[ -z "$MRF" ]]; then
     skip "smell" "no --mrf given, so the system cannot be re-reconstructed"
 else
     AFTER_MODELS="$(mktemp -d -t lemma-after-models)"
-    if (cd "$MRF" && uv run mrf -r -p Java Spring Communication Docker Protobuf Node \
-            -t "$WORK") > /dev/null 2>&1 \
+    # shellcheck disable=SC2086
+    if (cd "$MRF" && uv run mrf -r -p $PLUGINS -t "$WORK") > /dev/null 2>&1 \
         && "$WORKSPACE/de.fhdo.lemma.reconstruction/tools/reconstruct.sh" \
             --target "$AFTER_MODELS" > /dev/null 2>&1; then
         AFTER_REPORT="$(mktemp -t lemma-after)"
@@ -218,7 +275,7 @@ else
         CONTROL="$(mktemp -d -t lemma-control)"; rm -rf "$CONTROL"
         CONTROL_LOG="$(mktemp -t lemma-control)"
         CONTROL_STARTS=1
-        if git -C "$SOURCE" worktree add --detach "$CONTROL" HEAD > /dev/null 2>&1; then
+        if git -C "$SOURCE" worktree add --detach "$CONTROL" "$BASE" > /dev/null 2>&1; then
             if ! (cd "$CONTROL" && docker compose up -d --build --wait) \
                 > "$CONTROL_LOG" 2>&1; then
                 CONTROL_STARTS=0
