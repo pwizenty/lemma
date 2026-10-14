@@ -469,6 +469,24 @@ class SmellDetectionTest {
         check("rejectUnauthorized:false is rejected whatever the spacing",
             PatchGuard.violations(weakensJs).exists[contains("rejectUnauthorized")], true)
 
+        // Found by a real proposal: it documented the constraints it had
+        // honoured, naming the very things it must not add. A guard that reads
+        // prose rejects a patch for being honest.
+        val documentsIt = '''
+        --- a/REFACTORING-NOTES.md
+        +++ b/REFACTORING-NOTES.md
+        +Nothing disables verification: there is no `NoopHostnameVerifier` and no
+        +`rejectUnauthorized: false`.
+        '''.toString
+        check("a patch whose NOTES mention a weakening is not rejected",
+            PatchGuard.violations(documentsIt).empty, true)
+        check("but the same text in code still is",
+            PatchGuard.violations('''
+            --- a/index.js
+            +++ b/index.js
+            +  rejectUnauthorized: false,
+            '''.toString).empty, false)
+
         // The case a naive guard gets backwards.
         val removesWeakening = '''
         --- a/Client.java

@@ -85,22 +85,52 @@ class PatchGuard {
     }
 
     /**
-     * Whether the patch *adds* a line holding this text.
+     * Files whose added lines are prose, not instructions to a machine.
+     *
+     * A proposal is asked to write down what it did and what it deliberately
+     * avoided, so its notes legitimately contain the names of the things it
+     * must not do. Scanning them for those names rejects a patch for being
+     * honest - which is exactly what happened to the first proposal that
+     * documented its own constraints.
+     */
+    static val PROSE_SUFFIXES = #[".md", ".markdown", ".txt", ".adoc", ".rst"]
+
+    /**
+     * Whether the patch *adds* a line of code holding this text.
      *
      * Added lines only: a patch that removes an existing weakening, or merely
      * shows one as context, is not introducing it - and a guard that cannot
      * tell the difference would block the very patches worth having.
+     *
+     * Code only, for the same reason: see [[PROSE_SUFFIXES]].
      */
     private static def boolean addsLineContaining(String patch, String text) {
-        return patch.split("\n").exists[
-            startsWith("+") && !startsWith("+++") && contains(text)
-        ]
+        return patch.addedCodeLines.exists[contains(text)]
     }
 
     private static def boolean addsRejectUnauthorizedFalse(String patch) {
-        return patch.split("\n").exists[
-            startsWith("+") && !startsWith("+++")
-                && replaceAll("\\s", "").contains("rejectUnauthorized:false")
+        return patch.addedCodeLines.exists[
+            replaceAll("\\s", "").contains("rejectUnauthorized:false")
         ]
+    }
+
+    /**
+     * Every added line of the diff that belongs to a file holding code.
+     *
+     * The ``+++`` headers are what says which file the following lines are in,
+     * so the scan has to walk the diff in order rather than filter it.
+     */
+    private static def List<String> addedCodeLines(String patch) {
+        val lines = <String>newLinkedList
+        var prose = false
+        for (line : patch.split("\n")) {
+            if (line.startsWith("+++ ")) {
+                val path = line.substring(4).trim
+                prose = PROSE_SUFFIXES.exists[path.toLowerCase.endsWith(it)]
+            } else if (line.startsWith("+") && !prose) {
+                lines.add(line)
+            }
+        }
+        return lines
     }
 }
