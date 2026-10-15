@@ -1,112 +1,116 @@
 ## Summary
 
-The one setting the refactoring cannot work without had no user interface.
+**The refactoring now runs from the Eclipse editor.** It did, for the first
+time, on the way to this branch — 127 turns, 18 minutes, a 669-line patch for
+`CustomerCore`'s connector and its three callers, applied nowhere.
+
+Three changes, all of them found by running it rather than by reading it:
 
 ```diff
-- .metadata/.plugins/org.eclipse.core.runtime/.settings/
--     de.fhdo.lemma.servicedsl.ui.prefs          edited by hand,
--                                                 in the right workspace,
--                                                 before launching
 + Window → Preferences → ServiceDsl → Security Smell Refactoring
+      Source root · Command line · Model · Give up after · Keep proposals in
+- .metadata/.plugins/org.eclipse.core.runtime/.settings/*.prefs   edited by hand
+
++ RefactoringRequest.cliCommand        an absolute path, not a bare name
+- Preconditions: "not on the PATH, or is not authenticated"       it cannot know that
+
++ docs/smell-resolution-guide.md       both routes, end to end
 ```
 
-Four fields:
+**A preference page**, because the one setting the feature cannot work without
+had no user interface: the source root was an instance-scope preference whose
+only route was editing a `.prefs` file by hand, in the right workspace, before
+launching. It has **no default** on purpose — a reconstructed model carries no
+source paths, so there is nothing to guess from, and a wrong guess would aim a
+proposal at the wrong checkout.
 
-| Field | Default |
-|---|---|
-| **Source root of the reconstructed system** | **none, deliberately** |
-| Model | `claude-opus-5` |
-| Give up after (minutes) | 45 |
-| Keep proposals in | empty → beside the source root |
+**The command line is configurable**, because a bare name is resolved against
+the `PATH` of the process that spawns it, and Eclipse does not inherit a shell
+`PATH`. On macOS one started from the Dock sees only `/etc/paths`, so a tool
+under `/opt/homebrew/bin` is invisible to it — and a runtime workbench inherits
+from whatever started the IDE. An absolute path sidesteps the whole question.
+It travels on the `RefactoringRequest`, so the smells bundle keeps no UI
+dependency.
 
-**The source root has no default on purpose.** There is no sensible guess, and
-a wrong one would aim a proposal at the wrong checkout. It is also the reason
-the page exists at all: a reconstructed model carries no source paths, because
-those are absolute and a generated model has to be identical on every machine
-to be diffable — so the toolchain genuinely cannot tell which checkout a model
-came from, and nobody can infer it for them.
-
-The page writes into the same instance-scope node `SmellRefactoringPreferences`
-reads, so the page and the code cannot disagree about where a value lives. An
-`AbstractPreferenceInitializer` contributes the defaults, or the fields open
-blank.
-
-```diff
-  @Fix(NON_SECURED_COMMUNICATION)
-  proposeMutualTls(...)
-    if sourceRoot is unset
--     throw new IllegalStateException(...)      a stack trace in the error log
-+     explain what is missing, and offer to open the page
-```
+**A guide**, because none of the above is discoverable.
 
 ## Evidence
 
-**Before:** the only way to set it was editing
+The run that produced this branch:
 
 ```text
-<workspace>/.metadata/.plugins/org.eclipse.core.runtime/.settings/
-    de.fhdo.lemma.servicedsl.ui.prefs
+2026-10-15-endpoint-customercore-…/
+  model.txt   claude-opus-5 · 127 turns · 1056 s · $8.29 · patch produced
+  patch.diff  669 lines, 13 files
 ```
 
-by hand, in the right workspace, before launching — and if you got the
-workspace wrong, the quickfix threw an `IllegalStateException` into an error
-log you had not asked for.
-
-**After:** a page under the existing `ServiceDsl` category, and a refusal that
-offers to take you to it.
+**It independently reproduced `rc1`** — same 13 files, the Feign client in
+`CustomerCoreClientConfiguration`, both `DefaultAuthenticatedRestTemplateClient`s,
+the test-profile properties, a `generate-certificates.sh`. A different session
+reaching the same engineering answer is a useful reproducibility signal for a
+method whose output is not reproducible by construction.
 
 ```console
-$ build-diagrams.sh
-  compiled de.fhdo.lemma.diagram.common
-  …
-  compiled de.fhdo.lemma.servicedsl.ui        ← all seven, at --release 11
-
-$ SmellDetectionTest              108 check(s), 0 failed
-$ ReconstructionRegressionTest    all 4 systems match
-$ plugin.xml                      well-formed; page and initializer registered
+$ build-diagrams.sh          all 7 bundles compile at --release 11
+$ SmellDetectionTest         108 check(s), 0 failed
+$ ReconstructionRegressionTest   all 4 systems match
+$ git -C <source-root> status --porcelain     (empty — nothing was touched)
 ```
 
-The page also states a trap that cost real time while writing the instructions
-for this, **checked rather than assumed**:
+**What the first live run proved, and what it broke:**
 
-```console
-$ which claude                 /opt/homebrew/bin/claude
-$ cat /etc/paths               (no /opt/homebrew/bin)
-$ launchctl getenv PATH        (unset)
-```
+| | |
+|---|---|
+| Preference page opens, under `ServiceDsl` | ✅ |
+| Issue code reaches the editor; warning on the aspect line | ✅ |
+| Quickfix offers itself with the cause's label | ✅ |
+| Precondition check runs and refuses cleanly | ✅ |
+| Background job, patch written, source untouched | ✅ |
+| Finding the CLI | ❌ — the only failure, fixed here |
 
-An Eclipse started from the Dock does not inherit the shell `PATH`, so the CLI
-is invisible to it and the quickfix reports the command line as missing. Start
-Eclipse from a terminal. That is on the page rather than in a commit message
-nobody will read at the moment it matters.
+**The old message asserted something it cannot know.** The check runs
+`--version`, which says nothing about authentication: an unauthenticated CLI
+reports its version happily and then refuses the work. It now explains the
+`PATH` mechanism, names the macOS case, quotes the command it actually tried —
+so a bare `claude` in the message tells you the preference is not in use — and
+offers the two real fixes.
 
-**One Java level slip the build caught:** `String.stripIndent()` is Java 12 and
+Every command, flag and field label in the guide was checked against the code:
+the four scripts exist, `--base`/`--plugins`/`--build-command` are real flags,
+and the five field labels match the page.
+
+One Java level slip the build caught: `String.stripIndent()` is Java 12 and
 this bundle declares `JavaSE-11`. Same shape as the `List.getLast()` slip
-earlier in this work, and again **only `--release 11` reports it** — a compile
-against the running JDK accepts it and Eclipse then refuses.
+earlier in this work, and again **only `--release 11` reports it**.
 
 ## Merge Danger
 
-**Door:** two-way. One page, one initializer, two `plugin.xml` extensions, and
-one changed branch in the quickfix.
+**Door:** two-way. A page, an initializer, two `plugin.xml` extensions, one
+field on a data class, and documentation.
 
-**Blast Radius:** the preference dialog, and nothing else
+**Blast Radius:** the preference dialog, and the proposer's spawn
 
-- **A new page appears** under `ServiceDsl` for anyone with this bundle
-  installed, whether or not they use the refactoring.
-- **An initializer now contributes defaults** into the
-  `de.fhdo.lemma.servicedsl.ui` instance node. It sets only the two keys above
-  and touches nothing Xtext owns, but it is a new contribution to a node the
-  language also uses.
-- **Existing hand-edited `.prefs` files keep working.** The page reads and
-  writes the same keys, so a value set by hand shows up in it.
+- **A new page appears** under `ServiceDsl` for anyone with the bundle, used or
+  not.
+- **An initializer contributes defaults** into the
+  `de.fhdo.lemma.servicedsl.ui` instance node. It sets only `cliCommand`,
+  `model` and `timeoutMinutes`, and touches nothing Xtext owns — but it is a new
+  contribution to a node the language also uses.
+- **Hand-edited `.prefs` files keep working**: the page reads and writes the
+  same keys.
+- **`RefactoringRequest` gains a field with a default of `"claude"`**, so any
+  caller that does not set it behaves exactly as before.
 
-**Still unexercised, and this is the honest limit.** Neither the page nor the
-quickfix has run in a live Eclipse. Compilation proves the API use is right; it
-does not prove the page appears under the right category, that the field
-editors lay out sensibly, that the initializer fires before the page opens, or
-that `PreferencesUtil.createPreferenceDialogOn` finds the page by that id. All
-of that needs launching a runtime workbench, which no amount of headless
-testing substitutes for.
+What is **still** unverified, and worth stating rather than implying:
+
+- The `starts` verification gate and the full four-gate run have not been
+  exercised **from this branch**; they were verified earlier by hand.
+- **No automated test covers the page or the quickfix.** The headless suite
+  stops at the `RefactoringProposer` seam by design, so everything in
+  `…servicedsl.ui` is covered by compilation and one manual run. There is no CI
+  in this repository at all.
+- **Proposing is Eclipse-only.** There is no command-line entry point, which
+  the guide says plainly rather than leaving to be discovered — the shell route
+  runs `claude -p` by hand.
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
