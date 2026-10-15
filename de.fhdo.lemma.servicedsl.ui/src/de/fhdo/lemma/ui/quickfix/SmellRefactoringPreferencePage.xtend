@@ -78,7 +78,15 @@ class SmellRefactoringPreferencePage extends FieldEditorPreferencePage
         explain("Each proposal is kept as a folder: the prompt, the skill that produced it, "
             + "the patch, the model and the cost. Left empty, it goes beside the source root.")
 
-        explain("The 'claude' command line has to be installed and authenticated. On macOS "
+        addField(new StringFieldEditor(SmellRefactoringPreferences.CLI_COMMAND,
+            "&Command line:", fieldEditorParent))
+        explain("Give the ABSOLUTE PATH if Eclipse reports it cannot run this. A bare name is "
+            + "resolved against the PATH of the process that spawns it, and Eclipse does not "
+            + "inherit your shell PATH: on macOS one started from the Dock sees only "
+            + "/etc/paths, so a tool under /opt/homebrew/bin is invisible to it. Find it with "
+            + "'which claude' in a terminal.")
+
+        explain("The command line also has to be authenticated. On macOS "
             + "an Eclipse started from the Dock does not inherit your shell PATH, so a CLI "
             + "under /opt/homebrew/bin is invisible to it - start Eclipse from a terminal, "
             + "or the quickfix will report the command line as missing.")

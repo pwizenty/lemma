@@ -113,7 +113,7 @@ class ClaudeCliProposer implements RefactoringProposer {
         Files.write(prompt, PromptBuilder.request(request).getBytes(StandardCharsets.UTF_8))
 
         try {
-            val command = newArrayList(Preconditions.CLI, "-p",
+            val command = newArrayList(request.cliCommand ?: Preconditions.CLI, "-p",
                 "--model", model,
                 "--add-dir", worktree.toString,
                 "--allowedTools", ALLOWED_TOOLS,
@@ -139,7 +139,7 @@ class ClaudeCliProposer implements RefactoringProposer {
             val proposal = new Proposal
             proposal.rawResult = output
             proposal.model = model
-            proposal.cliVersion = cliVersion
+            proposal.cliVersion = cliVersion(request.cliCommand)
             readResult(output, proposal)
             return proposal
         } finally {
@@ -266,8 +266,8 @@ class ClaudeCliProposer implements RefactoringProposer {
         }
     }
 
-    private def String cliVersion() {
-        return capture(null, Preconditions.CLI, "--version")?.trim
+    private def String cliVersion(String command) {
+        return capture(null, command ?: Preconditions.CLI, "--version")?.trim
     }
 
     private def String readIfPresent(Path file) {

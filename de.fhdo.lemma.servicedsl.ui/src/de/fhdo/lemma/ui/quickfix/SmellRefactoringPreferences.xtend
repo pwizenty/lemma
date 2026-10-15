@@ -26,6 +26,13 @@ class SmellRefactoringPreferences {
     public static val MODEL = "smellRefactoring.model"
     public static val RECORD_ROOT = "smellRefactoring.recordRoot"
     public static val TIMEOUT_MINUTES = "smellRefactoring.timeoutMinutes"
+    public static val CLI_COMMAND = "smellRefactoring.cliCommand"
+
+    /**
+     * A bare name, which only works where the spawning process has the tool on
+     * its PATH. Eclipse often does not - see the preference page.
+     */
+    public static val DEFAULT_CLI_COMMAND = "claude"
 
     /**
      * Pinned, and recorded with every proposal, so a result can be attributed
@@ -41,6 +48,10 @@ class SmellRefactoringPreferences {
 
     static def String sourceRoot() {
         return get(SOURCE_ROOT, null)
+    }
+
+    static def String cliCommand() {
+        return get(CLI_COMMAND, DEFAULT_CLI_COMMAND)
     }
 
     static def String model() {

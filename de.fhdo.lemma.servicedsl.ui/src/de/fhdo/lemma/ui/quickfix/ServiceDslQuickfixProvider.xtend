@@ -62,6 +62,7 @@ throwaway worktree and written to disk for you to review.''',
                 request.rootCauseLabel = causeLabel
                 request.sourceRoot = sourceRoot
                 request.skill = SKILL
+                request.cliCommand = SmellRefactoringPreferences.cliCommand
                 request.findings.addAll(CauseFindings.of(aspect, causeId))
                 if (request.findings.empty) {
                     throw new IllegalStateException(

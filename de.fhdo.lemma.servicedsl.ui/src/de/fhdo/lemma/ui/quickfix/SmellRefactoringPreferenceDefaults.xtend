@@ -15,6 +15,8 @@ import org.eclipse.core.runtime.preferences.DefaultScope
 class SmellRefactoringPreferenceDefaults extends AbstractPreferenceInitializer {
     override initializeDefaultPreferences() {
         val node = DefaultScope.INSTANCE.getNode(SmellRefactoringPreferences.NODE)
+        node.put(SmellRefactoringPreferences.CLI_COMMAND,
+            SmellRefactoringPreferences.DEFAULT_CLI_COMMAND)
         node.put(SmellRefactoringPreferences.MODEL,
             SmellRefactoringPreferences.DEFAULT_MODEL)
         node.putInt(SmellRefactoringPreferences.TIMEOUT_MINUTES,

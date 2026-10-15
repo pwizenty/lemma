@@ -59,6 +59,18 @@ class RefactoringRequest {
     @Accessors
     val List<String> otherCauses = newLinkedList
 
+    /**
+     * How to run the command line, as a path or a bare name.
+     *
+     * Configurable because a bare name is resolved against the PATH of the
+     * process that spawns it, and a desktop application's PATH is not the
+     * user's shell PATH - on macOS an Eclipse started from the Dock gets
+     * /etc/paths only, so a tool installed under /opt/homebrew/bin is
+     * invisible to it. An absolute path sidesteps the whole question.
+     */
+    @Accessors
+    String cliCommand = "claude"
+
     def boolean isValid() {
         return !findings.empty && !rootCauseId.nullOrEmpty && !sourceRoot.nullOrEmpty
     }
