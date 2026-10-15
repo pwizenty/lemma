@@ -433,15 +433,18 @@
             commandId="de.fhdo.lemma.servicedsl.ui.reviewProposal"
             class="de.fhdo.lemma.ui.quickfix.ReviewProposalHandler"/>
     </extension>
+    <!-- Contributed INTO the existing LEMMA menu, which
+         de.fhdo.lemma.eclipse.ui defines as lemmaMenu. Declaring another menu
+         labelled "LEMMA" here produced two of them in the menu bar: a label is
+         not an identity, so Eclipse had no reason to merge them. -->
     <extension point="org.eclipse.ui.menus">
-        <menuContribution locationURI="menu:org.eclipse.ui.main.menu?after=additions">
-            <menu id="de.fhdo.lemma.servicedsl.ui.menu" label="LEMMA">
-                <menu id="de.fhdo.lemma.servicedsl.ui.menu.smells" label="Security Smells">
-                    <command
-                        commandId="de.fhdo.lemma.servicedsl.ui.reviewProposal"
-                        label="Review a Proposal..."
-                        style="push"/>
-                </menu>
+        <menuContribution
+                locationURI="menu:de.fhdo.lemma.eclipse.ui.lemmaMenu?after=additions">
+            <menu id="de.fhdo.lemma.servicedsl.ui.menu.smells" label="Security Smells">
+                <command
+                    commandId="de.fhdo.lemma.servicedsl.ui.reviewProposal"
+                    label="Review a Proposal..."
+                    style="push"/>
             </menu>
         </menuContribution>
     </extension>
