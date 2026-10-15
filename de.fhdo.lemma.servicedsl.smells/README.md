@@ -1,5 +1,7 @@
 # Security smells in service models
 
+**How to run it: [`docs/smell-resolution-guide.md`](../docs/smell-resolution-guide.md)** — the Eclipse route, the shell route, verification, and what to do when it goes wrong.
+
 Detects **Non-Secured Service-to-Service Communications** — §3.7 of Ponce et
 al. (2022) — in LEMMA service models. Select one or more `.services` files,
 **Detect security smells** from the context menu, and a Markdown report lands

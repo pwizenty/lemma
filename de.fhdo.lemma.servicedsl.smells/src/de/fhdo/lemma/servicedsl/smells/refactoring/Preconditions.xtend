@@ -36,11 +36,18 @@ Set it to the checked-out system the models were reconstructed from.'''.toString
 A proposal is produced in a throwaway worktree of it, so it has to be one.'''
                 .toString
         }
-        if (!cliAvailable) {
-            return '''The «CLI» command line is not on the PATH, or is not authenticated.
-Install and authenticate it, then try again. The proposal can also be produced
-by hand - the prompt and the constraints are written beside the report.'''
-                .toString
+        val command = request.cliCommand ?: CLI
+        if (!command.available) {
+            return '''Cannot run "«command»".
+
+If it is installed, this is almost certainly a PATH problem rather than a
+missing tool: a bare name is resolved against the PATH of the process that
+spawns it, and a desktop application does not inherit your shell PATH. On
+macOS an Eclipse started from the Dock sees only /etc/paths, so a tool under
+/opt/homebrew/bin is invisible to it.
+
+Either give the absolute path in the preferences, or start Eclipse from a
+terminal so it inherits your PATH.'''.toString
         }
         return null
     }
@@ -48,15 +55,16 @@ by hand - the prompt and the constraints are written beside the report.'''
     /**
      * Whether the CLI can be run at all.
      *
-     * ``--version`` rather than a real call: it is cheap, it needs no network,
-     * and it distinguishes "not installed" from "installed and busy". It does
-     * **not** prove the CLI is authenticated - that only shows up when a
-     * proposal comes back having done nothing, which the proposer reports as a
-     * failure rather than as an empty patch.
+     * ``--version`` rather than a real call: it is cheap and needs no network.
+     *
+     * It says nothing about **authentication**, which is why the message this
+     * feeds no longer claims otherwise. An unauthenticated CLI reports its
+     * version perfectly well and then refuses the proposal, which arrives here
+     * as a run that produced no patch.
      */
-    static def boolean isCliAvailable() {
+    static def boolean isAvailable(String command) {
         try {
-            val process = new ProcessBuilder(CLI, "--version")
+            val process = new ProcessBuilder(command, "--version")
                 .redirectErrorStream(true)
                 .start
             if (!process.waitFor(20, TimeUnit.SECONDS)) {

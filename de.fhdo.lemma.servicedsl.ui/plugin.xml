@@ -90,6 +90,16 @@
             name="Syntax Coloring">
             <keywordReference id="de.fhdo.lemma.ui.keyword_ServiceDsl"/>
         </page>
+        <!-- Not built through the Xtext extension factory: this page is not an
+             Xtext language preference, it configures the security-smell
+             refactoring, so it needs no injector. -->
+        <page
+            category="de.fhdo.lemma.ServiceDsl"
+            class="de.fhdo.lemma.ui.quickfix.SmellRefactoringPreferencePage"
+            id="de.fhdo.lemma.ServiceDsl.smellRefactoring"
+            name="Security Smell Refactoring">
+            <keywordReference id="de.fhdo.lemma.ui.keyword_ServiceDsl"/>
+        </page>
         <page
             category="de.fhdo.lemma.ServiceDsl"
             class="de.fhdo.lemma.ui.ServiceDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.templates.XtextTemplatePreferencePage"
@@ -406,5 +416,8 @@
             extension="services"
             type="text">
         </fileTypes>
+    </extension>
+    <extension point="org.eclipse.core.runtime.preferences">
+        <initializer class="de.fhdo.lemma.ui.quickfix.SmellRefactoringPreferenceDefaults"/>
     </extension>
 </plugin>
