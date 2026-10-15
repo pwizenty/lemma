@@ -76,6 +76,11 @@ class ProposeRefactoringJob extends Job {
 
             val folder = record(proposal)
             monitor.worked(1)
+            // Offer the review rather than only naming the folder. A modal
+            // dialog opening by itself 13-25 minutes later would land on top
+            // of whatever the reader moved on to - the job runs in the
+            // background precisely so they could.
+            offerToReview(folder)
             return new Status(IStatus.INFO, PLUGIN,
                 '''A patch for «request.rootCauseLabel» was written to «folder».
 It has been applied nowhere. Review it, then verify it by re-running the
@@ -115,6 +120,29 @@ resolved.'''.toString)
         } catch (Exception exception) {
             return "<the skill could not be read>"
         }
+    }
+
+    /**
+     * Ask, on the user interface thread, whether to review it now.
+     */
+    private def void offerToReview(java.nio.file.Path folder) {
+        val display = org.eclipse.swt.widgets.Display.getDefault
+        display.asyncExec[
+            val shell = org.eclipse.ui.PlatformUI.workbench?.activeWorkbenchWindow?.shell
+            if (shell === null) {
+                return
+            }
+            val review = org.eclipse.jface.dialogs.MessageDialog.openQuestion(shell,
+                "Security Smell Refactoring",
+                '''A patch for «request.rootCauseLabel» was written to
+
+«folder»
+
+It has been applied nowhere. Review it now?''')
+            if (review) {
+                ReviewProposal.open(shell, folder, request.sourceRoot)
+            }
+        ]
     }
 
     private def IStatus error(String message) {

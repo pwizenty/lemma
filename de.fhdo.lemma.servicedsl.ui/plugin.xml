@@ -420,4 +420,29 @@
     <extension point="org.eclipse.core.runtime.preferences">
         <initializer class="de.fhdo.lemma.ui.quickfix.SmellRefactoringPreferenceDefaults"/>
     </extension>
+    <!-- Reviewing a proposal made earlier, from the menu. The quickfix offers
+         the review when a job finishes; this is how an older one is reached. -->
+    <extension point="org.eclipse.ui.commands">
+        <command
+            id="de.fhdo.lemma.servicedsl.ui.reviewProposal"
+            name="Review a Refactoring Proposal"
+            categoryId="org.eclipse.ui.category.window"/>
+    </extension>
+    <extension point="org.eclipse.ui.handlers">
+        <handler
+            commandId="de.fhdo.lemma.servicedsl.ui.reviewProposal"
+            class="de.fhdo.lemma.ui.quickfix.ReviewProposalHandler"/>
+    </extension>
+    <extension point="org.eclipse.ui.menus">
+        <menuContribution locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+            <menu id="de.fhdo.lemma.servicedsl.ui.menu" label="LEMMA">
+                <menu id="de.fhdo.lemma.servicedsl.ui.menu.smells" label="Security Smells">
+                    <command
+                        commandId="de.fhdo.lemma.servicedsl.ui.reviewProposal"
+                        label="Review a Proposal..."
+                        style="push"/>
+                </menu>
+            </menu>
+        </menuContribution>
+    </extension>
 </plugin>
