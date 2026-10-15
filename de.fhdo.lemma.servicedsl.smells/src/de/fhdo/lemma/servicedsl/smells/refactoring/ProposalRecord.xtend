@@ -61,6 +61,7 @@ class ProposalRecord {
         findings      «request.findings.size»
         skill         «request.skill» (copied verbatim as skill.md)
         target        «request.sourceRoot»
+        base          «request.base ?: "<unrecorded>"»
 
         model         «proposal.model ?: "<unrecorded>"»
         cli           «proposal.cliVersion ?: "<unrecorded>"»

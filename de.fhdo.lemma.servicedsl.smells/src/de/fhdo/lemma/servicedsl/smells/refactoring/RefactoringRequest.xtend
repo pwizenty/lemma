@@ -71,6 +71,18 @@ class RefactoringRequest {
     @Accessors
     String cliCommand = "claude"
 
+    /**
+     * The commit the patch is produced against.
+     *
+     * Recorded rather than inferred afterwards. Reading it back from the
+     * target's git state later only answers "does this still apply"; it cannot
+     * say *which commit the patch was for*, which is the thing a reader needs
+     * when it does not. Two proposals generated against the same commit do not
+     * compose, so getting this wrong is not a detail.
+     */
+    @Accessors
+    String base
+
     def boolean isValid() {
         return !findings.empty && !rootCauseId.nullOrEmpty && !sourceRoot.nullOrEmpty
     }
