@@ -67,15 +67,28 @@ class ProposalCompareInput extends CompareEditorInput {
             }
             monitor?.worked(1)
 
-            val root = new DiffNode(Differencer.NO_CHANGE)
+            // CHANGE, not NO_CHANGE: the root describes the tree below it, and
+            // a root claiming no change invites the viewer to report that the
+            // sides are identical.
+            val tree = new DiffNode(Differencer.CHANGE)
+            val nodes = <DiffNode>newLinkedList
             for (path : proposal.changedPaths) {
                 val before = new File(this.root, path)
                 val after = patched.resolve(path).toFile
-                root.add(new DiffNode(kindOf(before, after),
+                nodes.add(new DiffNode(kindOf(before, after),
                     null, element(path, before), element(path, after)))
             }
             monitor?.worked(1)
-            return root
+
+            // A single-file proposal opens straight onto its diff. With a
+            // parent node it would open on an empty content pane and wait to
+            // be clicked, which is right for a tree of thirteen files and
+            // pointless for one.
+            if (nodes.size == 1) {
+                return nodes.head
+            }
+            nodes.forEach[tree.add(it)]
+            return tree
         } finally {
             monitor?.done
         }
