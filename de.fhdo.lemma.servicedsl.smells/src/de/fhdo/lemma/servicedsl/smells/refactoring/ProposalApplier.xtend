@@ -84,7 +84,16 @@ class ProposalApplier {
         outcome.done.add('''applied «proposal.changedPaths.size» file(s)'''.toString)
 
         if (commit) {
-            run(directory, "git", "add", "-A")
+            // Only the paths the patch touched. "git add -A" stages whatever
+            // else is in the directory, and git cannot tell the patch's work
+            // from the user's: it once swept three unrelated files into a
+            // commit whose message named only the refactoring.
+            val staged = newArrayList("git", "add", "--")
+            staged.addAll(proposal.changedPaths)
+            if (!run(directory, staged)) {
+                outcome.failure = "The patch applied but its files could not be staged."
+                return outcome
+            }
             val message = '''«proposal.cause ?: "Resolve a security smell"»
 
 Resolves security smell §3.7, Non-Secured Service-to-Service Communications
@@ -130,6 +139,10 @@ will not start until key material exists.'''.toString)
         }
     }
 
+    private static def boolean run(File directory, java.util.List<String> command) {
+        return run(directory, command.toArray(newArrayOfSize(0)))
+    }
+
     private static def boolean run(File directory, String... command) {
         try {
             val process = new ProcessBuilder(command).directory(directory)
@@ -161,9 +174,21 @@ will not start until key material exists.'''.toString)
      * interpreting the diff: git already knows how to apply a patch, and a
      * second implementation of that would be a second thing to get wrong.
      */
+    public static val REVIEW_PREFIX = "lemma-review"
+
+    /**
+     * The prefixes this toolchain gives its throwaway worktrees.
+     *
+     * Both, because the leak that prompted the sweep came from the *proposer*
+     * rather than from the review: a proposal takes up to 25 minutes, and a
+     * run that ends some other way than returning - a usage limit, a closed
+     * workbench - never reaches the clause that removes it.
+     */
+    public static val TEMPORARY_PREFIXES = #["lemma-review", "lemma-refactoring"]
+
     static def Path patchedCopy(String root, String base, Path patch) {
         try {
-            val worktree = Files.createTempDirectory("lemma-review")
+            val worktree = Files.createTempDirectory(REVIEW_PREFIX)
             Files.delete(worktree)
             if (!run(new File(root), "git", "worktree", "add", "--detach",
                 worktree.toString, base ?: "HEAD")) {
@@ -183,10 +208,37 @@ will not start until key material exists.'''.toString)
      * Give back a worktree made by [[patchedCopy]].
      */
     static def void release(String root, Path worktree) {
-        if (worktree === null) {
+        if (worktree !== null) {
+            run(new File(root), "git", "worktree", "remove", "--force", worktree.toString)
+        }
+        run(new File(root), "git", "worktree", "prune")
+    }
+
+    /**
+     * Remove throwaway worktrees this toolchain left behind.
+     *
+     * Releasing on close is not enough on its own: the compare viewer prepares
+     * its input on another thread, so a dialog closed while that is still
+     * running can dispose before the worktree is recorded, and the worktree
+     * then outlives everything that knew about it - showing up in the user's
+     * own ``git worktree list`` long afterwards.
+     *
+     * Safe to call when a review begins - the dialog is modal - and when a
+     * proposal begins, since the job that would own one has not started yet.
+     */
+    static def void releaseStaleWorktrees(String root) {
+        val listed = capture(new File(root), "git", "worktree", "list", "--porcelain")
+        if (listed === null) {
             return
         }
-        run(new File(root), "git", "worktree", "remove", "--force", worktree.toString)
+        for (line : listed.split("\n")) {
+            if (line.startsWith("worktree ")) {
+                val path = line.substring("worktree ".length).trim
+                if (TEMPORARY_PREFIXES.exists[path.contains(it)]) {
+                    run(new File(root), "git", "worktree", "remove", "--force", path)
+                }
+            }
+        }
         run(new File(root), "git", "worktree", "prune")
     }
 }

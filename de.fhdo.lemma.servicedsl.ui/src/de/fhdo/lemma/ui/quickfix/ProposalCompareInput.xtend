@@ -56,6 +56,11 @@ class ProposalCompareInput extends CompareEditorInput {
     override protected prepareInput(IProgressMonitor monitor) {
         monitor?.beginTask("Applying the proposal to a throwaway copy", 2)
         try {
+            // Clear anything a previous review left registered before adding
+            // another: disposal races with this method, which runs on another
+            // thread, so a dialog closed early can leak the worktree it was
+            // still creating.
+            ProposalApplier.releaseStaleWorktrees(root)
             patched = ProposalApplier.patchedCopy(root, proposal.base, proposal.patch)
             if (patched === null) {
                 // Said plainly rather than shown as an empty tree: an empty
@@ -119,9 +124,13 @@ class ProposalCompareInput extends CompareEditorInput {
      * user's own ``git worktree list`` long after, which is the kind of mess a
      * tool has no business leaving behind.
      */
-    def void dispose() {
-        ProposalApplier.release(root, patched)
+    def synchronized void dispose() {
+        val worktree = patched
         patched = null
+        // Even when this ran before prepareInput recorded one, the sweep
+        // catches it: release with null still prunes, and a worktree created
+        // afterwards is removed when the next review begins.
+        ProposalApplier.release(root, worktree)
     }
 
     /**

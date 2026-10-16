@@ -58,6 +58,7 @@ class SmellDetectionTest {
         aProposalBelongsToOneCommit
         applyingRefusesRatherThanGuesses
         anApplyIsPlannedBeforeItRuns
+        applyingStagesOnlyThePatchsFiles
 
         println('''
         ---
@@ -707,6 +708,40 @@ class SmellDetectionTest {
                 Files.createDirectories(folder.resolveSibling(
                     "2026-10-15-endpoint-customercore-1792046440612")
                 ).resolve("..").normalize.resolve(folder.fileName))) !== null, true)
+    }
+
+
+    /**
+     * Applying stages the patch's files and nothing else.
+     *
+     * Found the hard way: "git add -A" swept three unrelated uncommitted
+     * files into a commit whose message named only the refactoring, because
+     * git cannot tell a patch's work from the user's. The paths come from the
+     * patch, so this checks the list that is handed to git rather than the
+     * commit that results - the decision is which paths, not how to stage.
+     */
+    private def static void applyingStagesOnlyThePatchsFiles() {
+        val folder = Files.createTempDirectory("lemma-stage-test")
+        Files.write(folder.resolve("patch.diff"), '''
+        --- a/customer-core/src/main/resources/application.properties
+        +++ b/customer-core/src/main/resources/application.properties
+        +server.ssl.enabled=true
+        --- /dev/null
+        +++ b/generate-certificates.sh
+        +#!/usr/bin/env bash
+        '''.toString.bytes)
+        Files.write(folder.resolve("model.txt"), "base          622632f\n".bytes)
+        val proposal = RecordedProposal.at(folder)
+
+        val paths = proposal.changedPaths
+        check("the patch's paths are what gets staged", paths.size, 2)
+        check("and they are the patch's, not the directory's",
+            paths.contains("customer-core/src/main/resources/application.properties")
+                && paths.contains("generate-certificates.sh"), true)
+        // The three files that were swept in last time are the shape of what
+        // must never appear here: anything the patch does not mention.
+        check("nothing the patch does not mention is included",
+            paths.exists[contains("DataLoader") || contains("SECURITY_REVIEW")], false)
     }
 
 }

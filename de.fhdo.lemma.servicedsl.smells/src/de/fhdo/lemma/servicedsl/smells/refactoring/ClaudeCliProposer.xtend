@@ -81,6 +81,10 @@ class ClaudeCliProposer implements RefactoringProposer {
 
         var Path worktree = null
         try {
+            // A previous run that ended some other way than returning - a
+            // usage limit, a closed workbench - leaves its worktree
+            // registered. Clear those first rather than accumulating them.
+            ProposalApplier.releaseStaleWorktrees(request.sourceRoot)
             worktree = addWorktree(request.sourceRoot)
             if (worktree === null) {
                 return failed("a throwaway worktree of the source root could not be created")
