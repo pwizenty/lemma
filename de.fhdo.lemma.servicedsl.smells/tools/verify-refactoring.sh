@@ -100,6 +100,23 @@ PATCH="$PROPOSAL/patch.diff"
 [[ -d "$SOURCE/.git" ]] || { echo "Not a git checkout: $SOURCE" >&2; exit 2; }
 
 PASSED=(); FAILED=(); SKIPPED=()
+
+# Two things the gates establish but the verdict used to swallow.
+#
+# A patch that breaks a monitoring scrape and declares it passes gate 4, and so
+# does a patch that breaks nothing: the declared-loss rule exists so the gate
+# does not fail every correct refactoring, but folding both into one PASS erases
+# the difference between them. Two proposals of this work differ in exactly that
+# way. So the loss is reported as its own field instead of being hidden inside a
+# verdict, and the verdict is left alone, because the four gates did pass.
+#
+# COVERAGE_LOST is read from the proposal's own notes rather than measured: the
+# prompt requires a proposal to declare it when a test's transport changes, and
+# nothing here detects it. A proposal that stays silent therefore reads "none
+# declared", which is a statement about the notes and not about the tests.
+DECLARED_LOSSES="not measured"
+COVERAGE_LOST="not measured"
+
 pass() { PASSED+=("$1"); printf '  PASS  %s\n' "$1"; }
 fail() { FAILED+=("$1: $2"); printf '  FAIL  %s\n        %s\n' "$1" "$2"; }
 skip() { SKIPPED+=("$1: $2"); printf '  SKIP  %s (%s)\n' "$1" "$2"; }
@@ -180,6 +197,41 @@ generate_material() {
     fi
     [[ -z "$command" ]] && return $NO_MATERIAL
     (cd "$tree" && bash -c "$command") > /dev/null 2>&1
+}
+
+# What the proposal says it gave up in test coverage.
+#
+# Read, not measured. The constraints allow a test's configuration to be
+# updated so that it addresses the new transport, and require the proposal to
+# say so; one proposal of this work moved a producer test to an in-process
+# broker transport, which keeps every assertion and loses the network
+# handshake. No gate observes that, and nothing here detects it: this reads the
+# proposal's own notes, so silence prints as "none declared" and says something
+# about the notes rather than about the tests.
+coverage_lost() {
+    local notes="$1"
+    [[ -f "$notes" ]] || { echo "not measured (no REFACTORING-NOTES.md)"; return; }
+
+    # The notes' own test section when it has one, otherwise the whole file:
+    # the proposals of this work head it "Tests", but a heading is a convention
+    # and not a contract.
+    local section
+    section="$(awk '/^#+[[:space:]]*Tests/ { inside = 1; next }
+                    /^#+[[:space:]]/ { inside = 0 }
+                    inside { print }' "$notes")"
+    [[ -z "${section// /}" ]] && section="$(cat "$notes")"
+
+    # By sentence, not by line: the notes are wrapped prose, and the line a
+    # keyword falls on usually starts mid-clause.
+    local statement
+    statement="$(printf '%s\n' "$section" | tr '\n' ' ' | sed -E 's/\. /.\n/g' \
+        | grep -iE 'in-vm|in-process|vm://|coverage|no network connector|without opening a network' \
+        | head -1 | sed -E 's/^[-* ]+//; s/[[:space:]]+/ /g; s/[`*]//g' | cut -c1-160)"
+    if [[ -z "${statement// /}" ]]; then
+        echo "none declared"
+    else
+        echo "$statement"
+    fi
 }
 
 echo "Verifying $(basename "$PROPOSAL")"
@@ -407,6 +459,7 @@ else
         | head -3 | tr '\n' ' ')"
 
     if [[ "$PATCHED_UP" == 1 && -z "$PATCHED_ERRORS" ]]; then
+        DECLARED_LOSSES="none"
         pass "starts: the system comes up with the patch applied and no service reports an unreachable peer"
     else
         # This gate needs a baseline as much as the smell gate does. A sample
@@ -438,6 +491,7 @@ else
             # not have is the patch's doing.
             comm -23 "$START_LOG.errors" "$CONTROL_LOG.errors" > "$START_LOG.new"
             if [[ ! -s "$START_LOG.new" ]]; then
+                DECLARED_LOSSES="none"
                 pass "starts: the system comes up with the patch applied, and reports no unreachable peer the unpatched system does not report too"
             else
                 NEW_ERRORS="$(tr '\n' '; ' < "$START_LOG.new")"
@@ -476,8 +530,10 @@ else
                 done
 
                 if [[ -n "${UNDECLARED// /}" ]]; then
+                    DECLARED_LOSSES="$(printf '%s ' $NEW_SERVICES)(not declared:${UNDECLARED})"
                     fail "starts" "the system comes up, but${UNDECLARED} cannot reach a peer it reaches unpatched and REFACTORING-NOTES.md does not mention it: $NEW_ERRORS see $START_LOG.settled"
                 else
+                    DECLARED_LOSSES="$(printf '%s ' $NEW_SERVICES)(declared)"
                     pass "starts: the system comes up, and every peer it can no longer reach ($(printf '%s ' $NEW_SERVICES)) is declared in REFACTORING-NOTES.md"
                 fi
             fi
@@ -485,8 +541,14 @@ else
     fi
 fi
 
+COVERAGE_LOST="$(coverage_lost "$WORK/REFACTORING-NOTES.md")"
+
 git -C "$SOURCE" worktree remove --force "$WORK" > /dev/null 2>&1
 git -C "$SOURCE" worktree prune > /dev/null 2>&1
+
+echo
+echo "  declared losses: $DECLARED_LOSSES"
+echo "  test coverage lost: $COVERAGE_LOST"
 
 # ---------------------------------------------------------------- the verdict
 echo
@@ -513,6 +575,16 @@ echo "$VERDICT — ${#PASSED[@]} passed, ${#FAILED[@]} failed, ${#SKIPPED[@]} sk
     echo "Extent of the patch: $EXTENT. Not a gate - no number of files is the"
     echo "right one - but the claim that model-level input bounds a refactoring"
     echo "is a claim about extent, so it is counted rather than recalled."
+    echo
+    echo "Declared losses: $DECLARED_LOSSES. A peer this patch can no longer"
+    echo "reach, as the start gate measured it against the unpatched system."
+    echo "Reported rather than folded into the verdict, because a patch that"
+    echo "loses a monitoring scrape and declares it is not the same result as"
+    echo "one that loses nothing, and both pass the four gates."
+    echo
+    echo "Test coverage lost: $COVERAGE_LOST. Read from REFACTORING-NOTES.md,"
+    echo "not detected - a proposal that declares nothing reads \"none"
+    echo "declared\", which is a statement about the notes."
     echo
     for entry in "${PASSED[@]:-}";  do [[ -n "$entry" ]] && echo "- PASS $entry"; done
     for entry in "${FAILED[@]:-}";  do [[ -n "$entry" ]] && echo "- FAIL $entry"; done
