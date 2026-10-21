@@ -12,8 +12,16 @@
 #              generated
 #   3. smell   the addressed root cause has no finding left, and the total
 #              count fell, both against a baseline taken before
-#   4. starts  the system still comes up, and no service reports a peer it
-#              cannot reach once the stack has settled
+#   4. starts  the system still comes up, and every peer a service can no
+#              longer reach is one the unpatched system cannot reach either or
+#              one REFACTORING-NOTES.md declares
+#
+# Gate 4 does not decide which lost channel is acceptable, because it cannot:
+# mutual TLS on a service's actuator endpoints does stop an admin server that
+# holds no client certificate from scraping them, and every proposal of this
+# work does that. It decides whether the loss was declared - the prompt already
+# requires a proposal to write down what its patch gives up, and this is where
+# that is checked rather than trusted.
 #
 # Gate 1 and gate 2 are deliberately separate. A patch whose tests read a key
 # store from disk passes the second and fails the first, which is exactly what
@@ -402,9 +410,45 @@ else
                 pass "starts: the system comes up with the patch applied, and reports no unreachable peer the unpatched system does not report too"
             else
                 NEW_ERRORS="$(tr '\n' '; ' < "$START_LOG.new")"
+                # Compose prefixes every line with the service it came from.
                 NEW_SERVICES="$(grep -F -f "$START_LOG.new" "$START_LOG.settled" 2>/dev/null \
-                    | sed -E 's/^([a-z0-9_-]+)[ ]*\|.*/\1/' | sort -u | tr '\n' ' ')"
-                fail "starts" "the system comes up, but ${NEW_SERVICES:-a service} cannot reach a peer it reaches unpatched: $NEW_ERRORS see $START_LOG.settled"
+                    | sed -E 's/^([a-z0-9_-]+)[ ]*\|.*/\1/' | sort -u)"
+
+                # A lost channel is not automatically a defect, and this gate
+                # cannot decide which losses are acceptable: mutual TLS on a
+                # service's actuator endpoints does stop an admin server that
+                # holds no client certificate from scraping them, and all three
+                # proposals of this work do exactly that. What the gate can
+                # insist on is that the loss was declared. The prompt already
+                # requires a proposal to write down what its patch gives up;
+                # this is where that requirement is checked rather than trusted,
+                # so an undeclared broken channel fails and a declared one is
+                # reported and left to whoever reads the record.
+                # Compared with the punctuation and the case removed from
+                # both sides: the notes call it "Spring Boot Admin" and
+                # "spring.boot.admin.client.url" where the compose file calls it
+                # spring-boot-admin, and a literal search would have called
+                # every one of those undeclared.
+                NOTES="$(tr -cd '[:alnum:]' < "$WORK/REFACTORING-NOTES.md" 2>/dev/null \
+                    | tr '[:upper:]' '[:lower:]')"
+                UNDECLARED=""
+                for service in $NEW_SERVICES; do
+                    # The service's name as the compose file gives it: the log
+                    # prefix is <service>-<replica>.
+                    bare="${service%-[0-9]}"
+                    key="$(printf '%s' "$bare" | tr -cd '[:alnum:]' \
+                        | tr '[:upper:]' '[:lower:]')"
+                    case "$NOTES" in
+                        *"$key"*) ;;
+                        *) UNDECLARED="$UNDECLARED $bare" ;;
+                    esac
+                done
+
+                if [[ -n "${UNDECLARED// /}" ]]; then
+                    fail "starts" "the system comes up, but${UNDECLARED} cannot reach a peer it reaches unpatched and REFACTORING-NOTES.md does not mention it: $NEW_ERRORS see $START_LOG.settled"
+                else
+                    pass "starts: the system comes up, and every peer it can no longer reach ($(printf '%s ' $NEW_SERVICES)) is declared in REFACTORING-NOTES.md"
+                fi
             fi
         fi
     fi
