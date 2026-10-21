@@ -12,7 +12,8 @@
 #              generated
 #   3. smell   the addressed root cause has no finding left, and the total
 #              count fell, both against a baseline taken before
-#   4. starts  the system still comes up
+#   4. starts  the system still comes up, and no service reports a peer it
+#              cannot reach once the stack has settled
 #
 # Gate 1 and gate 2 are deliberately separate. A patch whose tests read a key
 # store from disk passes the second and fails the first, which is exactly what
@@ -44,6 +45,11 @@
 # Environment:
 #   LEMMA_ECLIPSE   Eclipse installation the LEMMA tools take their classpath
 #                   from (see detect-smells.sh)
+#   LEMMA_SETTLE_SECONDS
+#                   How long the start gate lets the stack settle before it
+#                   reads the logs for unreachable peers (default: 25). Long
+#                   enough that a client retrying its way through a starting
+#                   broker has finished retrying; a slower machine wants more.
 set -uo pipefail
 
 BUNDLE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -134,6 +140,21 @@ build_all() {
 }
 
 echo "Verifying $(basename "$PROPOSAL")"
+echo
+
+# How much the patch changes.
+#
+# Not a gate: there is no number of files that is right, and a smaller patch is
+# not a better one. It is measured because the claim that model-level input
+# bounds a refactoring is a claim about extent, and a claim about extent that
+# nobody counts is an anecdote. The one unguided run of this work changed 38
+# files where the guided ones changed 33 between them, which is the kind of
+# difference this line exists to make visible per proposal.
+PATCH_FILES="$(grep -c '^diff --git ' "$PROPOSAL/patch.diff" 2>/dev/null || true)"
+PATCH_ADDED="$(grep -c '^+[^+]' "$PROPOSAL/patch.diff" 2>/dev/null || true)"
+PATCH_REMOVED="$(grep -c '^-[^-]' "$PROPOSAL/patch.diff" 2>/dev/null || true)"
+EXTENT="${PATCH_FILES:-0} file(s), +${PATCH_ADDED:-0}/-${PATCH_REMOVED:-0} line(s)"
+echo "  extent: $EXTENT"
 echo
 
 # ---------------------------------------------------------------- gate 3 (before)
@@ -275,6 +296,63 @@ else
 fi
 
 # ---------------------------------------------------------------- gate 4: starts
+#
+# Coming up is not the same as working. A compose stack reports every container
+# as up while a client inside it fails every connection attempt: that is what
+# the Node consumer of Lakeside Mutual did when the broker's connector moved to
+# TLS and its own configuration had not, and no gate saw it. So this gate waits
+# for the stack to settle and then reads the logs for a peer that cannot be
+# reached - and, because a sample system may log such errors unpatched as well,
+# it compares against the base before blaming the patch.
+SETTLE_SECONDS="${LEMMA_SETTLE_SECONDS:-25}"
+
+# Errors that mean one service could not reach another. Chosen to be about the
+# channel and nothing else: a failed health check is already the --wait gate's
+# business, and an application error that has nothing to do with a peer must not
+# fail this one.
+CHANNEL_ERRORS="ECONNREFUSED|ECONNRESET|EPROTO|Connection refused\
+|Connection error to|Connection reset|UnknownHostException|ConnectException\
+|SSLHandshakeException|SSLException|certificate_unknown|handshake_failure\
+|unable to find valid certification path|bad_certificate|tlsv1 alert"
+
+# Bring a tree up, let it settle, and report what it says.
+#
+# Writes the log, sets CHANNEL_FAILURES to the distinct errors found after the
+# settle period, and returns non-zero when the stack did not come up at all.
+# Only what is logged *after* settling counts: a client that retries its way
+# through a starting broker logs a refused connection and then works, and
+# failing that would make this gate punish a healthy system for booting in an
+# order nobody fixed.
+compose_up_and_settle() {
+    local tree="$1" log="$2" up=0
+
+    # --build matters: the compose file names published images as well as build
+    # contexts, so without it a stale image would be started and the gate would
+    # report on code the patch never touched.
+    if (cd "$tree" && docker compose up -d --build --wait) > "$log" 2>&1; then
+        up=1
+        # No `timeout` on macOS, and nothing to wait for but time: the point is
+        # to let whatever retries finish retrying.
+        sleep "$SETTLE_SECONDS"
+        (cd "$tree" && docker compose logs --since "${SETTLE_SECONDS}s") \
+            > "$log.settled" 2>&1
+        CHANNEL_FAILURES="$(grep -oE "$CHANNEL_ERRORS" "$log.settled" \
+            | sort -u | tr '\n' ' ')"
+        # Compose prefixes every line with the service it came from.
+        CHANNEL_FAILING_SERVICES="$(grep -E "$CHANNEL_ERRORS" "$log.settled" \
+            | sed -E 's/^([a-z0-9_-]+)[ ]*\|.*/\1/' | sort -u | tr '\n' ' ')"
+    else
+        # Which services are unhealthy is the whole value of this gate, so it
+        # is captured before the stack is torn down.
+        (cd "$tree" && docker compose ps -a) >> "$log" 2>&1
+        (cd "$tree" && docker compose logs --tail 40) >> "$log" 2>&1
+        CHANNEL_FAILURES=""
+        CHANNEL_FAILING_SERVICES=""
+    fi
+    (cd "$tree" && docker compose down -v) >> "$log" 2>&1
+    return $(( 1 - up ))
+}
+
 if [[ "$SKIP_START" == 1 ]]; then
     skip "starts" "asked to skip"
 elif [[ ! -f "$WORK/docker-compose.yml" ]]; then
@@ -282,37 +360,29 @@ elif [[ ! -f "$WORK/docker-compose.yml" ]]; then
 elif ! command -v docker > /dev/null 2>&1; then
     skip "starts" "docker is not available"
 else
-    # --build matters: the compose file names published images as well as build
-    # contexts, so without it a stale image would be started and the gate would
-    # report on code the patch never touched.
     START_LOG="$(mktemp -t lemma-start)"
-    if (cd "$WORK" && docker compose up -d --build --wait) > "$START_LOG" 2>&1; then
-        pass "starts: the system comes up with the patch applied"
-        (cd "$WORK" && docker compose down -v) >> "$START_LOG" 2>&1
-    else
-        # Which services are unhealthy is the whole value of this gate, so it
-        # is captured before the stack is torn down.
-        (cd "$WORK" && docker compose ps -a) >> "$START_LOG" 2>&1
-        (cd "$WORK" && docker compose logs --tail 40) >> "$START_LOG" 2>&1
-        UNHEALTHY="$(grep -oE "(container|service) \"?[a-z0-9_-]+\"? is unhealthy" "$START_LOG" \
-            | head -3 | tr '\n' ' ')"
-        (cd "$WORK" && docker compose down -v) >> "$START_LOG" 2>&1
+    PATCHED_UP=1
+    compose_up_and_settle "$WORK" "$START_LOG" || PATCHED_UP=0
+    PATCHED_ERRORS="$CHANNEL_FAILURES"
+    PATCHED_SERVICES="$CHANNEL_FAILING_SERVICES"
+    UNHEALTHY="$(grep -oE "(container|service) \"?[a-z0-9_-]+\"? is unhealthy" "$START_LOG" \
+        | head -3 | tr '\n' ' ')"
 
+    if [[ "$PATCHED_UP" == 1 && -z "$PATCHED_ERRORS" ]]; then
+        pass "starts: the system comes up with the patch applied and no service reports an unreachable peer"
+    else
         # This gate needs a baseline as much as the smell gate does. A sample
-        # system whose base image has been withdrawn from the registry, or whose
-        # build is broken for any other reason of its own, does not come up
-        # patched or unpatched - and blaming the patch for that is a false
-        # finding. The control runs only on failure, because it costs a second
-        # full build.
+        # system whose base image has been withdrawn from the registry, or which
+        # logs a refused connection of its own, does not come up clean patched
+        # or unpatched - and blaming the patch for that is a false finding. The
+        # control runs only on failure, because it costs a second full build.
         CONTROL="$(mktemp -d -t lemma-control)"; rm -rf "$CONTROL"
         CONTROL_LOG="$(mktemp -t lemma-control)"
         CONTROL_STARTS=1
+        CONTROL_ERRORS=""
         if git -C "$SOURCE" worktree add --detach "$CONTROL" "$BASE" > /dev/null 2>&1; then
-            if ! (cd "$CONTROL" && docker compose up -d --build --wait) \
-                > "$CONTROL_LOG" 2>&1; then
-                CONTROL_STARTS=0
-            fi
-            (cd "$CONTROL" && docker compose down -v) >> "$CONTROL_LOG" 2>&1
+            compose_up_and_settle "$CONTROL" "$CONTROL_LOG" || CONTROL_STARTS=0
+            CONTROL_ERRORS="$CHANNEL_FAILURES"
             git -C "$SOURCE" worktree remove --force "$CONTROL" > /dev/null 2>&1
         fi
 
@@ -320,8 +390,12 @@ else
             WHY="$(grep -oE "[^ ]+: not found|failed to solve: [^ ]+" "$CONTROL_LOG" \
                 | head -1)"
             skip "starts" "the system does not come up unpatched either${WHY:+ ($WHY)}, so this gate cannot attribute anything to the patch; see $CONTROL_LOG"
-        else
+        elif [[ "$PATCHED_UP" == 0 ]]; then
             fail "starts" "the system does not come up with the patch applied, though it does unpatched: ${UNHEALTHY:+$UNHEALTHY, }see $START_LOG"
+        elif [[ -n "$CONTROL_ERRORS" ]]; then
+            skip "starts" "the system comes up, and ${PATCHED_SERVICES:-a service} reports an unreachable peer ($PATCHED_ERRORS) - which the unpatched system reports too ($CONTROL_ERRORS), so this gate cannot attribute it to the patch; see $START_LOG.settled"
+        else
+            fail "starts" "the system comes up, but ${PATCHED_SERVICES:-a service} cannot reach a peer it reaches unpatched ($PATCHED_ERRORS); see $START_LOG.settled"
         fi
     fi
 fi
@@ -350,6 +424,10 @@ echo "$VERDICT — ${#PASSED[@]} passed, ${#FAILED[@]} failed, ${#SKIPPED[@]} sk
     echo "## Verification, $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
     echo
     echo "**$VERDICT** — ${#PASSED[@]} passed, ${#FAILED[@]} failed, ${#SKIPPED[@]} skipped."
+    echo
+    echo "Extent of the patch: $EXTENT. Not a gate - no number of files is the"
+    echo "right one - but the claim that model-level input bounds a refactoring"
+    echo "is a claim about extent, so it is counted rather than recalled."
     echo
     for entry in "${PASSED[@]:-}";  do [[ -n "$entry" ]] && echo "- PASS $entry"; done
     for entry in "${FAILED[@]:-}";  do [[ -n "$entry" ]] && echo "- FAIL $entry"; done
