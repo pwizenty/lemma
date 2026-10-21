@@ -48,6 +48,7 @@ plaintext is a broken system, not a refactored one.
 | Spring REST, server and clients | `references/spring-rest.md` |
 | ActiveMQ over OpenWire, from Java | `references/activemq-openwire.md` |
 | ActiveMQ over STOMP, from Node | `references/activemq-stomp.md` |
+| A gRPC endpoint served from Node, and its client | `references/grpc-node.md` |
 | Key and trust stores | `references/certificates.md` |
 
 ## Definition of done
@@ -66,6 +67,12 @@ have worked - however correct it is.
 - the broker's connector scheme is `ssl` or `stomp+ssl`
 - **no plaintext connector remains** (see pitfalls)
 - every client's broker address uses the TLS scheme
+
+**For an endpoint bound by the service itself, such as gRPC:**
+- it reconstructs with `transportSecurity = "tls"`
+- and with `clientAuth` set to require a client certificate
+- its caller presents one from the same authority, even when the deployment
+  does not run that caller
 
 **For either, and not negotiable:**
 - the test suite of every affected service passes on a **clean checkout of the
