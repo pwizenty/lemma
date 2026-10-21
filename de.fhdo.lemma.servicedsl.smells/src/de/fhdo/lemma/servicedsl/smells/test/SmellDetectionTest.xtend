@@ -50,6 +50,7 @@ class SmellDetectionTest {
         aListenerIsMutualOnlyWithAClientCertificate
         aPlaintextLegToTheBrokerIsItsOwnFinding
         aServiceWithNoFactIsReportedAsNotJudged
+        theNodeChannelsBecomeRequests
         aFindingCarriesItsEvidenceAndRefactoring
         anAspectsValuesAreRead
         tlsIsNotTheSameAsMutualTls
@@ -464,6 +465,39 @@ class SmellDetectionTest {
         check("a fixture whose findings share one cause yields one request",
             fromFixture.size, 1)
         check("with no other cause to avoid", fromFixture.head.otherCauses.empty, true)
+    }
+
+    /**
+     * The two Node channels reach the request stage, not only the report.
+     *
+     * A finding nobody can ask for is a finding nobody fixes: the gRPC endpoint
+     * of Lakeside Mutual went unresolved through three proposals because it
+     * reached no model, hence no cause, hence no request. This check closes
+     * that chain for both Node facts - one request per cause, the listener's
+     * cause among them, carrying the evidence a proposal has to act on.
+     */
+    private def static void theNodeChannelsBecomeRequests() {
+        val result = judge("/node-channels.services")
+        val requests = RefactoringRequests.of(result, "/tmp/system", "a-skill")
+
+        check("every cause of the Node fixture yields a request",
+            requests.size, result.byRootCause.size)
+        val listener = requests.findFirst[rootCauseId == "endpoint:PlaintextListener"]
+        check("the plaintext gRPC endpoint has a request of its own",
+            listener !== null, true)
+        check("it carries the finding", listener?.findings?.size, 1)
+        check("and is valid", listener?.valid, true)
+
+        val leg = requests.findFirst[rootCauseId == "broker:activemq:stomp"]
+        check("the plaintext leg to the broker has one too", leg !== null, true)
+
+        val prompt = PromptBuilder.request(listener)
+        check("the prompt names the endpoint's address",
+            prompt.contains("0.0.0.0:50051"), true)
+        check("it carries the aspect as evidence",
+            prompt.contains("GrpcServer"), true)
+        check("and it states the cause the patch must resolve",
+            prompt.contains(listener.rootCauseLabel), true)
     }
 
     /**

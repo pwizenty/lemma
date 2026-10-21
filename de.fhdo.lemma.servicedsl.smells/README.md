@@ -97,7 +97,7 @@ java de.fhdo.lemma.servicedsl.smells.test.SmellDetectionTest
 python3 ../de.fhdo.lemma.diagram.common/tools/check-bundle-requires.py .
 ```
 
-152 checks, no database and no running Eclipse. The fixtures under `test/` carry
+160 checks, no database and no running Eclipse. The fixtures under `test/` carry
 what no sample system has — TLS anywhere, a TLS broker, a callee with both kinds
 of connector — because **neither Lakeside Mutual nor park-and-charge configures
 TLS at all**. So the rule's *negative* case is fixture-only.
