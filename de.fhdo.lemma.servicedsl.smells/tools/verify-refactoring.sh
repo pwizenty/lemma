@@ -336,18 +336,18 @@ compose_up_and_settle() {
         sleep "$SETTLE_SECONDS"
         (cd "$tree" && docker compose logs --since "${SETTLE_SECONDS}s") \
             > "$log.settled" 2>&1
-        CHANNEL_FAILURES="$(grep -oE "$CHANNEL_ERRORS" "$log.settled" \
-            | sort -u | tr '\n' ' ')"
-        # Compose prefixes every line with the service it came from.
-        CHANNEL_FAILING_SERVICES="$(grep -E "$CHANNEL_ERRORS" "$log.settled" \
-            | sed -E 's/^([a-z0-9_-]+)[ ]*\|.*/\1/' | sort -u | tr '\n' ' ')"
+        # One kind per line, in a file: several of these contain spaces, and a
+        # space-separated variable cannot hold "unable to find valid
+        # certification path" as one item.
+        grep -oE "$CHANNEL_ERRORS" "$log.settled" | sort -u > "$log.errors"
+        CHANNEL_FAILURES="$(tr '\n' '; ' < "$log.errors")"
     else
         # Which services are unhealthy is the whole value of this gate, so it
         # is captured before the stack is torn down.
         (cd "$tree" && docker compose ps -a) >> "$log" 2>&1
         (cd "$tree" && docker compose logs --tail 40) >> "$log" 2>&1
+        : > "$log.errors"
         CHANNEL_FAILURES=""
-        CHANNEL_FAILING_SERVICES=""
     fi
     (cd "$tree" && docker compose down -v) >> "$log" 2>&1
     return $(( 1 - up ))
@@ -364,7 +364,6 @@ else
     PATCHED_UP=1
     compose_up_and_settle "$WORK" "$START_LOG" || PATCHED_UP=0
     PATCHED_ERRORS="$CHANNEL_FAILURES"
-    PATCHED_SERVICES="$CHANNEL_FAILING_SERVICES"
     UNHEALTHY="$(grep -oE "(container|service) \"?[a-z0-9_-]+\"? is unhealthy" "$START_LOG" \
         | head -3 | tr '\n' ' ')"
 
@@ -379,10 +378,9 @@ else
         CONTROL="$(mktemp -d -t lemma-control)"; rm -rf "$CONTROL"
         CONTROL_LOG="$(mktemp -t lemma-control)"
         CONTROL_STARTS=1
-        CONTROL_ERRORS=""
+        : > "$CONTROL_LOG.errors"
         if git -C "$SOURCE" worktree add --detach "$CONTROL" "$BASE" > /dev/null 2>&1; then
             compose_up_and_settle "$CONTROL" "$CONTROL_LOG" || CONTROL_STARTS=0
-            CONTROL_ERRORS="$CHANNEL_FAILURES"
             git -C "$SOURCE" worktree remove --force "$CONTROL" > /dev/null 2>&1
         fi
 
@@ -392,10 +390,22 @@ else
             skip "starts" "the system does not come up unpatched either${WHY:+ ($WHY)}, so this gate cannot attribute anything to the patch; see $CONTROL_LOG"
         elif [[ "$PATCHED_UP" == 0 ]]; then
             fail "starts" "the system does not come up with the patch applied, though it does unpatched: ${UNHEALTHY:+$UNHEALTHY, }see $START_LOG"
-        elif [[ -n "$CONTROL_ERRORS" ]]; then
-            skip "starts" "the system comes up, and ${PATCHED_SERVICES:-a service} reports an unreachable peer ($PATCHED_ERRORS) - which the unpatched system reports too ($CONTROL_ERRORS), so this gate cannot attribute it to the patch; see $START_LOG.settled"
         else
-            fail "starts" "the system comes up, but ${PATCHED_SERVICES:-a service} cannot reach a peer it reaches unpatched ($PATCHED_ERRORS); see $START_LOG.settled"
+            # What is new is what can be attributed. A sample system logs errors
+            # of its own - this one's Node consumer cannot reach the broker's
+            # STOMP port in either tree - and a gate that gave up as soon as the
+            # base logged anything would be silenced by that forever. So the
+            # kinds of error are compared as sets, and only a kind the base does
+            # not have is the patch's doing.
+            comm -23 "$START_LOG.errors" "$CONTROL_LOG.errors" > "$START_LOG.new"
+            if [[ ! -s "$START_LOG.new" ]]; then
+                pass "starts: the system comes up with the patch applied, and reports no unreachable peer the unpatched system does not report too"
+            else
+                NEW_ERRORS="$(tr '\n' '; ' < "$START_LOG.new")"
+                NEW_SERVICES="$(grep -F -f "$START_LOG.new" "$START_LOG.settled" 2>/dev/null \
+                    | sed -E 's/^([a-z0-9_-]+)[ ]*\|.*/\1/' | sort -u | tr '\n' ' ')"
+                fail "starts" "the system comes up, but ${NEW_SERVICES:-a service} cannot reach a peer it reaches unpatched: $NEW_ERRORS see $START_LOG.settled"
+            fi
         fi
     fi
 fi
