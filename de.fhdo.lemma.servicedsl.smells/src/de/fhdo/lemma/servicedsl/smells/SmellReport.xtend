@@ -1,6 +1,7 @@
 package de.fhdo.lemma.servicedsl.smells
 
 import de.fhdo.lemma.servicedsl.diagram.ServiceGraph
+import java.util.List
 
 /**
  * The report a detection run writes.
@@ -21,6 +22,20 @@ class SmellReport {
      * @return the Markdown of the report
      */
     def String write(DetectionResult result, ServiceGraph graph) {
+        return write(result, graph, emptyList)
+    }
+
+    /**
+     * Write the report, with what the deployment holds beside the judged
+     * services.
+     *
+     * @param result what was found
+     * @param graph the services it was found in
+     * @param unmodelled deployment nodes that deploy no reconstructed
+     *     microservice, from [[DeploymentCoverage]]
+     * @return the Markdown of the report
+     */
+    def String write(DetectionResult result, ServiceGraph graph, List<String> unmodelled) {
         return '''
             # Security smells
 
@@ -34,6 +49,9 @@ class SmellReport {
             | Channels encrypted but not mutually authenticated | «result.notMutual.size» |
             | Channels that could not be judged | «result.undecided.size» |
             | Services with no fact about a channel | «result.unjudged.size» |
+            «IF !unmodelled.empty»
+                | Deployment nodes deploying no reconstructed microservice | «unmodelled.size» |
+            «ENDIF»
 
             ## «NonSecuredCommunicationDetector.SMELL»
 
@@ -108,6 +126,18 @@ class SmellReport {
                 These services carry no fact about any channel of theirs, so nothing above is about them. That is a gap in what was reconstructed, not a statement that they communicate securely or that they communicate at all — and a channel nobody can see is a channel no verification can measure.
 
                 «FOR entry : result.unjudged»
+                    - «entry»
+                «ENDFOR»
+
+            «ENDIF»
+            «IF !unmodelled.empty»
+                ## Potential unmodelled clients
+
+                These nodes are brought up by the same deployment as the judged services, and no service model declares what they deploy. Nothing above is about them, and nothing here says they communicate at all, let alone insecurely: it says the detection cannot see whether they do. Counting services with no fact does not catch them, because they have no service model to miss a fact in.
+
+                Measured, and it is why this section exists: both of Lakeside Mutual's are real clients of a connector the detection judged, and a refactoring given the sources secured them where one given only the models did not.
+
+                «FOR entry : unmodelled»
                     - «entry»
                 «ENDFOR»
 
