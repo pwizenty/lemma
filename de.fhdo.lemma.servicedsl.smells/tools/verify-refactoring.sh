@@ -147,6 +147,41 @@ build_all() {
     return $failures
 }
 
+# Generate the key material a tree needs, if the tree says how.
+#
+# Mutual TLS needs a key store per peer, and a patch that does it properly ships
+# the script that makes them - the proposals of this work all did, under three
+# different names and at two different depths. Hence two levels rather than one:
+# the one that shipped scripts/generate-certificates.sh was found by nothing,
+# its system could not come up for want of a key, and the gate blamed the patch
+# for the tool's lookup.
+#
+# Used for the patched tree and for the control, because the control needs it as
+# much. Its base may be a commit that already requires certificates, and that
+# base run without them is not its own baseline: rc3's base is rc1 applied, and
+# without key material its Customer Core never registers with the admin server,
+# so the control logged none of the TLS errors rc1 causes and rc3 was charged
+# with them.
+#
+# Returns NO_MATERIAL when the tree says nothing about key material, so a caller
+# can tell "generated" from "there was nothing to generate".
+NO_MATERIAL=250
+
+generate_material() {
+    local tree="$1" command=""
+    if [[ -n "$CERTS" ]]; then
+        command="$CERTS"
+    else
+        local generator
+        generator="$(find "$tree" -maxdepth 2 \
+            \( -name 'generate*certificate*' -o -name 'generate*certs*' \) \
+            -not -path '*/.git/*' 2>/dev/null | sort | head -1)"
+        [[ -n "$generator" ]] && command="bash '$generator'"
+    fi
+    [[ -z "$command" ]] && return $NO_MATERIAL
+    (cd "$tree" && bash -c "$command") > /dev/null 2>&1
+}
+
 echo "Verifying $(basename "$PROPOSAL")"
 echo
 
@@ -235,22 +270,13 @@ if git -C "$SOURCE" worktree add --detach "$WORK" "$BASE" > /dev/null 2>&1 \
     git -C "$WORK" checkout -q -b "$BRANCH" 2>/dev/null || true
 
     # Without key material this gate is gate 1 again, so it has to either
-    # generate the material or admit it measured nothing. Mutual TLS needs a
-    # key store per peer, and a patch that does it properly ships the script
-    # that makes them - rc1 and rc2 both did, under slightly different names.
-    MATERIAL=""
-    if [[ -n "$CERTS" ]]; then
-        MATERIAL="$CERTS"
-    else
-        GENERATOR="$(find "$WORK" -maxdepth 1 -name 'generate*certificate*' -o \
-                     -maxdepth 1 -name 'generate*certs*' | head -1)"
-        [[ -n "$GENERATOR" ]] && MATERIAL="bash '$GENERATOR'"
-    fi
+    # generate the material or admit it measured nothing.
+    generate_material "$WORK"; MATERIAL_STATUS=$?
 
-    if [[ -z "$MATERIAL" ]]; then
+    if (( MATERIAL_STATUS == NO_MATERIAL )); then
         skip "inplace" "no key-material command and none found in the patch, so this would only repeat the clean gate"
     else
-        if ! (cd "$WORK" && bash -c "$MATERIAL") > /dev/null 2>&1; then
+        if (( MATERIAL_STATUS != 0 )); then
             fail "inplace" "the key-material command failed, so the patch cannot be built at all"
         else
             WORK_LOG="$(mktemp -t lemma-work-build)"
@@ -333,6 +359,11 @@ CHANNEL_ERRORS="ECONNREFUSED|ECONNRESET|EPROTO|Connection refused\
 # order nobody fixed.
 compose_up_and_settle() {
     local tree="$1" log="$2" up=0
+
+    # The same material the inplace gate needs. In the patched tree it has
+    # usually been generated already and generating it again is harmless; in the
+    # control it is what makes the comparison fair.
+    generate_material "$tree"
 
     # --build matters: the compose file names published images as well as build
     # contexts, so without it a stale image would be started and the gate would
