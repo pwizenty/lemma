@@ -226,7 +226,15 @@ coverage_lost() {
     local statement
     statement="$(printf '%s\n' "$section" | tr '\n' ' ' | sed -E 's/\. /.\n/g' \
         | grep -iE 'in-vm|in-process|vm://|coverage|no network connector|without opening a network' \
-        | head -1 | sed -E 's/^[-* ]+//; s/[[:space:]]+/ /g; s/[`*]//g' | cut -c1-160)"
+        | head -1 | sed -E 's/^[-* ]+//; s/[[:space:]]+/ /g; s/[`*]//g' \
+        | awk '{ line = $0
+                 if (length(line) <= 160) { print line; exit }
+                 # Cut at the last word boundary, so the record does not end
+                 # mid-word, and say that it was cut.
+                 short = substr(line, 1, 160)
+                 sub(/[^ ]*$/, "", short)
+                 sub(/ +$/, "", short)
+                 print short " [...]" }')"
     if [[ -z "${statement// /}" ]]; then
         echo "none declared"
     else
