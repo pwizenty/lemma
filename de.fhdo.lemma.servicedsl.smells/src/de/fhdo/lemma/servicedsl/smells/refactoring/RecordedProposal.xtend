@@ -96,10 +96,12 @@ class RecordedProposal {
     }
 
     /**
-     * Whether a verification has been recorded and came out VERIFIED.
+     * Whether a verification has been recorded and every gate passed.
      *
-     * Absence means "not verified", never "fine": the whole point of the
-     * verdict is that a patch nobody measured is a suggestion.
+     * Absence means "not measured", never "fine": the whole point of the
+     * verdict is that a patch nobody measured is a suggestion. The older
+     * ``VERIFIED`` spelling is still accepted, because records written before
+     * the verdicts were renamed carry it.
      */
     def boolean isVerified() {
         val file = folder.resolve(VERIFICATION_FILE)
@@ -107,7 +109,8 @@ class RecordedProposal {
             return false
         }
         val text = new String(Files.readAllBytes(file), StandardCharsets.UTF_8)
-        return text.contains("**VERIFIED**") || text.contains("VERIFIED —")
+        return text.contains("**GATES PASSED**") || text.contains("GATES PASSED —")
+            || text.contains("**VERIFIED**") || text.contains("VERIFIED —")
     }
 
     /**

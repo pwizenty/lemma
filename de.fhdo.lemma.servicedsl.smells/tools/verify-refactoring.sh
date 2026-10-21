@@ -10,7 +10,8 @@
 #              there, with no generated key material present
 #   2. inplace the build is green in a tree where the material has been
 #              generated
-#   3. smell   the finding count fell, against a baseline taken before
+#   3. smell   the addressed root cause has no finding left, and the total
+#              count fell, both against a baseline taken before
 #   4. starts  the system still comes up
 #
 # Gate 1 and gate 2 are deliberately separate. A patch whose tests read a key
@@ -149,6 +150,29 @@ if [[ "$SKIP_SMELL" == 0 ]]; then
     else
         echo "  baseline: $BEFORE finding(s) before the patch"
     fi
+
+    # Which cause this proposal was asked to resolve. A falling total is a weak
+    # condition: it holds while the addressed cause still has findings, and it
+    # also holds if the reconstruction simply stopped seeing a channel. The id
+    # lets the gate ask the stronger question - does THIS cause still appear -
+    # so the record's own statement of intent is what the gate is measured
+    # against.
+    # Only a real cause id counts. A record may carry prose there - the
+    # ablation's says "(none given ...)" - and a gate that took the first word
+    # regardless would announce a cause of "(none" and check for it.
+    CAUSE="$(awk '$1 == "cause" && $2 ~ /^(endpoint|broker):/ { print $2; exit }' \
+        "$PROPOSAL/model.txt" 2>/dev/null)"
+    if [[ -n "$CAUSE" ]]; then
+        BEFORE_CAUSE="$(grep -c -F "(\`$CAUSE\`)" "$BEFORE_REPORT" 2>/dev/null || true)"
+        if [[ "$BEFORE_CAUSE" == 0 ]]; then
+            echo "  note: cause $CAUSE has no finding in the baseline, so the cause check cannot bite"
+            CAUSE=""
+        else
+            echo "  addressed cause: $CAUSE"
+        fi
+    else
+        echo "  note: the record names no cause, so only the total is checked"
+    fi
 fi
 
 # ---------------------------------------------------------------- gate 1: clean
@@ -230,12 +254,20 @@ else
         "$BUNDLE/tools/detect-smells.sh" "$AFTER_MODELS" --report "$AFTER_REPORT" \
             > /dev/null 2>&1
         AFTER="$(grep -m1 '^| Findings |' "$AFTER_REPORT" | tr -dc '0-9')"
+        AFTER_CAUSE=0
+        if [[ -n "${CAUSE:-}" ]]; then
+            AFTER_CAUSE="$(grep -c -F "(\`$CAUSE\`)" "$AFTER_REPORT" 2>/dev/null || true)"
+        fi
         if [[ -z "$AFTER" ]]; then
             fail "smell" "the finding count could not be read after patching"
-        elif (( AFTER < BEFORE )); then
-            pass "smell: findings fell from $BEFORE to $AFTER"
-        else
+        elif (( AFTER >= BEFORE )); then
             fail "smell" "findings did not fall: $BEFORE before, $AFTER after"
+        elif [[ -n "${CAUSE:-}" ]] && (( AFTER_CAUSE > 0 )); then
+            fail "smell" "findings fell from $BEFORE to $AFTER, but the addressed cause $CAUSE still has findings"
+        elif [[ -n "${CAUSE:-}" ]]; then
+            pass "smell: findings fell from $BEFORE to $AFTER, and the addressed cause $CAUSE has none left"
+        else
+            pass "smell: findings fell from $BEFORE to $AFTER"
         fi
     else
         fail "smell" "the system could not be re-reconstructed from the patched tree"
@@ -299,9 +331,15 @@ git -C "$SOURCE" worktree prune > /dev/null 2>&1
 
 # ---------------------------------------------------------------- the verdict
 echo
-VERDICT="VERIFIED"
+# "GATES PASSED", not "VERIFIED". The gates measure what they measure: the
+# build, this smell's findings for the addressed cause, and that the system
+# comes up. A proposal can clear all four and still leave a deployment path
+# inconsistent, break a component nobody reconstructed, or introduce a
+# different smell of the catalogue - all three happened in this work. The old
+# label claimed the larger thing, so it was renamed rather than qualified.
+VERDICT="GATES PASSED"
 if (( ${#FAILED[@]} > 0 )); then
-    VERDICT="NOT VERIFIED"
+    VERDICT="GATE FAILED"
 elif (( ${#SKIPPED[@]} > 0 )); then
     VERDICT="PARTIAL"
 fi
@@ -319,7 +357,9 @@ echo "$VERDICT — ${#PASSED[@]} passed, ${#FAILED[@]} failed, ${#SKIPPED[@]} sk
     echo
     echo "A skipped gate is not a passed one: PARTIAL means the refactoring has"
     echo "not been shown to resolve the smell, only that nothing checked"
-    echo "contradicts it."
+    echo "contradicts it. GATES PASSED means every gate passed, which is not"
+    echo "the same as the application being secure: the gates cover this smell"
+    echo "and this deployment only."
 } >> "$PROPOSAL/verification.md"
 
 (( ${#FAILED[@]} == 0 )) || exit 1

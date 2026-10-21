@@ -50,7 +50,10 @@ class PromptBuilder {
           InsecureTrustManagerFactory, no rejectUnauthorized:false.
         - Never disable a test or weaken an assertion. Updating a test's
           configuration so it addresses the new transport is allowed and
-          expected.
+          expected. If you change what transport a test exercises, say so in
+          REFACTORING-NOTES.md and say what coverage is lost: a fixture moved
+          off the network still builds and still asserts, so no gate can see
+          the difference.
         - The test suite must still pass on a CLEAN CHECKOUT of your patch, with
           no generated key material present. You cannot see this from inside
           this worktree, because the material is already here.
