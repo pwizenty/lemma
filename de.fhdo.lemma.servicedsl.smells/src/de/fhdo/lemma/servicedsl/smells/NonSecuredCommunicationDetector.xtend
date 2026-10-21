@@ -44,6 +44,8 @@ class NonSecuredCommunicationDetector {
     static val SERVICE_CALL = "ServiceCall"
     static val MESSAGE_CHANNEL = "MessageChannel"
     static val SERVER_ENDPOINT = "ServerEndpoint"
+    static val GRPC_SERVER = "GrpcServer"
+    static val MESSAGE_QUEUE = "MessageQueue"
 
     static val TARGET = "target"
     static val TARGET_KIND = "targetKind"
@@ -55,7 +57,32 @@ class NonSecuredCommunicationDetector {
     static val TLS_ENABLED = "tlsEnabled"
     static val CONNECTOR = "connector"
     static val PORT = "port"
+    static val HOST = "host"
     static val CLIENT_AUTH = "clientAuth"
+    static val TRANSPORT_SECURITY = "transportSecurity"
+
+    /**
+     * The aspects that say anything about a service's channels.
+     *
+     * A service carrying none of them was not judged at all, which is not the
+     * same as having nothing to judge, so the report names it. The Risk
+     * Management server of Lakeside Mutual was such a service until its two
+     * Node facts reached the models, and its plaintext gRPC endpoint and its
+     * plaintext broker connection were invisible for as long as that lasted.
+     */
+    static val COMMUNICATION_FACTS = #[
+        SERVICE_CALL, MESSAGE_CHANNEL, SERVER_ENDPOINT, GRPC_SERVER, MESSAGE_QUEUE
+    ]
+
+    /**
+     * What a finding names as the caller where the model names none.
+     *
+     * An endpoint is judged from the server's end, so its peer may be something
+     * the reconstruction does not model - a command line tool, a client outside
+     * the application. Naming it this way keeps the finding readable without
+     * claiming a caller that was never read.
+     */
+    static val UNIDENTIFIED_PEER = "an unidentified peer"
 
     static val KIND_SERVICE = "SERVICE"
     static val ROLE_PRODUCER = "producer"
@@ -81,8 +108,13 @@ class NonSecuredCommunicationDetector {
                 switch (aspect.name) {
                     case SERVICE_CALL: judgeCall(service, aspect, graph, result)
                     case MESSAGE_CHANNEL: judgeChannel(service, aspect, result)
+                    case GRPC_SERVER: judgeListener(service, aspect, result)
+                    case MESSAGE_QUEUE: judgeBrokerConnection(service, aspect, result)
                     default: {}
                 }
+            }
+            if (!service.aspects.exists[COMMUNICATION_FACTS.contains(name)]) {
+                result.unjudged.add(service.name)
             }
         }
         return result
@@ -190,6 +222,89 @@ class NonSecuredCommunicationDetector {
             case SMELL: {
                 val cause = RootCause.ofQueue(aspect.valueOf(BROKER), aspect.valueOf(SCHEME))
                 val finding = newFinding(service.name, target, channel)
+                finding.reason = verdict.reason
+                finding.rootCauseId = cause.id
+                finding.rootCauseLabel = cause.label
+                finding.evidence.add(aspect.written)
+                result.add(finding)
+            }
+        }
+    }
+
+    /**
+     * Judge an endpoint a service answers on, from what it binds it with.
+     *
+     * The peer is not required to be a reconstructed microservice. A gRPC
+     * endpoint is served to whatever addresses it, and the smell holds "even if
+     * within the same network", so a plaintext listener is a finding and the
+     * reason says that no caller of it was identified. Where the model does
+     * carry a caller, [[judgeCall]] judges that call as well: the two read
+     * different facts, and a disagreement between them is information.
+     */
+    private def void judgeListener(ServiceNode service, AspectReference aspect,
+        DetectionResult result) {
+        val address = '''«aspect.valueOf(HOST) ?: "?"»:«aspect.valueOf(PORT) ?: "?"»'''
+        val channel = '''gRPC endpoint on «address»'''.toString
+        val verdict = ChannelVerdict.ofListener(aspect.valueOf(TRANSPORT_SECURITY),
+            aspect.valueOf(CLIENT_AUTH))
+
+        switch (verdict.outcome) {
+            case NOT_APPLICABLE: return
+            case UNDECIDED:
+                result.undecided.add('''«service.name» serves a «channel»: «verdict.reason»''')
+            case PROTECTED:
+                result.secured.add('''«service.name» («channel»): «verdict.reason»''')
+            case PROTECTED_NOT_MUTUAL:
+                result.notMutual.add('''«service.name» («channel»): «verdict.reason»''')
+            case SMELL: {
+                // The connectors of this service are what has to change, which
+                // is the cause a plaintext call to it has as well: one patch
+                // serves both, and the key says so.
+                val cause = RootCause.ofCall(service.name)
+                val finding = newFinding(UNIDENTIFIED_PEER, service.name, channel)
+                finding.reason =
+                    '''«verdict.reason», and no reconstructed microservice calls it'''
+                finding.rootCauseId = cause.id
+                finding.rootCauseLabel = cause.label
+                finding.evidence.add(aspect.written)
+                result.add(finding)
+            }
+        }
+    }
+
+    /**
+     * Judge the leg between a service and its message broker.
+     *
+     * Not the channel [[judgeChannel]] judges. That one is the interaction
+     * between two microservices through a queue, judged once, at the producer's
+     * end. This is the connection one service holds to the broker, and a broker
+     * offers one connector per transport: Lakeside Mutual's producers reach it
+     * over TCP and its Node consumer over STOMP, so protecting the one leaves
+     * the other open and the queue readable there.
+     *
+     * Hence the cause is keyed by the scheme, as a MessageChannel's is. The two
+     * legs are two patches.
+     */
+    private def void judgeBrokerConnection(ServiceNode service, AspectReference aspect,
+        DetectionResult result) {
+        val broker = aspect.valueOf(BROKER)
+        val scheme = aspect.valueOf(SCHEME)
+        val channel = '''queue «aspect.valueOf(QUEUE) ?: "a queue"» over «scheme ?: "?"»'''.toString
+        val peer = '''the «broker ?: "message"» broker'''.toString
+        val verdict = ChannelVerdict.ofBrokerConnection(
+            aspect.valueOf(TRANSPORT_SECURITY), scheme)
+
+        switch (verdict.outcome) {
+            case NOT_APPLICABLE: return
+            case UNDECIDED:
+                result.undecided.add('''«service.name» uses «channel»: «verdict.reason»''')
+            case PROTECTED:
+                result.secured.add('''«service.name» -> «peer» («channel»): «verdict.reason»''')
+            case PROTECTED_NOT_MUTUAL:
+                result.notMutual.add('''«service.name» -> «peer» («channel»): «verdict.reason»''')
+            case SMELL: {
+                val cause = RootCause.ofQueue(broker, scheme)
+                val finding = newFinding(service.name, peer, channel)
                 finding.reason = verdict.reason
                 finding.rootCauseId = cause.id
                 finding.rootCauseLabel = cause.label

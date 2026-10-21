@@ -46,6 +46,10 @@ class SmellDetectionTest {
         whatCannotBeDecidedIsNotCalledSecure
         aPlaintextQueueIsTheSmell
         aChannelIsJudgedOnceNotTwice
+        aPlaintextListenerIsTheSmell
+        aListenerIsMutualOnlyWithAClientCertificate
+        aPlaintextLegToTheBrokerIsItsOwnFinding
+        aServiceWithNoFactIsReportedAsNotJudged
         aFindingCarriesItsEvidenceAndRefactoring
         anAspectsValuesAreRead
         tlsIsNotTheSameAsMutualTls
@@ -66,6 +70,93 @@ class SmellDetectionTest {
         if (failures > 0) {
             System.exit(1)
         }
+    }
+
+    /**
+     * A gRPC endpoint bound without TLS.
+     *
+     * Catches a detector that judges only what a caller states. This endpoint
+     * has no reconstructed caller at all - Lakeside Mutual's is addressed by a
+     * command line tool that nothing deploys - and the smell holds "even if
+     * within the same network", so a plaintext listener is a finding. Until
+     * this case existed, the one in Lakeside Mutual was invisible, and the
+     * proposal that secured it and the one that did not looked alike.
+     */
+    private def static void aPlaintextListenerIsTheSmell() {
+        val result = judge("/node-channels.services")
+        val finding = result.findings.findFirst[callee == "PlaintextListener"]
+
+        check("a gRPC endpoint bound without TLS is a finding", finding !== null, true)
+        check("the channel names the address", finding?.channel?.contains("0.0.0.0:50051"),
+            true)
+        check("and the reason says no caller of it was identified",
+            finding?.reason?.contains("no reconstructed microservice calls it"), true)
+        check("its cause is the connectors of the service that serves it",
+            finding?.rootCauseId, "endpoint:PlaintextListener")
+    }
+
+    /**
+     * The same endpoint with TLS, with and without a client certificate.
+     *
+     * Catches a listener rule that stops at encryption. §3.7 is resolved by
+     * TLS, so the encrypted endpoint is no finding - and the refactoring the
+     * paper prescribes is *mutual* TLS, so it is not secured either.
+     */
+    private def static void aListenerIsMutualOnlyWithAClientCertificate() {
+        val result = judge("/node-channels.services")
+
+        check("a TLS endpoint that requires a client certificate is secured",
+            result.secured.exists[contains("MutualListener")], true)
+        check("a TLS endpoint without one is not a finding",
+            result.findings.exists[callee == "EncryptedListener"], false)
+        check("it is reported as encrypted but not mutually authenticated",
+            result.notMutual.exists[contains("EncryptedListener")], true)
+        check("an endpoint whose binding the sources do not state is undecided",
+            result.undecided.exists[contains("UnknownListener")], true)
+        check("and it is not called secure",
+            result.secured.exists[contains("UnknownListener")], false)
+    }
+
+    /**
+     * The leg between a service and its broker, over a scheme of its own.
+     *
+     * Catches a rule that treats the consumer's leg as the producer's channel
+     * seen twice. A broker offers one connector per transport: Lakeside
+     * Mutual's producers reach it over TCP and its Node consumer over STOMP, so
+     * securing the producers leaves this leg plaintext and the queue readable
+     * there. Two legs, two causes, two patches.
+     */
+    private def static void aPlaintextLegToTheBrokerIsItsOwnFinding() {
+        val result = judge("/node-channels.services")
+        val finding = result.findings.findFirst[caller == "PlaintextConsumer"]
+
+        check("a plaintext leg to the broker is a finding", finding !== null, true)
+        check("the peer is the broker, not the service at the other end",
+            finding?.callee, "the activemq broker")
+        check("the channel names the queue and the scheme",
+            finding?.channel, "queue orders over stomp")
+        check("its cause is keyed by the broker and the scheme",
+            finding?.rootCauseId, "broker:activemq:stomp")
+        check("a protected leg is secured instead",
+            result.secured.exists[contains("SecuredConsumer")], true)
+    }
+
+    /**
+     * A service that carries no fact about any channel of its own.
+     *
+     * Catches a report that cannot tell "nothing to report" from "nothing was
+     * read". This is the state Lakeside Mutual's Risk Management server was in
+     * while its two channels went unjudged, and nothing in the report said so.
+     */
+    private def static void aServiceWithNoFactIsReportedAsNotJudged() {
+        val result = judge("/node-channels.services")
+
+        check("a service with no communication fact is named as not judged",
+            result.unjudged.contains("Silent"), true)
+        check("it is not a finding", result.findings.exists[callee == "Silent"], false)
+        check("and not called secure", result.secured.exists[contains("Silent")], false)
+        check("a service that does carry one is not named",
+            result.unjudged.contains("PlaintextListener"), false)
     }
 
     /**
