@@ -205,7 +205,9 @@ generate_material() {
 
 # What the proposal says it gave up in test coverage.
 #
-# Read, not measured. The constraints allow a test's configuration to be
+# Read from the patch's own added notes lines, not measured, and not from the
+# file in the tree: a stacked proposal inherits the notes of the ones below it.
+# The constraints allow a test's configuration to be
 # updated so that it addresses the new transport, and require the proposal to
 # say so; one proposal of this work moved a producer test to an in-process
 # broker transport, which keeps every assertion and loses the network
@@ -213,17 +215,28 @@ generate_material() {
 # proposal's own notes, so silence prints as "none declared" and says something
 # about the notes rather than about the tests.
 coverage_lost() {
-    local notes="$1"
-    [[ -f "$notes" ]] || { echo "not measured (no REFACTORING-NOTES.md)"; return; }
+    local patch="$1"
+    [[ -f "$patch" ]] || { echo "not measured (no patch)"; return; }
 
-    # The notes' own test section when it has one, otherwise the whole file:
+    # The lines this patch ADDS to REFACTORING-NOTES.md, not the file in the
+    # tree. A proposal applied on top of another inherits the earlier notes -
+    # rc4 is built on rc1 and rc2 - and reading the file would have credited
+    # it with a declaration it never made.
+    local notes
+    notes="$(awk '/^\+\+\+ b\/REFACTORING-NOTES\.md$/ { inside = 1; next }
+                  /^diff --git / { inside = 0 }
+                  inside && /^\+/ { print substr($0, 2) }' "$patch")"
+    [[ -z "${notes// /}" ]] && { echo "none declared"; return; }
+
+    # The notes' own test section when they have one, otherwise all of them:
     # the proposals of this work head it "Tests", but a heading is a convention
     # and not a contract.
     local section
-    section="$(awk '/^#+[[:space:]]*Tests/ { inside = 1; next }
-                    /^#+[[:space:]]/ { inside = 0 }
-                    inside { print }' "$notes")"
-    [[ -z "${section// /}" ]] && section="$(cat "$notes")"
+    section="$(printf '%s\n' "$notes" \
+        | awk '/^#+[[:space:]]*Tests/ { inside = 1; next }
+               /^#+[[:space:]]/ { inside = 0 }
+               inside { print }')"
+    [[ -z "${section// /}" ]] && section="$notes"
 
     # By sentence, not by line: the notes are wrapped prose, and the line a
     # keyword falls on usually starts mid-clause.
@@ -553,7 +566,7 @@ else
     fi
 fi
 
-COVERAGE_LOST="$(coverage_lost "$WORK/REFACTORING-NOTES.md")"
+COVERAGE_LOST="$(coverage_lost "$PATCH")"
 
 git -C "$SOURCE" worktree remove --force "$WORK" > /dev/null 2>&1
 git -C "$SOURCE" worktree prune > /dev/null 2>&1
