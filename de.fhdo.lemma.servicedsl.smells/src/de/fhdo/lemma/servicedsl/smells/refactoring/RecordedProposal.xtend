@@ -99,18 +99,40 @@ class RecordedProposal {
      * Whether a verification has been recorded and every gate passed.
      *
      * Absence means "not measured", never "fine": the whole point of the
-     * verdict is that a patch nobody measured is a suggestion. The older
-     * ``VERIFIED`` spelling is still accepted, because records written before
-     * the verdicts were renamed carry it.
+     * verdict is that a patch nobody measured is a suggestion. True for a
+     * partial repair as well, because every gate did pass there - what a
+     * partial repair lost is reported by [[isPartialRepair]], and whether that
+     * loss is acceptable is the reviewer's to decide, not this method's.
+     *
+     * The older ``GATES PASSED`` and ``VERIFIED`` spellings are still accepted,
+     * because records written before the verdicts were renamed carry them.
      */
     def boolean isVerified() {
+        val text = verdictText
+        return text.contains("**REPAIR COMPLETE**") || text.contains("REPAIR COMPLETE —")
+            || text.contains("**REPAIR PARTIAL**") || text.contains("REPAIR PARTIAL —")
+            || text.contains("**GATES PASSED**") || text.contains("GATES PASSED —")
+            || text.contains("**VERIFIED**") || text.contains("VERIFIED —")
+    }
+
+    /**
+     * Whether every gate passed and a peer was nevertheless lost.
+     *
+     * The distinction the declared-loss rule used to swallow: a patch that
+     * breaks the monitoring scrape and declares it read exactly like a patch
+     * that broke nothing.
+     */
+    def boolean isPartialRepair() {
+        val text = verdictText
+        return text.contains("**REPAIR PARTIAL**") || text.contains("REPAIR PARTIAL —")
+    }
+
+    private def String verdictText() {
         val file = folder.resolve(VERIFICATION_FILE)
         if (!Files.exists(file)) {
-            return false
+            return ""
         }
-        val text = new String(Files.readAllBytes(file), StandardCharsets.UTF_8)
-        return text.contains("**GATES PASSED**") || text.contains("GATES PASSED —")
-            || text.contains("**VERIFIED**") || text.contains("VERIFIED —")
+        return new String(Files.readAllBytes(file), StandardCharsets.UTF_8)
     }
 
     /**

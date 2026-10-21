@@ -23,6 +23,10 @@
 # requires a proposal to write down what its patch gives up, and this is where
 # that is checked rather than trusted.
 #
+# The verdict is one of REPAIR COMPLETE, REPAIR PARTIAL, GATE FAILED and
+# NOT MEASURED; exit status 0, 4, 1 and 3 respectively. A declared loss makes a
+# repair partial rather than failed, and never complete.
+#
 # Gate 1 and gate 2 are deliberately separate. A patch whose tests read a key
 # store from disk passes the second and fails the first, which is exactly what
 # the second proposal of this work did - and nothing but a clean-room build
@@ -560,17 +564,33 @@ echo "  test coverage lost: $COVERAGE_LOST"
 
 # ---------------------------------------------------------------- the verdict
 echo
-# "GATES PASSED", not "VERIFIED". The gates measure what they measure: the
-# build, this smell's findings for the addressed cause, and that the system
-# comes up. A proposal can clear all four and still leave a deployment path
-# inconsistent, break a component nobody reconstructed, or introduce a
-# different smell of the catalogue - all three happened in this work. The old
-# label claimed the larger thing, so it was renamed rather than qualified.
-VERDICT="GATES PASSED"
+# Four words, and none of them is "verified". The gates measure what they
+# measure: the build, this smell's findings for the addressed cause, and that
+# the system comes up. A proposal can clear all four and still leave a
+# deployment path inconsistent, break a component nobody reconstructed, or
+# introduce a different smell of the catalogue - all three happened in this
+# work.
+#
+#   REPAIR COMPLETE  every gate passed and no peer was lost
+#   REPAIR PARTIAL   every gate passed, but a peer is gone and was declared
+#   GATE FAILED      a gate failed
+#   NOT MEASURED     a gate was skipped, which is not a gate that passed
+#
+# REPAIR PARTIAL exists because the declared-loss rule was swallowing a
+# difference that matters. The rule stops gate 4 failing every correct patch,
+# and that is right; but it also made a patch that breaks the monitoring
+# scrape and says so read exactly like a patch that breaks nothing. Declaring
+# a loss is what keeps it from being a failure. It is not what makes the
+# repair complete, and the verdict now says which of the two happened.
+VERDICT="REPAIR COMPLETE"
 if (( ${#FAILED[@]} > 0 )); then
     VERDICT="GATE FAILED"
 elif (( ${#SKIPPED[@]} > 0 )); then
-    VERDICT="PARTIAL"
+    VERDICT="NOT MEASURED"
+elif [[ "$DECLARED_LOSSES" != "none" && "$DECLARED_LOSSES" != "not measured" ]]; then
+    # Every gate passed and a peer is gone. Declaring it is what keeps this from
+    # being a failure; it is not what makes the repair complete.
+    VERDICT="REPAIR PARTIAL"
 fi
 echo "$VERDICT — ${#PASSED[@]} passed, ${#FAILED[@]} failed, ${#SKIPPED[@]} skipped"
 
@@ -598,13 +618,16 @@ echo "$VERDICT — ${#PASSED[@]} passed, ${#FAILED[@]} failed, ${#SKIPPED[@]} sk
     for entry in "${FAILED[@]:-}";  do [[ -n "$entry" ]] && echo "- FAIL $entry"; done
     for entry in "${SKIPPED[@]:-}"; do [[ -n "$entry" ]] && echo "- SKIP $entry"; done
     echo
-    echo "A skipped gate is not a passed one: PARTIAL means the refactoring has"
-    echo "not been shown to resolve the smell, only that nothing checked"
-    echo "contradicts it. GATES PASSED means every gate passed, which is not"
-    echo "the same as the application being secure: the gates cover this smell"
-    echo "and this deployment only."
+    echo "A skipped gate is not a passed one: NOT MEASURED means the"
+    echo "refactoring has not been shown to resolve the smell, only that"
+    echo "nothing checked contradicts it. REPAIR PARTIAL means every gate"
+    echo "passed and a peer is nevertheless gone, declared in the notes."
+    echo "REPAIR COMPLETE means every gate passed and nothing was lost, which"
+    echo "is still not the same as the application being secure: the gates"
+    echo "cover this smell, this deployment and the declared scope only."
 } >> "$PROPOSAL/verification.md"
 
 (( ${#FAILED[@]} == 0 )) || exit 1
 (( ${#SKIPPED[@]} == 0 )) || exit 3
+[[ "$VERDICT" == "REPAIR PARTIAL" ]] && exit 4
 exit 0

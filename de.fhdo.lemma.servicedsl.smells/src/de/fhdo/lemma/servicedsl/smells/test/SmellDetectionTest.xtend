@@ -67,6 +67,7 @@ class SmellDetectionTest {
         aProposalIsRecorded
         aSecuredSystemYieldsNothingToResolve
         aProposalBelongsToOneCommit
+        aDeclaredLossIsAPartialRepair
         applyingRefusesRatherThanGuesses
         anApplyIsPlannedBeforeItRuns
         applyingStagesOnlyThePatchsFiles
@@ -806,6 +807,40 @@ class SmellDetectionTest {
     }
 
     /**
+     * A declared loss makes a repair partial, not complete - and not a failure.
+     *
+     * Catches the state the declared-loss rule used to produce: a patch that
+     * breaks the monitoring scrape and says so read exactly like a patch that
+     * broke nothing, because both printed one verdict. Two of the five
+     * proposals of this work are in that state.
+     */
+    private def static void aDeclaredLossIsAPartialRepair() {
+        check("a complete repair is verified", verdictReads("REPAIR COMPLETE", true), true)
+        check("and is not partial", verdictReads("REPAIR COMPLETE", false), false)
+        check("a partial repair is verified too, because every gate passed",
+            verdictReads("REPAIR PARTIAL", true), true)
+        check("and it says so", verdictReads("REPAIR PARTIAL", false), true)
+        check("a failed gate is neither", verdictReads("GATE FAILED", true), false)
+        check("a skipped gate is neither", verdictReads("NOT MEASURED", true), false)
+        check("the old spelling still reads as verified",
+            verdictReads("GATES PASSED", true), true)
+        check("but not as partial", verdictReads("GATES PASSED", false), false)
+    }
+
+    /**
+     * @param verdict the word a verification.md carries
+     * @param verified true to ask whether it is verified, false for partial
+     */
+    private def static boolean verdictReads(String verdict, boolean verified) {
+        val folder = Files.createTempDirectory("lemma-verdict-test")
+        Files.write(folder.resolve("patch.diff"), "--- a/x\n+++ b/x\n+changed\n".bytes)
+        Files.write(folder.resolve("verification.md"),
+            '''**«verdict»** — 4 passed, 0 failed, 0 skipped.'''.toString.bytes)
+        val proposal = RecordedProposal.at(folder)
+        return if (verified) proposal.verified else proposal.partialRepair
+    }
+
+    /**
      * What applying refuses, and why it says so.
      *
      * Catches a refusal that reports "it does not apply" when it knows which
@@ -828,6 +863,7 @@ class SmellDetectionTest {
         check("and its base is the recorded one", proposal.base, "622632f")
         check("and its cause is the label", proposal.cause, "the connectors of CustomerCore")
         check("and it is not verified without a verdict", proposal.verified, false)
+        check("nor is it a partial repair without one", proposal.partialRepair, false)
 
         check("a matching commit that applies is allowed",
             ProposalApplication.refusal(proposal, "622632f0a1b2c3", true), null)
