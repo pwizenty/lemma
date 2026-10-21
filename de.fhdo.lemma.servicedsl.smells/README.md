@@ -68,12 +68,25 @@ which is what additionally mitigates §3.8 Unauthenticated traffic.
 ```
 3 synchronous calls   CustomerManagement, CustomerSelfService, PolicyManagement → CustomerCore
 6 queue channels      CustomerSelfService ↔ PolicyManagement (5), PolicyManagement → RiskManagement
+1 gRPC endpoint       RiskManagement serves 0.0.0.0:50051 bound with createInsecure
+1 leg to the broker   RiskManagement consumes newpolicies over STOMP
                       ─────
-                      9 findings, 0 protected, 0 undecided
+                      11 findings, 0 protected, 0 undecided, 0 services unjudged
 ```
 
-Every one plaintext. The last is cross-technology: a Java producer and a Node
-consumer, paired by queue name.
+Every one plaintext, over 4 root causes: the connectors of CustomerCore (3), the
+broker over TCP (6), the connectors of RiskManagement (1), the broker over STOMP
+(1).
+
+The queue channel to RiskManagement is cross-technology: a Java producer and a
+Node consumer, paired by queue name. The last two findings are the Node
+consumer's own facts, and they were invisible until the technology model
+declared an aspect for them — the service appeared in the models with no
+communication fact at all, so **the count was 9 and nothing said that two
+channels had not been looked at**. The gRPC endpoint is the sharper of the two:
+the proposal guided by the models never touched it, and the unguided run
+secured it, which is a difference no gate could see while the detector could
+not either.
 
 ## Checking it
 
