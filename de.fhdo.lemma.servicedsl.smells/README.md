@@ -68,12 +68,48 @@ which is what additionally mitigates §3.8 Unauthenticated traffic.
 ```
 3 synchronous calls   CustomerManagement, CustomerSelfService, PolicyManagement → CustomerCore
 6 queue channels      CustomerSelfService ↔ PolicyManagement (5), PolicyManagement → RiskManagement
+1 gRPC endpoint       RiskManagement serves 0.0.0.0:50051 bound with createInsecure
+1 leg to the broker   RiskManagement consumes newpolicies over STOMP
                       ─────
-                      9 findings, 0 protected, 0 undecided
+                      11 findings, 0 protected, 0 undecided, 0 services unjudged
+2 deployment nodes    SpringBootAdmin and Proxy deploy no reconstructed
+                      microservice, so no channel of theirs was judged
 ```
 
-Every one plaintext. The last is cross-technology: a Java producer and a Node
-consumer, paired by queue name.
+Every one plaintext, over 4 root causes: the connectors of CustomerCore (3), the
+broker over TCP (6), the connectors of RiskManagement (1), the broker over STOMP
+(1).
+
+The queue channel to RiskManagement is cross-technology: a Java producer and a
+Node consumer, paired by queue name. The last two findings are the Node
+consumer's own facts, and they were invisible until the technology model
+declared an aspect for them — the service appeared in the models with no
+communication fact at all, so **the count was 9 and nothing said that two
+channels had not been looked at**. The gRPC endpoint is the sharper of the two:
+the proposal guided by the models never touched it, and the unguided run
+secured it, which is a difference no gate could see while the detector could
+not either.
+
+## Where its view ends
+
+Counting services with no communication fact catches a service the
+reconstruction read and left without one. It does not catch a client that has no
+service model at all, and Lakeside Mutual has two: the monitoring server, which
+MRF skips as infrastructure, and an NGINX load-balancing demonstration, which it
+does not read. Both are real clients of the Customer Core's connector — a
+refactoring given the sources secured them, one given only the models did not.
+
+So the detection answers the coverage question from the deployment instead:
+
+```sh
+tools/detect-smells.sh <models> --deployment <models>/operation
+```
+
+Every operation node that deploys no microservice a read service model declares
+is reported as a **potential unmodelled client** — not as a finding. Nothing
+there says such a node communicates, let alone insecurely; it says the detection
+cannot see whether it does, which is what a report has to admit rather than
+imply by silence.
 
 ## Checking it
 
@@ -84,7 +120,7 @@ java de.fhdo.lemma.servicedsl.smells.test.SmellDetectionTest
 python3 ../de.fhdo.lemma.diagram.common/tools/check-bundle-requires.py .
 ```
 
-28 checks, no database and no running Eclipse. The fixtures under `test/` carry
+176 checks, no database and no running Eclipse. The fixtures under `test/` carry
 what no sample system has — TLS anywhere, a TLS broker, a callee with both kinds
 of connector — because **neither Lakeside Mutual nor park-and-charge configures
 TLS at all**. So the rule's *negative* case is fixture-only.

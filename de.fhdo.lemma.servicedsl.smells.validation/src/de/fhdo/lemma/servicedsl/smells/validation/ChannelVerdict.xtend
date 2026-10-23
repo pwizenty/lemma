@@ -179,6 +179,85 @@ class ChannelVerdict {
             '''the broker is reached over «scheme ?: transport», which does not protect the channel'''
                 .toString)
     }
+
+    /**
+     * Judge an endpoint a service answers on.
+     *
+     * The caller-side counterpart of [[ofCall]] is missing here on purpose: a
+     * gRPC endpoint is judged from what the server binds, because the peer that
+     * calls it need not be a service the reconstruction knows. A command line
+     * tool is such a peer in Lakeside Mutual, and it is deployed by nobody.
+     *
+     * That the peer is unknown does not make the endpoint protected. A
+     * plaintext listener is reachable in plaintext by whatever is on the
+     * network with it, which is what §3.7 is about - the smell holds "even if
+     * within the same network". The detector says in the finding that no
+     * reconstructed microservice was identified as the caller, so nothing is
+     * claimed that was not read.
+     *
+     * @param transport whether the endpoint is bound with TLS - plaintext, tls,
+     *     or unresolved where the sources do not say
+     * @param clientAuth what the endpoint demands of a client certificate, or
+     *     null where it demands nothing. Decides whether TLS is mutual.
+     * @return the verdict
+     */
+    static def ChannelVerdict ofListener(String transport, String clientAuth) {
+        if (transport.nullOrEmpty || UNRESOLVED.equalsIgnoreCase(transport)) {
+            return new ChannelVerdict(Outcome.UNDECIDED,
+                "the model does not say whether the endpoint is bound with TLS")
+        }
+        if (PLAINTEXT.equalsIgnoreCase(transport)) {
+            return new ChannelVerdict(Outcome.SMELL,
+                "the endpoint is bound without TLS, so it is reached over plaintext "
+                    + "by whatever is on the network with it")
+        }
+        if (CLIENT_AUTH_NEED.equalsIgnoreCase(clientAuth)) {
+            return new ChannelVerdict(Outcome.PROTECTED,
+                "the endpoint uses TLS and requires a client certificate")
+        }
+        return new ChannelVerdict(Outcome.PROTECTED_NOT_MUTUAL,
+            if (CLIENT_AUTH_WANT.equalsIgnoreCase(clientAuth))
+                "the endpoint uses TLS, but only requests a client certificate and "
+                    + "serves the request without one"
+            else
+                "the endpoint uses TLS, but does not require a client certificate")
+    }
+
+    /**
+     * Judge the leg between a service and its message broker.
+     *
+     * [[ofQueue]] judges a channel between two microservices that passes
+     * through a queue, and judges it once, at the producer's end. This judges
+     * something else: the connection one service holds to the broker. A broker
+     * offers a connector per transport, and the two ends of one queue may use
+     * different ones - Lakeside Mutual's producers reach it over TCP and its
+     * Node consumer over STOMP - so protecting the producer's connector leaves
+     * the consumer's unprotected and the queue readable there.
+     *
+     * Which is why this is not the same finding seen from the other side, and
+     * why its cause is keyed by the scheme: the two legs want two patches.
+     *
+     * @param transport whether the leg is protected - plaintext, tls, or
+     *     unresolved where the sources do not say
+     * @param scheme scheme the broker is addressed over, for the reason
+     * @return the verdict
+     */
+    static def ChannelVerdict ofBrokerConnection(String transport, String scheme) {
+        if (transport.nullOrEmpty || UNRESOLVED.equalsIgnoreCase(transport)) {
+            return new ChannelVerdict(Outcome.UNDECIDED,
+                "the model does not say how the service reaches the broker")
+        }
+        if (!PLAINTEXT.equalsIgnoreCase(transport)) {
+            // PROTECTED rather than split in two, as in ofQueue: what a broker
+            // demands of a client certificate is the broker's configuration,
+            // and the broker is no service of the model.
+            return new ChannelVerdict(Outcome.PROTECTED,
+                '''the broker is reached over «transport»'''.toString)
+        }
+        return new ChannelVerdict(Outcome.SMELL,
+            '''the service reaches the broker over «scheme ?: transport», which does not protect the channel'''
+                .toString)
+    }
 }
 
 /**

@@ -124,6 +124,33 @@ rather than failed** at first — it dereferenced a refusal that had become
 null — so those checks are guarded now. Third time in this work that a test's
 failure *mode* was wrong rather than its logic.
 
+### Added after this body was written: the smell gate asks about the cause
+
+`07d049e8` is on the branch and not in the text above, because it arrived after
+it. **A falling finding count is a weak condition.** It holds while the cause
+the proposal was asked to resolve still has findings, and it holds when the
+reconstruction simply stopped seeing a channel. The smell gate now reads the
+cause id from the record's own statement of intent and fails unless *that* cause
+has no finding left **and** the total fell.
+
+So the report has to quote an id a gate can look for: every cause bullet carries
+it beside the label, and the section renders whenever a cause exists rather than
+only when findings outnumber causes.
+
+**Only a real id counts.** A record may carry prose where the cause goes — the
+ablation's says that none was given — and taking the first word regardless made
+the gate announce a cause of `(none` and then dutifully check for it.
+
+The verdicts were renamed to say what they measure: `GATES PASSED`,
+`GATE FAILED`, `PARTIAL`, instead of `VERIFIED`, which claimed more than four
+gates can establish. `RecordedProposal` accepts both spellings, because records
+written before the rename carry the old one.
+
+The prompt gains the one constraint the gates cannot enforce: a test moved off
+the network still builds and still asserts, so a proposal that changes what
+transport a test exercises has to say so, and say what coverage is lost.
+
+
 ## Merge Danger
 
 **Door:** two-way for everything except one case. Six new classes, two

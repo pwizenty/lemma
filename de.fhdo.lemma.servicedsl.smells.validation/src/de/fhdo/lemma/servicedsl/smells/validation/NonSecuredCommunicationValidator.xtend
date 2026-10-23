@@ -44,6 +44,8 @@ class NonSecuredCommunicationValidator extends AbstractDeclarativeValidator {
     static val SERVICE_CALL = "ServiceCall"
     static val MESSAGE_CHANNEL = "MessageChannel"
     static val SERVER_ENDPOINT = "ServerEndpoint"
+    static val GRPC_SERVER = "GrpcServer"
+    static val MESSAGE_QUEUE = "MessageQueue"
 
     static val TARGET = "target"
     static val TARGET_KIND = "targetKind"
@@ -54,6 +56,8 @@ class NonSecuredCommunicationValidator extends AbstractDeclarativeValidator {
     static val BROKER = "broker"
     static val TLS_ENABLED = "tlsEnabled"
     static val CLIENT_AUTH = "clientAuth"
+    static val TRANSPORT_SECURITY = "transportSecurity"
+    static val PORT = "port"
 
     /**
      * The issue code a quickfix binds to.
@@ -76,6 +80,8 @@ class NonSecuredCommunicationValidator extends AbstractDeclarativeValidator {
 
     public static val KIND_CALL = "call"
     public static val KIND_QUEUE = "queue"
+    public static val KIND_LISTENER = "listener"
+    public static val KIND_BROKER = "broker"
 
     /**
      * A composed validator registers no EPackage of its own: the validator it
@@ -94,6 +100,8 @@ class NonSecuredCommunicationValidator extends AbstractDeclarativeValidator {
             switch (aspect.aspectName) {
                 case SERVICE_CALL: microservice.checkCall(aspect)
                 case MESSAGE_CHANNEL: microservice.checkQueue(aspect)
+                case GRPC_SERVER: microservice.checkListener(aspect)
+                case MESSAGE_QUEUE: microservice.checkBrokerConnection(aspect)
                 default: {}
             }
         }
@@ -121,6 +129,47 @@ class NonSecuredCommunicationValidator extends AbstractDeclarativeValidator {
             aspect.warn(verdict,
                 '''the queue «queue ?: "it produces to"» shared with «values.get(TARGET)»''',
                 KIND_QUEUE, RootCause.ofQueue(values.get(BROKER), values.get(SCHEME)))
+        }
+    }
+
+    /**
+     * Warn for a gRPC endpoint this service binds without protecting it.
+     *
+     * Judged from this service alone, because the peer that calls the endpoint
+     * need not be a microservice the models know - and a plaintext listener is
+     * reachable in plaintext by whatever is on the network with it.
+     */
+    private def void checkListener(Microservice microservice, ImportedServiceAspect aspect) {
+        val values = aspect.valuesOf
+        val verdict = ChannelVerdict.ofListener(values.get(TRANSPORT_SECURITY),
+            values.get(CLIENT_AUTH))
+
+        if (verdict.smell) {
+            aspect.warn(verdict,
+                '''the gRPC endpoint on «values.get(PORT) ?: "the configured port"»''',
+                KIND_LISTENER, RootCause.ofCall(microservice.simpleName))
+        }
+    }
+
+    /**
+     * Warn for a plaintext leg between this service and its broker.
+     *
+     * Not the channel [[checkQueue]] warns about. That one is the interaction
+     * between two microservices through a queue; this is the connection this
+     * service holds to the broker, over one of the broker's connectors - and
+     * protecting another connector of the same broker does nothing for this
+     * one.
+     */
+    private def void checkBrokerConnection(Microservice microservice,
+        ImportedServiceAspect aspect) {
+        val values = aspect.valuesOf
+        val verdict = ChannelVerdict.ofBrokerConnection(values.get(TRANSPORT_SECURITY),
+            values.get(SCHEME))
+
+        if (verdict.smell) {
+            aspect.warn(verdict,
+                '''the «values.get(BROKER) ?: "message"» broker it reaches for «values.get(QUEUE) ?: "a queue"»''',
+                KIND_BROKER, RootCause.ofQueue(values.get(BROKER), values.get(SCHEME)))
         }
     }
 
@@ -178,6 +227,22 @@ class NonSecuredCommunicationValidator extends AbstractDeclarativeValidator {
      * Resolves here, inside Eclipse; the command line reads the same link from
      * a parse tree instead.
      */
+    /**
+     * The service's own name without its qualifying parts.
+     *
+     * A cause's id has to read the same here and on the command line, and the
+     * graph the command line builds carries the simple name - so a cause keyed
+     * on a qualified one would split one cause into two depending on which of
+     * the two tools found it.
+     */
+    private def String simpleName(Microservice microservice) {
+        val name = microservice.name
+        if (name === null) {
+            return null
+        }
+        return name.substring(name.lastIndexOf(".") + 1)
+    }
+
     private def Microservice calleeOf(Microservice microservice, String target) {
         if (target === null) {
             return null

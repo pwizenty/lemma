@@ -1,6 +1,8 @@
 package de.fhdo.lemma.servicedsl.smells.cli
 
+import de.fhdo.lemma.operationdsl.diagram.OperationModelReader
 import de.fhdo.lemma.servicedsl.diagram.ServiceModelReader
+import de.fhdo.lemma.servicedsl.smells.DeploymentCoverage
 import de.fhdo.lemma.servicedsl.smells.DetectionResult
 import de.fhdo.lemma.servicedsl.smells.NonSecuredCommunicationDetector
 import de.fhdo.lemma.servicedsl.smells.SmellReport
@@ -32,6 +34,8 @@ import java.util.List
  */
 class SmellDetectionCli {
     static val SERVICES_EXTENSION = ".services"
+    static val OPERATION_EXTENSION = ".operation"
+    static val DEPLOYMENT_OPTION = "--deployment"
     static val REPORT_OPTION = "--report"
     static val QUIET_OPTION = "--quiet"
     static val HELP_OPTION = "--help"
@@ -46,6 +50,7 @@ class SmellDetectionCli {
         }
 
         val models = <Path>newLinkedList
+        val deploymentModels = <Path>newLinkedList
         var String reportFile = null
         var boolean quiet = false
 
@@ -60,10 +65,18 @@ class SmellDetectionCli {
                     }
                     reportFile = args.get(index)
                 }
+                case DEPLOYMENT_OPTION: {
+                    index++
+                    if (index >= args.length) {
+                        System.err.println('''«DEPLOYMENT_OPTION» needs a model or folder.''')
+                        System.exit(EXIT_NOTHING_READ)
+                    }
+                    deploymentModels.addAll(modelsAt(args.get(index), OPERATION_EXTENSION))
+                }
                 case QUIET_OPTION:
                     quiet = true
                 default:
-                    models.addAll(modelsAt(args.get(index)))
+                    models.addAll(modelsAt(args.get(index), SERVICES_EXTENSION))
             }
             index++
         }
@@ -76,13 +89,28 @@ class SmellDetectionCli {
         val graph = new ServiceModelReader().read(models)
         val result = new NonSecuredCommunicationDetector().detect(graph)
 
+        // What the deployment holds beside the judged services. Optional
+        // because the detection does not need it to judge anything - it needs
+        // it to say where its view ends, and an operation model is not always
+        // reconstructed.
+        var List<String> unmodelled = emptyList
+        if (!deploymentModels.empty) {
+            val deployment = new OperationModelReader().read(deploymentModels)
+            unmodelled = DeploymentCoverage.potentialUnmodelledClients(deployment, graph)
+        }
+
         if (reportFile !== null) {
-            val report = new SmellReport().write(result, graph)
+            val report = new SmellReport().write(result, graph, unmodelled)
             Files.write(Paths.get(reportFile), report.getBytes(StandardCharsets.UTF_8))
             println('''Report written to «reportFile».''')
         }
         if (!quiet) {
             print(summary(result, models.size))
+            if (!unmodelled.empty) {
+                println('''
+                «unmodelled.size» deployment node(s) deploy no reconstructed microservice, so no channel of theirs was judged:''')
+                unmodelled.forEach[println('''    «it»''')]
+            }
         }
 
         if (graph.empty) {
@@ -94,10 +122,10 @@ class SmellDetectionCli {
     }
 
     /**
-     * The models at one path: the file itself, or every service model below a
-     * folder.
+     * The models at one path: the file itself, or every model whose name ends
+     * with this suffix below a folder.
      */
-    private def static List<Path> modelsAt(String path) {
+    private def static List<Path> modelsAt(String path, String suffix) {
         val start = Paths.get(path)
         if (!Files.exists(start)) {
             System.err.println('''No such file or folder: «path»''')
@@ -110,7 +138,7 @@ class SmellDetectionCli {
         val stream = Files.walk(start)
         try {
             stream.filter[Files.isRegularFile(it)]
-                .filter[fileName.toString.endsWith(SERVICES_EXTENSION)]
+                .filter[fileName.toString.endsWith(suffix)]
                 .forEach[found.add(it)]
         } finally {
             stream.close
@@ -166,6 +194,11 @@ class SmellDetectionCli {
                               because a finding is about a pair of services.
 
         Options:
+          «DEPLOYMENT_OPTION» <path> An operation model, or a folder of them. Their
+                              nodes are compared against the service models,
+                              and a node deploying no reconstructed
+                              microservice is reported as a potential
+                              unmodelled client - not as a finding
           «REPORT_OPTION» <file>     Write the full report, with the evidence of
                               each finding, as Markdown
           «QUIET_OPTION»             Write nothing to the terminal
