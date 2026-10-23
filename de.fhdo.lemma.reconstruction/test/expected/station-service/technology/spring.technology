@@ -269,6 +269,57 @@ technology javaWithSpring {
             string transport;
         }
 
+        // The gRPC endpoint a Node service serves, and whether it is protected.
+        //
+        // The Java services state their connectors in configuration, which
+        // ServerEndpoint above carries. A Node service states the address in
+        // configuration and the transport in the code that binds it, so the
+        // reconstruction reads the call - createInsecure or createSsl - by
+        // name. Without this declaration the fact was reconstructed and then
+        // dropped, because an aspect the model does not declare cannot be
+        // referred to: the Risk Management server of Lakeside Mutual appeared
+        // in the service models with no communication fact at all, and its two
+        // channels were judged by nothing.
+        //
+        // clientAuth is "need" where the server requires and verifies a client
+        // certificate, as it is on ServerEndpoint. transportSecurity is
+        // plaintext, tls or unresolved - the words of the client-side
+        // transport, so that one spelling is compared against everywhere.
+        //
+        // Not <singleval>: a service may bind more than one endpoint, and
+        // checkUniqueAspects would make the second one unrepresentable.
+        aspect GrpcServer for microservices {
+            string host;
+            string port;
+            string transportSecurity;
+            string clientAuth;
+        }
+
+        // One queue a Node service is configured for, and whether the channel
+        // to the broker is protected.
+        //
+        // The counterpart of MessageChannel for a service the Spring detectors
+        // do not see. Both ends of Lakeside Mutual's newpolicies queue are
+        // reconstructed, and only the producing end was in the models: the
+        // consumer is a Node service, reached over STOMP rather than over the
+        // broker's TCP connector, which is a second connector of the same
+        // broker and a channel of its own.
+        //
+        // credentialsConfigured says that the broker is authenticated, never
+        // with what: the architecture information is that a credential exists,
+        // and its value is a secret.
+        //
+        // Not <singleval>, for a service configured for several queues.
+        aspect MessageQueue for microservices {
+            string broker;
+            string host;
+            string port;
+            string queue;
+            string scheme;
+            string credentialsConfigured;
+            string transportSecurity;
+        }
+
         aspect Table<singleval> for types {
             string name;
         }
