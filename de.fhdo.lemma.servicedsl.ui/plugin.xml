@@ -420,4 +420,32 @@
     <extension point="org.eclipse.core.runtime.preferences">
         <initializer class="de.fhdo.lemma.ui.quickfix.SmellRefactoringPreferenceDefaults"/>
     </extension>
+    <!-- Reviewing a proposal made earlier, from the menu. The quickfix offers
+         the review when a job finishes; this is how an older one is reached. -->
+    <extension point="org.eclipse.ui.commands">
+        <command
+            id="de.fhdo.lemma.servicedsl.ui.reviewProposal"
+            name="Review a Refactoring Proposal"
+            categoryId="org.eclipse.ui.category.window"/>
+    </extension>
+    <extension point="org.eclipse.ui.handlers">
+        <handler
+            commandId="de.fhdo.lemma.servicedsl.ui.reviewProposal"
+            class="de.fhdo.lemma.ui.quickfix.ReviewProposalHandler"/>
+    </extension>
+    <!-- Contributed INTO the existing LEMMA menu, which
+         de.fhdo.lemma.eclipse.ui defines as lemmaMenu. Declaring another menu
+         labelled "LEMMA" here produced two of them in the menu bar: a label is
+         not an identity, so Eclipse had no reason to merge them. -->
+    <extension point="org.eclipse.ui.menus">
+        <menuContribution
+                locationURI="menu:de.fhdo.lemma.eclipse.ui.lemmaMenu?after=additions">
+            <menu id="de.fhdo.lemma.servicedsl.ui.menu.smells" label="Security Smells">
+                <command
+                    commandId="de.fhdo.lemma.servicedsl.ui.reviewProposal"
+                    label="Review a Proposal..."
+                    style="push"/>
+            </menu>
+        </menuContribution>
+    </extension>
 </plugin>

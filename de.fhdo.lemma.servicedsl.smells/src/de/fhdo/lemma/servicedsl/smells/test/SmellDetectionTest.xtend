@@ -10,6 +10,8 @@ import de.fhdo.lemma.servicedsl.smells.validation.ChannelVerdict
 import de.fhdo.lemma.servicedsl.smells.validation.Outcome
 import de.fhdo.lemma.servicedsl.smells.validation.RootCause
 import de.fhdo.lemma.servicedsl.smells.refactoring.PatchGuard
+import de.fhdo.lemma.servicedsl.smells.refactoring.ProposalApplication
+import de.fhdo.lemma.servicedsl.smells.refactoring.RecordedProposal
 import de.fhdo.lemma.servicedsl.smells.refactoring.PromptBuilder
 import de.fhdo.lemma.servicedsl.smells.refactoring.ProposalRecord
 import de.fhdo.lemma.servicedsl.smells.refactoring.RecordedProposer
@@ -53,6 +55,10 @@ class SmellDetectionTest {
         aPatchIsCheckedNotTrusted
         aProposalIsRecorded
         aSecuredSystemYieldsNothingToResolve
+        aProposalBelongsToOneCommit
+        applyingRefusesRatherThanGuesses
+        anApplyIsPlannedBeforeItRuns
+        applyingStagesOnlyThePatchsFiles
 
         println('''
         ---
@@ -587,6 +593,155 @@ class SmellDetectionTest {
             report.contains("What has to change"), false)
         check("but it does report the channel that is not mutual",
             report.contains("not mutually authenticated"), true)
+    }
+
+
+    /**
+     * A proposal may only be applied to the commit it was produced against.
+     *
+     * Catches a check that compares commit identifiers as strings - a record
+     * keeps a short hash and rev-parse gives a full one, so that rejects every
+     * legitimate match - and one that lets a mismatch through, which is how two
+     * incompatible proposals came to overlap in five files.
+     */
+    private def static void aProposalBelongsToOneCommit() {
+        check("an abbreviated hash matches the full one",
+            ProposalApplication.sameCommit("622632f",
+                "622632f0a1b2c3d4e5f60718293a4b5c6d7e8f90"), true)
+        check("and the other way round",
+            ProposalApplication.sameCommit("622632f0a1b2c3d4e5f60718293a4b5c6d7e8f90",
+                "622632f"), true)
+        check("a different commit does not match",
+            ProposalApplication.sameCommit("622632f", "8a73096"), false)
+        // Seven characters is git's own abbreviation floor; shorter is not an
+        // identifier and must not be treated as a prefix match.
+        check("too short to be an identifier does not match",
+            ProposalApplication.sameCommit("62", "622632f"), false)
+        check("nothing matches nothing", ProposalApplication.sameCommit(null, "622632f"), false)
+    }
+
+    /**
+     * What applying refuses, and why it says so.
+     *
+     * Catches a refusal that reports "it does not apply" when it knows which
+     * commit the patch was for, and one that proceeds with no idea what the
+     * target is on.
+     */
+    private def static void applyingRefusesRatherThanGuesses() {
+        val folder = Files.createTempDirectory("lemma-proposal-test")
+        Files.write(folder.resolve("patch.diff"),
+            "--- a/x\n+++ b/x\n+changed\n".bytes)
+        Files.write(folder.resolve("model.txt"), '''
+        cause         endpoint:CustomerCore
+        label         the connectors of CustomerCore
+        base          622632f
+        target        /tmp/system
+        '''.toString.bytes)
+        val proposal = RecordedProposal.at(folder)
+
+        check("a folder with a patch reads back", proposal !== null, true)
+        check("and its base is the recorded one", proposal.base, "622632f")
+        check("and its cause is the label", proposal.cause, "the connectors of CustomerCore")
+        check("and it is not verified without a verdict", proposal.verified, false)
+
+        check("a matching commit that applies is allowed",
+            ProposalApplication.refusal(proposal, "622632f0a1b2c3", true), null)
+
+        val mismatch = ProposalApplication.refusal(proposal, "8a73096", true)
+        check("a different commit is refused", mismatch !== null, true)
+        check("and the refusal names BOTH commits",
+            mismatch !== null && mismatch.contains("622632f")
+                && mismatch.contains("8a73096"), true)
+        check("and says what to do instead",
+            mismatch !== null && mismatch.contains("Generate a new proposal"), true)
+
+        val unknown = ProposalApplication.refusal(proposal, null, true)
+        check("an unreadable target commit is refused",
+            unknown !== null && unknown.contains("not a git checkout"), true)
+
+        val moved = ProposalApplication.refusal(proposal, "622632f", false)
+        check("a matching commit that does not apply blames the working tree",
+            moved !== null && moved.contains("working") && moved.contains("tree"), true)
+
+        check("a folder with no patch is not a proposal",
+            RecordedProposal.at(Files.createTempDirectory("lemma-empty")), null)
+        check("and is refused with that reason",
+            ProposalApplication.refusal(null, "622632f", true).contains("no proposal"), true)
+    }
+
+    /**
+     * What an apply will do, before it does it.
+     *
+     * Catches a plan that forgets the certificate script: the patch configures
+     * mutual TLS but commits no key material, so a system applied without it
+     * cannot start.
+     */
+    private def static void anApplyIsPlannedBeforeItRuns() {
+        val folder = Files.createTempDirectory("lemma-plan-test")
+        Files.write(folder.resolve("patch.diff"), '''
+        --- a/customer-core/src/main/resources/application.properties
+        +++ b/customer-core/src/main/resources/application.properties
+        +server.ssl.enabled=true
+        --- /dev/null
+        +++ b/generate-certificates.sh
+        +#!/usr/bin/env bash
+        '''.toString.bytes)
+        Files.write(folder.resolve("model.txt"), "base          622632f\n".bytes)
+
+        val plan = ProposalApplication.planFor(RecordedProposal.at(folder), "/tmp/system")
+        check("the plan counts the files", plan.files, 2)
+        check("it names the base", plan.base, "622632f")
+        check("it finds the certificate script the patch ships",
+            plan.hasCertificateScript, true)
+        check("and names it", plan.certificateScript, "generate-certificates.sh")
+
+        // A patch with no script needs no offer, and claiming otherwise would
+        // send the reader to run something that is not there.
+        val plain = Files.createTempDirectory("lemma-plan-plain")
+        Files.write(plain.resolve("patch.diff"), "--- a/x\n+++ b/x\n+y\n".bytes)
+        check("a patch shipping no script offers none",
+            ProposalApplication.planFor(RecordedProposal.at(plain), "/tmp/s")
+                .hasCertificateScript, false)
+
+        check("the branch is named after the cause, not the date",
+            ProposalApplication.branchFor(RecordedProposal.at(
+                Files.createDirectories(folder.resolveSibling(
+                    "2026-10-15-endpoint-customercore-1792046440612")
+                ).resolve("..").normalize.resolve(folder.fileName))) !== null, true)
+    }
+
+
+    /**
+     * Applying stages the patch's files and nothing else.
+     *
+     * Found the hard way: "git add -A" swept three unrelated uncommitted
+     * files into a commit whose message named only the refactoring, because
+     * git cannot tell a patch's work from the user's. The paths come from the
+     * patch, so this checks the list that is handed to git rather than the
+     * commit that results - the decision is which paths, not how to stage.
+     */
+    private def static void applyingStagesOnlyThePatchsFiles() {
+        val folder = Files.createTempDirectory("lemma-stage-test")
+        Files.write(folder.resolve("patch.diff"), '''
+        --- a/customer-core/src/main/resources/application.properties
+        +++ b/customer-core/src/main/resources/application.properties
+        +server.ssl.enabled=true
+        --- /dev/null
+        +++ b/generate-certificates.sh
+        +#!/usr/bin/env bash
+        '''.toString.bytes)
+        Files.write(folder.resolve("model.txt"), "base          622632f\n".bytes)
+        val proposal = RecordedProposal.at(folder)
+
+        val paths = proposal.changedPaths
+        check("the patch's paths are what gets staged", paths.size, 2)
+        check("and they are the patch's, not the directory's",
+            paths.contains("customer-core/src/main/resources/application.properties")
+                && paths.contains("generate-certificates.sh"), true)
+        // The three files that were swept in last time are the shape of what
+        // must never appear here: anything the patch does not mention.
+        check("nothing the patch does not mention is included",
+            paths.exists[contains("DataLoader") || contains("SECURITY_REVIEW")], false)
     }
 
 }

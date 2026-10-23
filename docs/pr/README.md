@@ -32,8 +32,12 @@ their own diffs stay free of files describing themselves.
 | `feat-server-endpoint-aspect.md` | `feat/server-endpoint-aspect` | `dev` |
 | `feat-security-smell-detection.md` | `feat/security-smell-detection` | `dev` |
 | `feat-smell-verdict-and-grouping.md` | `feat/smell-verdict-and-grouping` | `dev` |
+| `feat-resolve-smell-skill.md` | `feat/resolve-smell-skill` | `dev` |
+| `feat-refactoring-machinery.md` | `feat/refactoring-machinery` | `dev` |
+| `docs-smell-resolution-plan.md` | `docs/smell-resolution-plan` | `dev` |
 | `fix-temurin-operation-environments.md` | `fix/temurin-operation-environments` | `dev` |
 | `feat-smell-refactoring-preference-page.md` | `feat/smell-refactoring-preference-page` | `dev` |
+| `feat-review-and-apply-a-proposal.md` | `feat/review-and-apply-a-proposal` | `dev` |
 
 Merge order matters for `feat/communication-aspect`: it contains the commits of
 `feat/rest-technology-information`, so that branch goes first. Most also need

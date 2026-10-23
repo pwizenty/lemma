@@ -57,13 +57,17 @@ class SmellReport {
 
                 «ENDFOR»
             «ENDIF»
-            «IF result.findings.size > result.byRootCause.size»
+            «IF !result.byRootCause.empty»
                 ### What has to change
 
                 «result.findings.size» finding(s) come from «result.byRootCause.size» cause(s). A cause is the unit a refactoring acts on, because mutual TLS has to be applied to both ends of every channel it covers at once.
 
+                The cause's id is quoted so that a verification can ask whether
+                *this* cause still has findings, rather than only whether the
+                total fell.
+
                 «FOR cause : result.byRootCause.entrySet»
-                    - **«cause.value.head.rootCauseLabel ?: cause.key»** — «cause.value.size» finding(s)
+                    - **«cause.value.head.rootCauseLabel ?: cause.key»** (`«cause.key»`) — «cause.value.size» finding(s)
                 «ENDFOR»
 
             «ENDIF»
