@@ -1,7 +1,12 @@
 package de.fhdo.lemma.servicedsl.smells.test
 
+import de.fhdo.lemma.operationdsl.diagram.ArtifactInfo
+import de.fhdo.lemma.operationdsl.diagram.NodeInfo
+import de.fhdo.lemma.operationdsl.diagram.NodeKind
+import de.fhdo.lemma.operationdsl.diagram.OperationGraph
 import de.fhdo.lemma.servicedsl.diagram.AspectReference
 import de.fhdo.lemma.servicedsl.diagram.ServiceModelReader
+import de.fhdo.lemma.servicedsl.smells.DeploymentCoverage
 import de.fhdo.lemma.servicedsl.smells.DetectionResult
 import de.fhdo.lemma.servicedsl.smells.Finding
 import de.fhdo.lemma.servicedsl.smells.NonSecuredCommunicationDetector
@@ -50,6 +55,7 @@ class SmellDetectionTest {
         aListenerIsMutualOnlyWithAClientCertificate
         aPlaintextLegToTheBrokerIsItsOwnFinding
         aServiceWithNoFactIsReportedAsNotJudged
+        aDeploymentNodeWithNoModelledServiceIsReported
         theNodeChannelsBecomeRequests
         aFindingCarriesItsEvidenceAndRefactoring
         anAspectsValuesAreRead
@@ -61,6 +67,7 @@ class SmellDetectionTest {
         aProposalIsRecorded
         aSecuredSystemYieldsNothingToResolve
         aProposalBelongsToOneCommit
+        aDeclaredLossIsAPartialRepair
         applyingRefusesRatherThanGuesses
         anApplyIsPlannedBeforeItRuns
         applyingStagesOnlyThePatchsFiles
@@ -167,6 +174,60 @@ class SmellDetectionTest {
      * network to be public: the smell holds "even if they are within the same
      * network".
      */
+    /**
+     * A deployment node that deploys nothing the models declare.
+     *
+     * Catches a coverage report that only counts services with no fact: the two
+     * clients Lakeside Mutual's refactoring found in the sources have no service
+     * model to miss a fact in - the monitoring server is skipped as
+     * infrastructure, the NGINX demonstration is not read at all - so counting
+     * facts says nothing about them. Built by hand rather than from an operation
+     * model, because the question is what the comparison does with a node, not
+     * whether the reader parses one.
+     */
+    private def static void aDeploymentNodeWithNoModelledServiceIsReported() {
+        val services = new ServiceModelReader().read(#[
+            Paths.get(FIXTURES + "/node-channels.services") as Path
+        ])
+
+        val deployment = new OperationGraph
+        val deployed = new NodeInfo("ListenerContainer", NodeKind.CONTAINER)
+        deployed.technology = "Docker"
+        deployed.artifacts.add(new ArtifactInfo("PlaintextListener",
+            "Channels::com.example.PlaintextListener"))
+        deployment.add(deployed)
+
+        val monitoring = new NodeInfo("SpringBootAdmin", NodeKind.INFRASTRUCTURE)
+        monitoring.technology = "SpringBootAdmin"
+        monitoring.operationEnvironment = "eclipse-temurin:21-jre"
+        deployment.add(monitoring)
+
+        val proxy = new NodeInfo("Proxy", NodeKind.CONTAINER)
+        proxy.technology = "Docker"
+        proxy.operationEnvironment = "nginx"
+        deployment.add(proxy)
+
+        val unmodelled = DeploymentCoverage.potentialUnmodelledClients(deployment, services)
+
+        check("a node deploying no reconstructed microservice is reported",
+            unmodelled.exists[contains("SpringBootAdmin")], true)
+        check("so is a container that deploys nothing at all",
+            unmodelled.exists[contains("Proxy")], true)
+        check("a node deploying a service the models declare is not",
+            unmodelled.exists[contains("ListenerContainer")], false)
+        check("and that is all of them", unmodelled.size, 2)
+        check("the line says what kind of node it is",
+            unmodelled.exists[contains("infrastructure node")], true)
+
+        val report = new SmellReport().write(
+            new NonSecuredCommunicationDetector().detect(services), services, unmodelled)
+        check("the report names them as potential unmodelled clients, not findings",
+            report.contains("## Potential unmodelled clients"), true)
+        check("and counts them in its table",
+            report.contains("| Deployment nodes deploying no reconstructed microservice | 2 |"),
+            true)
+    }
+
     private def static void aPlaintextCallIsTheSmell() {
         val result = judge("/judged.services")
 
@@ -746,6 +807,40 @@ class SmellDetectionTest {
     }
 
     /**
+     * A declared loss makes a repair partial, not complete - and not a failure.
+     *
+     * Catches the state the declared-loss rule used to produce: a patch that
+     * breaks the monitoring scrape and says so read exactly like a patch that
+     * broke nothing, because both printed one verdict. Two of the five
+     * proposals of this work are in that state.
+     */
+    private def static void aDeclaredLossIsAPartialRepair() {
+        check("a complete repair is verified", verdictReads("REPAIR COMPLETE", true), true)
+        check("and is not partial", verdictReads("REPAIR COMPLETE", false), false)
+        check("a partial repair is verified too, because every gate passed",
+            verdictReads("REPAIR PARTIAL", true), true)
+        check("and it says so", verdictReads("REPAIR PARTIAL", false), true)
+        check("a failed gate is neither", verdictReads("GATE FAILED", true), false)
+        check("a skipped gate is neither", verdictReads("NOT MEASURED", true), false)
+        check("the old spelling still reads as verified",
+            verdictReads("GATES PASSED", true), true)
+        check("but not as partial", verdictReads("GATES PASSED", false), false)
+    }
+
+    /**
+     * @param verdict the word a verification.md carries
+     * @param verified true to ask whether it is verified, false for partial
+     */
+    private def static boolean verdictReads(String verdict, boolean verified) {
+        val folder = Files.createTempDirectory("lemma-verdict-test")
+        Files.write(folder.resolve("patch.diff"), "--- a/x\n+++ b/x\n+changed\n".bytes)
+        Files.write(folder.resolve("verification.md"),
+            '''**«verdict»** — 4 passed, 0 failed, 0 skipped.'''.toString.bytes)
+        val proposal = RecordedProposal.at(folder)
+        return if (verified) proposal.verified else proposal.partialRepair
+    }
+
+    /**
      * What applying refuses, and why it says so.
      *
      * Catches a refusal that reports "it does not apply" when it knows which
@@ -768,6 +863,7 @@ class SmellDetectionTest {
         check("and its base is the recorded one", proposal.base, "622632f")
         check("and its cause is the label", proposal.cause, "the connectors of CustomerCore")
         check("and it is not verified without a verdict", proposal.verified, false)
+        check("nor is it a partial repair without one", proposal.partialRepair, false)
 
         check("a matching commit that applies is allowed",
             ProposalApplication.refusal(proposal, "622632f0a1b2c3", true), null)

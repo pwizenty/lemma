@@ -72,6 +72,8 @@ which is what additionally mitigates §3.8 Unauthenticated traffic.
 1 leg to the broker   RiskManagement consumes newpolicies over STOMP
                       ─────
                       11 findings, 0 protected, 0 undecided, 0 services unjudged
+2 deployment nodes    SpringBootAdmin and Proxy deploy no reconstructed
+                      microservice, so no channel of theirs was judged
 ```
 
 Every one plaintext, over 4 root causes: the connectors of CustomerCore (3), the
@@ -88,6 +90,27 @@ the proposal guided by the models never touched it, and the unguided run
 secured it, which is a difference no gate could see while the detector could
 not either.
 
+## Where its view ends
+
+Counting services with no communication fact catches a service the
+reconstruction read and left without one. It does not catch a client that has no
+service model at all, and Lakeside Mutual has two: the monitoring server, which
+MRF skips as infrastructure, and an NGINX load-balancing demonstration, which it
+does not read. Both are real clients of the Customer Core's connector — a
+refactoring given the sources secured them, one given only the models did not.
+
+So the detection answers the coverage question from the deployment instead:
+
+```sh
+tools/detect-smells.sh <models> --deployment <models>/operation
+```
+
+Every operation node that deploys no microservice a read service model declares
+is reported as a **potential unmodelled client** — not as a finding. Nothing
+there says such a node communicates, let alone insecurely; it says the detection
+cannot see whether it does, which is what a report has to admit rather than
+imply by silence.
+
 ## Checking it
 
 ```sh
@@ -97,7 +120,7 @@ java de.fhdo.lemma.servicedsl.smells.test.SmellDetectionTest
 python3 ../de.fhdo.lemma.diagram.common/tools/check-bundle-requires.py .
 ```
 
-160 checks, no database and no running Eclipse. The fixtures under `test/` carry
+176 checks, no database and no running Eclipse. The fixtures under `test/` carry
 what no sample system has — TLS anywhere, a TLS broker, a callee with both kinds
 of connector — because **neither Lakeside Mutual nor park-and-charge configures
 TLS at all**. So the rule's *negative* case is fixture-only.

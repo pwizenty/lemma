@@ -23,6 +23,10 @@
 # requires a proposal to write down what its patch gives up, and this is where
 # that is checked rather than trusted.
 #
+# The verdict is one of REPAIR COMPLETE, REPAIR PARTIAL, GATE FAILED and
+# NOT MEASURED; exit status 0, 4, 1 and 3 respectively. A declared loss makes a
+# repair partial rather than failed, and never complete.
+#
 # Gate 1 and gate 2 are deliberately separate. A patch whose tests read a key
 # store from disk passes the second and fails the first, which is exactly what
 # the second proposal of this work did - and nothing but a clean-room build
@@ -100,6 +104,23 @@ PATCH="$PROPOSAL/patch.diff"
 [[ -d "$SOURCE/.git" ]] || { echo "Not a git checkout: $SOURCE" >&2; exit 2; }
 
 PASSED=(); FAILED=(); SKIPPED=()
+
+# Two things the gates establish but the verdict used to swallow.
+#
+# A patch that breaks a monitoring scrape and declares it passes gate 4, and so
+# does a patch that breaks nothing: the declared-loss rule exists so the gate
+# does not fail every correct refactoring, but folding both into one PASS erases
+# the difference between them. Two proposals of this work differ in exactly that
+# way. So the loss is reported as its own field instead of being hidden inside a
+# verdict, and the verdict is left alone, because the four gates did pass.
+#
+# COVERAGE_LOST is read from the proposal's own notes rather than measured: the
+# prompt requires a proposal to declare it when a test's transport changes, and
+# nothing here detects it. A proposal that stays silent therefore reads "none
+# declared", which is a statement about the notes and not about the tests.
+DECLARED_LOSSES="not measured"
+COVERAGE_LOST="not measured"
+
 pass() { PASSED+=("$1"); printf '  PASS  %s\n' "$1"; }
 fail() { FAILED+=("$1: $2"); printf '  FAIL  %s\n        %s\n' "$1" "$2"; }
 skip() { SKIPPED+=("$1: $2"); printf '  SKIP  %s (%s)\n' "$1" "$2"; }
@@ -180,6 +201,62 @@ generate_material() {
     fi
     [[ -z "$command" ]] && return $NO_MATERIAL
     (cd "$tree" && bash -c "$command") > /dev/null 2>&1
+}
+
+# What the proposal says it gave up in test coverage.
+#
+# Read from the patch's own added notes lines, not measured, and not from the
+# file in the tree: a stacked proposal inherits the notes of the ones below it.
+# The constraints allow a test's configuration to be
+# updated so that it addresses the new transport, and require the proposal to
+# say so; one proposal of this work moved a producer test to an in-process
+# broker transport, which keeps every assertion and loses the network
+# handshake. No gate observes that, and nothing here detects it: this reads the
+# proposal's own notes, so silence prints as "none declared" and says something
+# about the notes rather than about the tests.
+coverage_lost() {
+    local patch="$1"
+    [[ -f "$patch" ]] || { echo "not measured (no patch)"; return; }
+
+    # The lines this patch ADDS to REFACTORING-NOTES.md, not the file in the
+    # tree. A proposal applied on top of another inherits the earlier notes -
+    # rc4 is built on rc1 and rc2 - and reading the file would have credited
+    # it with a declaration it never made.
+    local notes
+    notes="$(awk '/^\+\+\+ b\/REFACTORING-NOTES\.md$/ { inside = 1; next }
+                  /^diff --git / { inside = 0 }
+                  inside && /^\+/ { print substr($0, 2) }' "$patch")"
+    [[ -z "${notes// /}" ]] && { echo "none declared"; return; }
+
+    # The notes' own test section when they have one, otherwise all of them:
+    # the proposals of this work head it "Tests", but a heading is a convention
+    # and not a contract.
+    local section
+    section="$(printf '%s\n' "$notes" \
+        | awk '/^#+[[:space:]]*Tests/ { inside = 1; next }
+               /^#+[[:space:]]/ { inside = 0 }
+               inside { print }')"
+    [[ -z "${section// /}" ]] && section="$notes"
+
+    # By sentence, not by line: the notes are wrapped prose, and the line a
+    # keyword falls on usually starts mid-clause.
+    local statement
+    statement="$(printf '%s\n' "$section" | tr '\n' ' ' | sed -E 's/\. /.\n/g' \
+        | grep -iE 'in-vm|in-process|vm://|coverage|no network connector|without opening a network' \
+        | head -1 | sed -E 's/^[-* ]+//; s/[[:space:]]+/ /g; s/[`*]//g' \
+        | awk '{ line = $0
+                 if (length(line) <= 160) { print line; exit }
+                 # Cut at the last word boundary, so the record does not end
+                 # mid-word, and say that it was cut.
+                 short = substr(line, 1, 160)
+                 sub(/[^ ]*$/, "", short)
+                 sub(/ +$/, "", short)
+                 print short " [...]" }')"
+    if [[ -z "${statement// /}" ]]; then
+        echo "none declared"
+    else
+        echo "$statement"
+    fi
 }
 
 echo "Verifying $(basename "$PROPOSAL")"
@@ -407,6 +484,7 @@ else
         | head -3 | tr '\n' ' ')"
 
     if [[ "$PATCHED_UP" == 1 && -z "$PATCHED_ERRORS" ]]; then
+        DECLARED_LOSSES="none"
         pass "starts: the system comes up with the patch applied and no service reports an unreachable peer"
     else
         # This gate needs a baseline as much as the smell gate does. A sample
@@ -438,6 +516,7 @@ else
             # not have is the patch's doing.
             comm -23 "$START_LOG.errors" "$CONTROL_LOG.errors" > "$START_LOG.new"
             if [[ ! -s "$START_LOG.new" ]]; then
+                DECLARED_LOSSES="none"
                 pass "starts: the system comes up with the patch applied, and reports no unreachable peer the unpatched system does not report too"
             else
                 NEW_ERRORS="$(tr '\n' '; ' < "$START_LOG.new")"
@@ -476,8 +555,10 @@ else
                 done
 
                 if [[ -n "${UNDECLARED// /}" ]]; then
+                    DECLARED_LOSSES="$(printf '%s ' $NEW_SERVICES)(not declared:${UNDECLARED})"
                     fail "starts" "the system comes up, but${UNDECLARED} cannot reach a peer it reaches unpatched and REFACTORING-NOTES.md does not mention it: $NEW_ERRORS see $START_LOG.settled"
                 else
+                    DECLARED_LOSSES="$(printf '%s ' $NEW_SERVICES)(declared)"
                     pass "starts: the system comes up, and every peer it can no longer reach ($(printf '%s ' $NEW_SERVICES)) is declared in REFACTORING-NOTES.md"
                 fi
             fi
@@ -485,22 +566,44 @@ else
     fi
 fi
 
+COVERAGE_LOST="$(coverage_lost "$PATCH")"
+
 git -C "$SOURCE" worktree remove --force "$WORK" > /dev/null 2>&1
 git -C "$SOURCE" worktree prune > /dev/null 2>&1
 
+echo
+echo "  declared losses: $DECLARED_LOSSES"
+echo "  test coverage lost: $COVERAGE_LOST"
+
 # ---------------------------------------------------------------- the verdict
 echo
-# "GATES PASSED", not "VERIFIED". The gates measure what they measure: the
-# build, this smell's findings for the addressed cause, and that the system
-# comes up. A proposal can clear all four and still leave a deployment path
-# inconsistent, break a component nobody reconstructed, or introduce a
-# different smell of the catalogue - all three happened in this work. The old
-# label claimed the larger thing, so it was renamed rather than qualified.
-VERDICT="GATES PASSED"
+# Four words, and none of them is "verified". The gates measure what they
+# measure: the build, this smell's findings for the addressed cause, and that
+# the system comes up. A proposal can clear all four and still leave a
+# deployment path inconsistent, break a component nobody reconstructed, or
+# introduce a different smell of the catalogue - all three happened in this
+# work.
+#
+#   REPAIR COMPLETE  every gate passed and no peer was lost
+#   REPAIR PARTIAL   every gate passed, but a peer is gone and was declared
+#   GATE FAILED      a gate failed
+#   NOT MEASURED     a gate was skipped, which is not a gate that passed
+#
+# REPAIR PARTIAL exists because the declared-loss rule was swallowing a
+# difference that matters. The rule stops gate 4 failing every correct patch,
+# and that is right; but it also made a patch that breaks the monitoring
+# scrape and says so read exactly like a patch that breaks nothing. Declaring
+# a loss is what keeps it from being a failure. It is not what makes the
+# repair complete, and the verdict now says which of the two happened.
+VERDICT="REPAIR COMPLETE"
 if (( ${#FAILED[@]} > 0 )); then
     VERDICT="GATE FAILED"
 elif (( ${#SKIPPED[@]} > 0 )); then
-    VERDICT="PARTIAL"
+    VERDICT="NOT MEASURED"
+elif [[ "$DECLARED_LOSSES" != "none" && "$DECLARED_LOSSES" != "not measured" ]]; then
+    # Every gate passed and a peer is gone. Declaring it is what keeps this from
+    # being a failure; it is not what makes the repair complete.
+    VERDICT="REPAIR PARTIAL"
 fi
 echo "$VERDICT — ${#PASSED[@]} passed, ${#FAILED[@]} failed, ${#SKIPPED[@]} skipped"
 
@@ -514,17 +617,30 @@ echo "$VERDICT — ${#PASSED[@]} passed, ${#FAILED[@]} failed, ${#SKIPPED[@]} sk
     echo "right one - but the claim that model-level input bounds a refactoring"
     echo "is a claim about extent, so it is counted rather than recalled."
     echo
+    echo "Declared losses: $DECLARED_LOSSES. A peer this patch can no longer"
+    echo "reach, as the start gate measured it against the unpatched system."
+    echo "Reported rather than folded into the verdict, because a patch that"
+    echo "loses a monitoring scrape and declares it is not the same result as"
+    echo "one that loses nothing, and both pass the four gates."
+    echo
+    echo "Test coverage lost: $COVERAGE_LOST. Read from REFACTORING-NOTES.md,"
+    echo "not detected - a proposal that declares nothing reads \"none"
+    echo "declared\", which is a statement about the notes."
+    echo
     for entry in "${PASSED[@]:-}";  do [[ -n "$entry" ]] && echo "- PASS $entry"; done
     for entry in "${FAILED[@]:-}";  do [[ -n "$entry" ]] && echo "- FAIL $entry"; done
     for entry in "${SKIPPED[@]:-}"; do [[ -n "$entry" ]] && echo "- SKIP $entry"; done
     echo
-    echo "A skipped gate is not a passed one: PARTIAL means the refactoring has"
-    echo "not been shown to resolve the smell, only that nothing checked"
-    echo "contradicts it. GATES PASSED means every gate passed, which is not"
-    echo "the same as the application being secure: the gates cover this smell"
-    echo "and this deployment only."
+    echo "A skipped gate is not a passed one: NOT MEASURED means the"
+    echo "refactoring has not been shown to resolve the smell, only that"
+    echo "nothing checked contradicts it. REPAIR PARTIAL means every gate"
+    echo "passed and a peer is nevertheless gone, declared in the notes."
+    echo "REPAIR COMPLETE means every gate passed and nothing was lost, which"
+    echo "is still not the same as the application being secure: the gates"
+    echo "cover this smell, this deployment and the declared scope only."
 } >> "$PROPOSAL/verification.md"
 
 (( ${#FAILED[@]} == 0 )) || exit 1
 (( ${#SKIPPED[@]} == 0 )) || exit 3
+[[ "$VERDICT" == "REPAIR PARTIAL" ]] && exit 4
 exit 0

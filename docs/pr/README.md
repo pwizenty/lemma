@@ -38,6 +38,27 @@ their own diffs stay free of files describing themselves.
 | `fix-temurin-operation-environments.md` | `fix/temurin-operation-environments` | `dev` |
 | `feat-smell-refactoring-preference-page.md` | `feat/smell-refactoring-preference-page` | `dev` |
 | `feat-review-and-apply-a-proposal.md` | `feat/review-and-apply-a-proposal` | `dev` |
+| `feat-node-communication-aspects.md` | `feat/node-communication-aspects` | `feat/review-and-apply-a-proposal` |
+| `feat-judge-node-channels.md` | `feat/judge-node-channels` | `feat/node-communication-aspects` |
+| `feat-detection-coverage-report.md` | `feat/detection-coverage-report` | `feat/judge-node-channels` |
+
+The last four are a **stack**, each branch containing the commits of the one
+above it, so they merge in the order listed and nothing else:
+
+```text
+dev
+└── feat/review-and-apply-a-proposal      review and apply, from the editor
+    └── feat/node-communication-aspects   the two aspects a technology model has to declare
+        └── feat/judge-node-channels      the detector judges them: 9 findings -> 11
+            └── feat/detection-coverage-report  where its view ends, and four verdicts
+```
+
+Reviewing them in that order is also how the numbers read as a sequence: the
+finding count of Lakeside Mutual is 9 before the stack, 9 after the aspects are
+declared, 11 once they are judged, and 11 with the coverage question answered
+beside them. `feat/node-communication-aspects` needs MRF's
+`feat/node-transport-evidence` merged beside it, because the facts it declares a
+vocabulary for are produced there.
 
 Merge order matters for `feat/communication-aspect`: it contains the commits of
 `feat/rest-technology-information`, so that branch goes first. Most also need
