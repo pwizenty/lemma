@@ -121,7 +121,7 @@ saying so - shows up here.
 `riskmanagement.proto` with
 
 ```
-uv run mrf -p Protobuf -t <LakesideMutual>
+uv run mrf -p Protobuf Node -t <LakesideMutual>
 ```
 
 The one component of that system written in Node rather than Java, and the only
@@ -138,8 +138,30 @@ import datatypes from "../domain/RiskManagement.data" as RiskManagement
     );
 ```
 
-Two things about it are deliberate and worth knowing before a difference here is
-read as a regression.
+**It carries the two communication facts of a Node service**, since the Node
+plugin joined the selection:
+
+```
+@javaWithSpring::_aspects.GrpcServer(host = "0.0.0.0", port = "50051", transportSecurity = "plaintext")
+@javaWithSpring::_aspects.MessageQueue(broker = "activemq", host = "localhost", port = "61613", queue = "newpolicies", scheme = "stomp", credentialsConfigured = "true", transportSecurity = "plaintext")
+```
+
+That is the pair the smell detection was blind to. The facts were reconstructed
+before, and `spring.technology` declared no aspect for either, so the generator
+dropped them and this service appeared in the models with no communication fact
+at all - which is how a plaintext gRPC endpoint and a plaintext queue consumer
+stayed out of every report.
+
+`transportSecurity` is read from `index.js`, by the name of the call that opens
+the channel, so the fixture also guards that: a service that binds with
+`createInsecure` says `plaintext`, and one that binds with `createSsl` says
+`tls` and, where the third argument requires a client certificate, carries
+`clientAuth = "need"` as well. `valueSource` is reconstructed and **not**
+generated, as with `ServerEndpoint`: the recorded path is absolute for a real
+run, and a generated model has to be the same on every machine.
+
+Two further things about it are deliberate and worth knowing before a difference
+here is read as a regression.
 
 **The interface carries no `@endpoints`.** A gRPC service is addressed by its
 qualified name, and the reconstruction reports that address under a name of its

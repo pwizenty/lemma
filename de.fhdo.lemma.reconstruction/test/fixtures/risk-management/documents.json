@@ -91,6 +91,28 @@
         {
           "name": "functional",
           "values": {}
+        },
+        {
+          "name": "GrpcServer",
+          "values": {
+            "host": "0.0.0.0",
+            "port": "50051",
+            "transportSecurity": "plaintext",
+            "valueSource": "risk-management-server/index.js"
+          }
+        },
+        {
+          "name": "MessageQueue",
+          "values": {
+            "host": "localhost",
+            "port": "61613",
+            "broker": "activemq",
+            "queue": "newpolicies",
+            "scheme": "stomp",
+            "credentialsConfigured": "true",
+            "transportSecurity": "plaintext",
+            "valueSource": "risk-management-server/index.js"
+          }
         }
       ],
       "interfaces": [
