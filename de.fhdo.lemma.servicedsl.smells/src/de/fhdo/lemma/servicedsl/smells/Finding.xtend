@@ -117,6 +117,19 @@ class DetectionResult {
     @Accessors
     val List<String> notMutual = newLinkedList
 
+    /**
+     * Services that carry no fact about any channel of theirs.
+     *
+     * Not channels, and deliberately not undecided either: an undecided channel
+     * was seen and could not be judged, while these services were not even
+     * looked at, because nothing in the models says they communicate at all.
+     * Reported so that the gap is visible in the artifact rather than only to
+     * whoever reads the sources. Lakeside Mutual's Risk Management server stood
+     * here while its two channels went unjudged.
+     */
+    @Accessors
+    val List<String> unjudged = newLinkedList
+
     @Accessors
     val List<String> problems = newLinkedList
 

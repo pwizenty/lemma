@@ -33,13 +33,14 @@ class SmellReport {
             | Channels judged protected | «result.secured.size» |
             | Channels encrypted but not mutually authenticated | «result.notMutual.size» |
             | Channels that could not be judged | «result.undecided.size» |
+            | Services with no fact about a channel | «result.unjudged.size» |
 
             ## «NonSecuredCommunicationDetector.SMELL»
 
             «NonSecuredCommunicationDetector.REFERENCE». The smell holds whenever two microservices interact without a secure channel, *even if they are within the same network*. Suggested refactoring: **«NonSecuredCommunicationDetector.REFACTORING»** — mutual rather than plain TLS, because it also authenticates the peers.
 
             «IF result.findings.empty»
-                No finding.«IF !result.undecided.empty» That is not the same as a system without the smell: «result.undecided.size» channel(s) below could not be judged.«ENDIF»
+                No finding.«IF !result.undecided.empty» That is not the same as a system without the smell: «result.undecided.size» channel(s) below could not be judged.«ENDIF»«IF !result.unjudged.empty» «result.unjudged.size» service(s) carry no fact about any channel of theirs, so they were not judged at all.«ENDIF»
 
             «ELSE»
                 «FOR finding : result.findings»
@@ -97,6 +98,16 @@ class SmellReport {
                 The facts in the models do not settle these. Reported rather than counted as protected, so a system that does not smell and a system whose facts were not reconstructed do not look alike.
 
                 «FOR entry : result.undecided»
+                    - «entry»
+                «ENDFOR»
+
+            «ENDIF»
+            «IF !result.unjudged.empty»
+                ## Not judged at all
+
+                These services carry no fact about any channel of theirs, so nothing above is about them. That is a gap in what was reconstructed, not a statement that they communicate securely or that they communicate at all — and a channel nobody can see is a channel no verification can measure.
+
+                «FOR entry : result.unjudged»
                     - «entry»
                 «ENDFOR»
 

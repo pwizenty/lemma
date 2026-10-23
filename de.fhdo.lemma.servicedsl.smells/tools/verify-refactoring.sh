@@ -12,7 +12,16 @@
 #              generated
 #   3. smell   the addressed root cause has no finding left, and the total
 #              count fell, both against a baseline taken before
-#   4. starts  the system still comes up
+#   4. starts  the system still comes up, and every peer a service can no
+#              longer reach is one the unpatched system cannot reach either or
+#              one REFACTORING-NOTES.md declares
+#
+# Gate 4 does not decide which lost channel is acceptable, because it cannot:
+# mutual TLS on a service's actuator endpoints does stop an admin server that
+# holds no client certificate from scraping them, and every proposal of this
+# work does that. It decides whether the loss was declared - the prompt already
+# requires a proposal to write down what its patch gives up, and this is where
+# that is checked rather than trusted.
 #
 # Gate 1 and gate 2 are deliberately separate. A patch whose tests read a key
 # store from disk passes the second and fails the first, which is exactly what
@@ -44,6 +53,11 @@
 # Environment:
 #   LEMMA_ECLIPSE   Eclipse installation the LEMMA tools take their classpath
 #                   from (see detect-smells.sh)
+#   LEMMA_SETTLE_SECONDS
+#                   How long the start gate lets the stack settle before it
+#                   reads the logs for unreachable peers (default: 25). Long
+#                   enough that a client retrying its way through a starting
+#                   broker has finished retrying; a slower machine wants more.
 set -uo pipefail
 
 BUNDLE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -133,7 +147,57 @@ build_all() {
     return $failures
 }
 
+# Generate the key material a tree needs, if the tree says how.
+#
+# Mutual TLS needs a key store per peer, and a patch that does it properly ships
+# the script that makes them - the proposals of this work all did, under three
+# different names and at two different depths. Hence two levels rather than one:
+# the one that shipped scripts/generate-certificates.sh was found by nothing,
+# its system could not come up for want of a key, and the gate blamed the patch
+# for the tool's lookup.
+#
+# Used for the patched tree and for the control, because the control needs it as
+# much. Its base may be a commit that already requires certificates, and that
+# base run without them is not its own baseline: rc3's base is rc1 applied, and
+# without key material its Customer Core never registers with the admin server,
+# so the control logged none of the TLS errors rc1 causes and rc3 was charged
+# with them.
+#
+# Returns NO_MATERIAL when the tree says nothing about key material, so a caller
+# can tell "generated" from "there was nothing to generate".
+NO_MATERIAL=250
+
+generate_material() {
+    local tree="$1" command=""
+    if [[ -n "$CERTS" ]]; then
+        command="$CERTS"
+    else
+        local generator
+        generator="$(find "$tree" -maxdepth 2 \
+            \( -name 'generate*certificate*' -o -name 'generate*certs*' \) \
+            -not -path '*/.git/*' 2>/dev/null | sort | head -1)"
+        [[ -n "$generator" ]] && command="bash '$generator'"
+    fi
+    [[ -z "$command" ]] && return $NO_MATERIAL
+    (cd "$tree" && bash -c "$command") > /dev/null 2>&1
+}
+
 echo "Verifying $(basename "$PROPOSAL")"
+echo
+
+# How much the patch changes.
+#
+# Not a gate: there is no number of files that is right, and a smaller patch is
+# not a better one. It is measured because the claim that model-level input
+# bounds a refactoring is a claim about extent, and a claim about extent that
+# nobody counts is an anecdote. The one unguided run of this work changed 38
+# files where the guided ones changed 33 between them, which is the kind of
+# difference this line exists to make visible per proposal.
+PATCH_FILES="$(grep -c '^diff --git ' "$PROPOSAL/patch.diff" 2>/dev/null || true)"
+PATCH_ADDED="$(grep -c '^+[^+]' "$PROPOSAL/patch.diff" 2>/dev/null || true)"
+PATCH_REMOVED="$(grep -c '^-[^-]' "$PROPOSAL/patch.diff" 2>/dev/null || true)"
+EXTENT="${PATCH_FILES:-0} file(s), +${PATCH_ADDED:-0}/-${PATCH_REMOVED:-0} line(s)"
+echo "  extent: $EXTENT"
 echo
 
 # ---------------------------------------------------------------- gate 3 (before)
@@ -206,22 +270,13 @@ if git -C "$SOURCE" worktree add --detach "$WORK" "$BASE" > /dev/null 2>&1 \
     git -C "$WORK" checkout -q -b "$BRANCH" 2>/dev/null || true
 
     # Without key material this gate is gate 1 again, so it has to either
-    # generate the material or admit it measured nothing. Mutual TLS needs a
-    # key store per peer, and a patch that does it properly ships the script
-    # that makes them - rc1 and rc2 both did, under slightly different names.
-    MATERIAL=""
-    if [[ -n "$CERTS" ]]; then
-        MATERIAL="$CERTS"
-    else
-        GENERATOR="$(find "$WORK" -maxdepth 1 -name 'generate*certificate*' -o \
-                     -maxdepth 1 -name 'generate*certs*' | head -1)"
-        [[ -n "$GENERATOR" ]] && MATERIAL="bash '$GENERATOR'"
-    fi
+    # generate the material or admit it measured nothing.
+    generate_material "$WORK"; MATERIAL_STATUS=$?
 
-    if [[ -z "$MATERIAL" ]]; then
+    if (( MATERIAL_STATUS == NO_MATERIAL )); then
         skip "inplace" "no key-material command and none found in the patch, so this would only repeat the clean gate"
     else
-        if ! (cd "$WORK" && bash -c "$MATERIAL") > /dev/null 2>&1; then
+        if (( MATERIAL_STATUS != 0 )); then
             fail "inplace" "the key-material command failed, so the patch cannot be built at all"
         else
             WORK_LOG="$(mktemp -t lemma-work-build)"
@@ -275,6 +330,68 @@ else
 fi
 
 # ---------------------------------------------------------------- gate 4: starts
+#
+# Coming up is not the same as working. A compose stack reports every container
+# as up while a client inside it fails every connection attempt: that is what
+# the Node consumer of Lakeside Mutual did when the broker's connector moved to
+# TLS and its own configuration had not, and no gate saw it. So this gate waits
+# for the stack to settle and then reads the logs for a peer that cannot be
+# reached - and, because a sample system may log such errors unpatched as well,
+# it compares against the base before blaming the patch.
+SETTLE_SECONDS="${LEMMA_SETTLE_SECONDS:-25}"
+
+# Errors that mean one service could not reach another. Chosen to be about the
+# channel and nothing else: a failed health check is already the --wait gate's
+# business, and an application error that has nothing to do with a peer must not
+# fail this one.
+CHANNEL_ERRORS="ECONNREFUSED|ECONNRESET|EPROTO|Connection refused\
+|Connection error to|Connection reset|UnknownHostException|ConnectException\
+|SSLHandshakeException|SSLException|certificate_unknown|handshake_failure\
+|unable to find valid certification path|bad_certificate|tlsv1 alert"
+
+# Bring a tree up, let it settle, and report what it says.
+#
+# Writes the log, sets CHANNEL_FAILURES to the distinct errors found after the
+# settle period, and returns non-zero when the stack did not come up at all.
+# Only what is logged *after* settling counts: a client that retries its way
+# through a starting broker logs a refused connection and then works, and
+# failing that would make this gate punish a healthy system for booting in an
+# order nobody fixed.
+compose_up_and_settle() {
+    local tree="$1" log="$2" up=0
+
+    # The same material the inplace gate needs. In the patched tree it has
+    # usually been generated already and generating it again is harmless; in the
+    # control it is what makes the comparison fair.
+    generate_material "$tree"
+
+    # --build matters: the compose file names published images as well as build
+    # contexts, so without it a stale image would be started and the gate would
+    # report on code the patch never touched.
+    if (cd "$tree" && docker compose up -d --build --wait) > "$log" 2>&1; then
+        up=1
+        # No `timeout` on macOS, and nothing to wait for but time: the point is
+        # to let whatever retries finish retrying.
+        sleep "$SETTLE_SECONDS"
+        (cd "$tree" && docker compose logs --since "${SETTLE_SECONDS}s") \
+            > "$log.settled" 2>&1
+        # One kind per line, in a file: several of these contain spaces, and a
+        # space-separated variable cannot hold "unable to find valid
+        # certification path" as one item.
+        grep -oE "$CHANNEL_ERRORS" "$log.settled" | sort -u > "$log.errors"
+        CHANNEL_FAILURES="$(tr '\n' '; ' < "$log.errors")"
+    else
+        # Which services are unhealthy is the whole value of this gate, so it
+        # is captured before the stack is torn down.
+        (cd "$tree" && docker compose ps -a) >> "$log" 2>&1
+        (cd "$tree" && docker compose logs --tail 40) >> "$log" 2>&1
+        : > "$log.errors"
+        CHANNEL_FAILURES=""
+    fi
+    (cd "$tree" && docker compose down -v) >> "$log" 2>&1
+    return $(( 1 - up ))
+}
+
 if [[ "$SKIP_START" == 1 ]]; then
     skip "starts" "asked to skip"
 elif [[ ! -f "$WORK/docker-compose.yml" ]]; then
@@ -282,37 +399,27 @@ elif [[ ! -f "$WORK/docker-compose.yml" ]]; then
 elif ! command -v docker > /dev/null 2>&1; then
     skip "starts" "docker is not available"
 else
-    # --build matters: the compose file names published images as well as build
-    # contexts, so without it a stale image would be started and the gate would
-    # report on code the patch never touched.
     START_LOG="$(mktemp -t lemma-start)"
-    if (cd "$WORK" && docker compose up -d --build --wait) > "$START_LOG" 2>&1; then
-        pass "starts: the system comes up with the patch applied"
-        (cd "$WORK" && docker compose down -v) >> "$START_LOG" 2>&1
-    else
-        # Which services are unhealthy is the whole value of this gate, so it
-        # is captured before the stack is torn down.
-        (cd "$WORK" && docker compose ps -a) >> "$START_LOG" 2>&1
-        (cd "$WORK" && docker compose logs --tail 40) >> "$START_LOG" 2>&1
-        UNHEALTHY="$(grep -oE "(container|service) \"?[a-z0-9_-]+\"? is unhealthy" "$START_LOG" \
-            | head -3 | tr '\n' ' ')"
-        (cd "$WORK" && docker compose down -v) >> "$START_LOG" 2>&1
+    PATCHED_UP=1
+    compose_up_and_settle "$WORK" "$START_LOG" || PATCHED_UP=0
+    PATCHED_ERRORS="$CHANNEL_FAILURES"
+    UNHEALTHY="$(grep -oE "(container|service) \"?[a-z0-9_-]+\"? is unhealthy" "$START_LOG" \
+        | head -3 | tr '\n' ' ')"
 
+    if [[ "$PATCHED_UP" == 1 && -z "$PATCHED_ERRORS" ]]; then
+        pass "starts: the system comes up with the patch applied and no service reports an unreachable peer"
+    else
         # This gate needs a baseline as much as the smell gate does. A sample
-        # system whose base image has been withdrawn from the registry, or whose
-        # build is broken for any other reason of its own, does not come up
-        # patched or unpatched - and blaming the patch for that is a false
-        # finding. The control runs only on failure, because it costs a second
-        # full build.
+        # system whose base image has been withdrawn from the registry, or which
+        # logs a refused connection of its own, does not come up clean patched
+        # or unpatched - and blaming the patch for that is a false finding. The
+        # control runs only on failure, because it costs a second full build.
         CONTROL="$(mktemp -d -t lemma-control)"; rm -rf "$CONTROL"
         CONTROL_LOG="$(mktemp -t lemma-control)"
         CONTROL_STARTS=1
+        : > "$CONTROL_LOG.errors"
         if git -C "$SOURCE" worktree add --detach "$CONTROL" "$BASE" > /dev/null 2>&1; then
-            if ! (cd "$CONTROL" && docker compose up -d --build --wait) \
-                > "$CONTROL_LOG" 2>&1; then
-                CONTROL_STARTS=0
-            fi
-            (cd "$CONTROL" && docker compose down -v) >> "$CONTROL_LOG" 2>&1
+            compose_up_and_settle "$CONTROL" "$CONTROL_LOG" || CONTROL_STARTS=0
             git -C "$SOURCE" worktree remove --force "$CONTROL" > /dev/null 2>&1
         fi
 
@@ -320,8 +427,60 @@ else
             WHY="$(grep -oE "[^ ]+: not found|failed to solve: [^ ]+" "$CONTROL_LOG" \
                 | head -1)"
             skip "starts" "the system does not come up unpatched either${WHY:+ ($WHY)}, so this gate cannot attribute anything to the patch; see $CONTROL_LOG"
-        else
+        elif [[ "$PATCHED_UP" == 0 ]]; then
             fail "starts" "the system does not come up with the patch applied, though it does unpatched: ${UNHEALTHY:+$UNHEALTHY, }see $START_LOG"
+        else
+            # What is new is what can be attributed. A sample system logs errors
+            # of its own - this one's Node consumer cannot reach the broker's
+            # STOMP port in either tree - and a gate that gave up as soon as the
+            # base logged anything would be silenced by that forever. So the
+            # kinds of error are compared as sets, and only a kind the base does
+            # not have is the patch's doing.
+            comm -23 "$START_LOG.errors" "$CONTROL_LOG.errors" > "$START_LOG.new"
+            if [[ ! -s "$START_LOG.new" ]]; then
+                pass "starts: the system comes up with the patch applied, and reports no unreachable peer the unpatched system does not report too"
+            else
+                NEW_ERRORS="$(tr '\n' '; ' < "$START_LOG.new")"
+                # Compose prefixes every line with the service it came from.
+                NEW_SERVICES="$(grep -F -f "$START_LOG.new" "$START_LOG.settled" 2>/dev/null \
+                    | sed -E 's/^([a-z0-9_-]+)[ ]*\|.*/\1/' | sort -u)"
+
+                # A lost channel is not automatically a defect, and this gate
+                # cannot decide which losses are acceptable: mutual TLS on a
+                # service's actuator endpoints does stop an admin server that
+                # holds no client certificate from scraping them, and all three
+                # proposals of this work do exactly that. What the gate can
+                # insist on is that the loss was declared. The prompt already
+                # requires a proposal to write down what its patch gives up;
+                # this is where that requirement is checked rather than trusted,
+                # so an undeclared broken channel fails and a declared one is
+                # reported and left to whoever reads the record.
+                # Compared with the punctuation and the case removed from
+                # both sides: the notes call it "Spring Boot Admin" and
+                # "spring.boot.admin.client.url" where the compose file calls it
+                # spring-boot-admin, and a literal search would have called
+                # every one of those undeclared.
+                NOTES="$(tr -cd '[:alnum:]' < "$WORK/REFACTORING-NOTES.md" 2>/dev/null \
+                    | tr '[:upper:]' '[:lower:]')"
+                UNDECLARED=""
+                for service in $NEW_SERVICES; do
+                    # The service's name as the compose file gives it: the log
+                    # prefix is <service>-<replica>.
+                    bare="${service%-[0-9]}"
+                    key="$(printf '%s' "$bare" | tr -cd '[:alnum:]' \
+                        | tr '[:upper:]' '[:lower:]')"
+                    case "$NOTES" in
+                        *"$key"*) ;;
+                        *) UNDECLARED="$UNDECLARED $bare" ;;
+                    esac
+                done
+
+                if [[ -n "${UNDECLARED// /}" ]]; then
+                    fail "starts" "the system comes up, but${UNDECLARED} cannot reach a peer it reaches unpatched and REFACTORING-NOTES.md does not mention it: $NEW_ERRORS see $START_LOG.settled"
+                else
+                    pass "starts: the system comes up, and every peer it can no longer reach ($(printf '%s ' $NEW_SERVICES)) is declared in REFACTORING-NOTES.md"
+                fi
+            fi
         fi
     fi
 fi
@@ -350,6 +509,10 @@ echo "$VERDICT — ${#PASSED[@]} passed, ${#FAILED[@]} failed, ${#SKIPPED[@]} sk
     echo "## Verification, $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
     echo
     echo "**$VERDICT** — ${#PASSED[@]} passed, ${#FAILED[@]} failed, ${#SKIPPED[@]} skipped."
+    echo
+    echo "Extent of the patch: $EXTENT. Not a gate - no number of files is the"
+    echo "right one - but the claim that model-level input bounds a refactoring"
+    echo "is a claim about extent, so it is counted rather than recalled."
     echo
     for entry in "${PASSED[@]:-}";  do [[ -n "$entry" ]] && echo "- PASS $entry"; done
     for entry in "${FAILED[@]:-}";  do [[ -n "$entry" ]] && echo "- FAIL $entry"; done
