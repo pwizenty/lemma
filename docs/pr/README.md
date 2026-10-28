@@ -1,6 +1,7 @@
 # Pull request bodies
 
-One file per feature branch, named after it. Written when the branch was ready
+One file per feature branch, named after it, and one for the release of
+`dev` into `main`. Written when the branch was ready
 and kept so the text survives the session it was written in.
 
 They are a record of what a change claimed and what it was verified against, so
@@ -41,6 +42,7 @@ their own diffs stay free of files describing themselves.
 | `feat-node-communication-aspects.md` | `feat/node-communication-aspects` | `feat/review-and-apply-a-proposal` |
 | `feat-judge-node-channels.md` | `feat/judge-node-channels` | `feat/node-communication-aspects` |
 | `feat-detection-coverage-report.md` | `feat/detection-coverage-report` | `feat/judge-node-channels` |
+| `dev-to-main-release.md` | `dev` | `main` |
 
 The last four are a **stack**, each branch containing the commits of the one
 above it, so they merge in the order listed and nothing else:
